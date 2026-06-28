@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=Montserrat:wght@600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --background: #06060c;
+  --foreground: #f4f4f7;
+  
+  --primary: #16a34a;
+  --primary-hover: #15803d;
+  --primary-foreground: #ffffff;
+
+  --accent: #ef7c1e;
+  --accent-foreground: #ffffff;
+
+  /* Brand wordmark colors (adaptive per theme) */
+  --brand-green: #2fac66;
+  --brand-orange: #ef7c1e;
+
+  --card-bg: rgba(13, 13, 23, 0.6);
+  --card-border: rgba(255, 255, 255, 0.06);
+
+  --glass-bg: rgba(13, 13, 23, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-shadow: rgba(0, 0, 0, 0.4);
+  --scrollbar-track: #06060c;
+  --scrollbar-thumb: #14532d;
+  --scrollbar-thumb-hover: #166534;
+  --footer-bg: rgba(0,0,0,0.6);
+}
+
+/* ── Light Mode ── */
+.light {
+  color-scheme: light;
+  --background: #f3f4f8;
+  --foreground: #12121a;
+  
+  --primary: #16a34a;
+  --primary-hover: #15803d;
+  --primary-foreground: #ffffff;
+
+  --accent: #ef7c1e;
+  --accent-foreground: #ffffff;
+
+  --brand-green: #158f51;
+  --brand-orange: #ef7c1e;
+
+  --card-bg: rgba(255, 255, 255, 0.75);
+  --card-border: rgba(22, 163, 74, 0.14);
+
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(22, 163, 74, 0.16);
+  --glass-shadow: rgba(22, 163, 74, 0.10);
+  --scrollbar-track: #e8efe9;
+  --scrollbar-thumb: #86efac;
+  --scrollbar-thumb-hover: #4ade80;
+  --footer-bg: rgba(238,244,239,0.95);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Premium Styles & Utilities */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 var(--glass-shadow);
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.glass-panel-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-panel-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(34, 197, 94, 0.30);
+  box-shadow: 0 12px 40px 0 rgba(34, 197, 94, 0.18);
+}
+
+.dark .glass-panel-hover:hover {
+  background: rgba(18, 18, 32, 0.85);
+}
+.light .glass-panel-hover:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #158f51 0%, #2fac66 45%, #ef7c1e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-btn {
+  background: linear-gradient(135deg, #16a34a 0%, #2fac66 45%, #ef7c1e 100%);
+  background-size: 200% auto;
+  transition: 0.5s;
+}
+.gradient-btn:hover {
+  background-position: right center;
+  box-shadow: 0 0 25px rgba(239, 124, 30, 0.4);
+}
+
+/* Brand wordmark (logo) */
+.brand-font { font-family: 'Montserrat', 'Outfit', sans-serif; }
+.brand-green { color: var(--brand-green); }
+.brand-orange { color: var(--brand-orange); }
+
+/* Native <select> dropdown list — force solid, theme-aware colors.
+   Translucent select backgrounds make the open option list render
+   white with light text (unreadable), so we set options explicitly. */
+select option {
+  background-color: #ffffff;
+  color: #14141f;
+}
+.dark select option {
+  background-color: #14141c;
+  color: #f4f4f7;
+}
+
+/* Ambient glow blobs */
+.glow-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.light .glow-blob {
+  opacity: 0.08;
+}
+
+/* Animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.12;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(1.1);
+  }
+}
+
+.animated-glow-1 {
+  animation: pulseGlow 10s infinite ease-in-out;
+}
+.animated-glow-2 {
+  animation: pulseGlow 14s infinite ease-in-out reverse;
+}
+
+
+/* Footer follows the theme (light surface in light mode) */
+.site-footer {
+  background: var(--footer-bg);
+  transition: background-color 0.4s ease;
+}
+
+/* ──────────────────────────────────────────────────────────
+   LIGHT MODE — readability overrides
+   The UI was authored dark-first with hardcoded utility colors
+   (text-white / text-gray-*). On light surfaces these become
+   invisible or too faint, so we remap them to legible values,
+   then re-assert light text on colored / dark surfaces.
+   Source order matters: remaps first, exceptions last (equal
+   specificity → later rule wins).
+   ────────────────────────────────────────────────────────── */
+
+/* Base text on light surfaces */
+.light .glass-panel { color: var(--foreground); }
+
+.light .text-white    { color: #14141f !important; }
+.light .text-gray-200 { color: #1f2533 !important; }
+.light .text-gray-300 { color: #2b3342 !important; }
+.light .text-gray-400 { color: #4a5263 !important; }
+.light .text-gray-500 { color: #5d6678 !important; }
+.light .text-gray-600 { color: #717a8c !important; }
+
+/* Faint accent text → richer shades for contrast on light surfaces */
+.light .text-emerald-300 { color: #047857 !important; }
+.light .text-orange-300 { color: #c2410c !important; }
+
+/* Keep white text on the gradient buttons */
+.light .gradient-btn,
+.light .gradient-btn .text-white,
+.light .gradient-btn .text-gray-200,
+.light .gradient-btn .text-gray-300,
+.light .gradient-btn .text-gray-400 { color: #ffffff !important; }
+
+/* Keep white text on solid colored badges / pills */
+.light .bg-orange-600,
+.light .bg-emerald-600,
+.light .bg-orange-600 .text-white,
+.light .bg-emerald-600 .text-white { color: #ffffff !important; }
+
+/* Keep light text on intentionally dark translucent surfaces
+   (status chips, code boxes, dark inputs). Element-level only so
+   the modal scrim's light glass panel content is not affected. */
+.light [class*="bg-black/"] { color: #e8e9ee !important; }
+/* …including their accent children (e.g. the "Copier" chip on the dark code box) */
+.light [class*="bg-black/"] .text-emerald-300,
+.light [class*="bg-black/"] .text-orange-300 { color: #fed7aa !important; }
