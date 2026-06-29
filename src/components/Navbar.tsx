@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Menu, X, Compass, Sparkles, Mail, Newspaper, LogOut } from "lucide-react";
+import { User, Menu, X, Compass, Sparkles, Mail, Newspaper, LogOut, LayoutDashboard, UserCog } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
@@ -89,8 +89,16 @@ export default function Navbar() {
           {loggedIn ? (
             <>
               <Link href={spaceHref} className={accountBtnClass}>
-                <User className="w-4 h-4" />
+                <LayoutDashboard className="w-4 h-4" />
                 <span className="hidden sm:inline">Mon espace</span>
+              </Link>
+              <Link
+                href="/profil"
+                aria-label="Mon profil"
+                title="Mon profil"
+                className="hidden md:flex items-center justify-center p-2.5 rounded-full text-gray-300 hover:text-white border border-white/10 hover:bg-white/5 transition-all"
+              >
+                <UserCog className="w-4 h-4" />
               </Link>
               <button
                 onClick={handleLogout}
@@ -155,13 +163,31 @@ export default function Navbar() {
               Contact
             </Link>
             {loggedIn && (
-              <button
-                onClick={handleLogout}
-                className="text-sm font-semibold text-rose-300 hover:text-rose-200 transition-colors flex items-center gap-2 py-2 border-t border-white/5 pt-4 w-full text-left"
-              >
-                <LogOut className="w-4.5 h-4.5" />
-                Déconnexion
-              </button>
+              <>
+                <Link
+                  href={spaceHref}
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-2 py-2 border-t border-white/5 pt-4"
+                >
+                  <LayoutDashboard className="w-4.5 h-4.5" />
+                  Mon espace
+                </Link>
+                <Link
+                  href="/profil"
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-2 py-2"
+                >
+                  <UserCog className="w-4.5 h-4.5" />
+                  Mon profil
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-sm font-semibold text-rose-300 hover:text-rose-200 transition-colors flex items-center gap-2 py-2 w-full text-left"
+                >
+                  <LogOut className="w-4.5 h-4.5" />
+                  Déconnexion
+                </button>
+              </>
             )}
           </nav>
         </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Sparkles, Loader2, GraduationCap, ArrowRight, Calendar, Award, PlayCircle } from "lucide-react";
+import { BookOpen, Sparkles, Loader2, GraduationCap, ArrowRight, Calendar, Award, PlayCircle, UserCog } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
 import { fetchMyPurchases, type Purchase } from "@/lib/purchases-db";
@@ -71,13 +71,22 @@ export default function MonEspacePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       {/* Header */}
-      <div className="mb-10">
-        <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
-          <GraduationCap className="w-4 h-4" />
-          Mon espace
-        </span>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-1">Mes formations & accompagnements</h1>
-        <p className="text-gray-400 mt-2">Retrouvez ici tout ce que vous avez acquis.</p>
+      <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+            <GraduationCap className="w-4 h-4" />
+            Mon espace
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-1">Mes formations & accompagnements</h1>
+          <p className="text-gray-400 mt-2">Retrouvez ici tout ce que vous avez acquis.</p>
+        </div>
+        <Link
+          href="/profil"
+          className="self-start sm:self-auto shrink-0 px-4 py-2.5 rounded-xl text-sm font-bold text-gray-300 hover:text-white glass-panel border-white/5 hover:border-white/20 transition-all inline-flex items-center gap-2"
+        >
+          <UserCog className="w-4 h-4" />
+          Mon profil
+        </Link>
       </div>
 
       {paymentSuccess && (
