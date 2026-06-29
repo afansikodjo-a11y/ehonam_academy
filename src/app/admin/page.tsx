@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Shield, Plus, Pencil, Trash2, LogOut, BookOpen, Eye, EyeOff,
-  Loader2, AlertCircle, X, Check,
+  Loader2, AlertCircle, X, Check, Video,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import {
@@ -573,18 +573,19 @@ export default function AdminPage() {
                                 <X className="w-4 h-4" />
                               </button>
                             </div>
-                            <div className="flex gap-2">
+                            <input
+                              className={`${inputClass} w-full sm:w-44`}
+                              value={l.duration}
+                              onChange={(e) => setLessonField(ci, li, "duration", e.target.value)}
+                              placeholder="Durée (ex : 10:00)"
+                            />
+                            <div className="flex items-center gap-2 rounded-xl bg-emerald-500/5 border border-emerald-500/25 px-3 py-2">
+                              <Video className="w-4 h-4 text-emerald-400 shrink-0" />
                               <input
-                                className={`${inputClass} w-28`}
-                                value={l.duration}
-                                onChange={(e) => setLessonField(ci, li, "duration", e.target.value)}
-                                placeholder="Durée (10:00)"
-                              />
-                              <input
-                                className={`${inputClass} flex-1`}
+                                className="w-full bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none"
                                 value={l.videoUrl || ""}
                                 onChange={(e) => setLessonField(ci, li, "videoUrl", e.target.value)}
-                                placeholder="Lien vidéo (YouTube ou Google Drive)"
+                                placeholder="Lien vidéo — YouTube ou Google Drive"
                               />
                             </div>
                           </div>
