@@ -48,6 +48,13 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
         if (!res.ok || !data.checkoutUrl) {
           throw new Error(data.error || "Le paiement n'a pas pu être initié.");
         }
+        // Mémorise l'ID du paiement pour le confirmer au retour (filet de
+        // sécurité indépendant du webhook).
+        if (data.paymentId) {
+          try {
+            localStorage.setItem("ea_pending_payment", String(data.paymentId));
+          } catch {}
+        }
         window.location.href = data.checkoutUrl; // → page de paiement Moneroo
       } catch (e: any) {
         if (active) setError(e.message || "Le paiement n'a pas pu être initié.");

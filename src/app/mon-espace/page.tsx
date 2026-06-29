@@ -16,6 +16,31 @@ function formatDate(iso: string): string {
   }
 }
 
+// Au retour de Moneroo : revérifie la transaction et enregistre l'achat
+// (filet de sécurité, indépendant du webhook).
+async function confirmReturnPayment(accessToken: string) {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const pid =
+      params.get("paymentId") ||
+      params.get("payment_id") ||
+      params.get("paymentID") ||
+      params.get("transaction_id") ||
+      params.get("id") ||
+      localStorage.getItem("ea_pending_payment") ||
+      "";
+    if (!pid) return;
+    await fetch("/api/confirm-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ paymentId: pid }),
+    });
+    localStorage.removeItem("ea_pending_payment");
+  } catch {
+    // silencieux : le webhook reste le filet de secours
+  }
+}
+
 export default function MonEspacePage() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
@@ -37,14 +62,20 @@ export default function MonEspacePage() {
       }
       setAuthed(true);
       setReady(true);
+
+      // Retour de paiement : on confirme la transaction AVANT d'afficher la liste.
+      const isReturn = new URLSearchParams(window.location.search).get("paiement") === "succes";
+      if (isReturn) {
+        setPaymentSuccess(true);
+        await confirmReturnPayment(data.session.access_token);
+      }
+
       setPurchases(await fetchMyPurchases());
       setLoading(false);
 
-      // Retour de paiement : le webhook peut arriver après la redirection,
-      // on recharge la liste quelques secondes plus tard.
-      if (new URLSearchParams(window.location.search).get("paiement") === "succes") {
-        setPaymentSuccess(true);
-        timer = setTimeout(async () => setPurchases(await fetchMyPurchases()), 4000);
+      // Filet de sécurité : le webhook peut aussi arriver un peu après.
+      if (isReturn) {
+        timer = setTimeout(async () => setPurchases(await fetchMyPurchases()), 5000);
       }
     });
     return () => clearTimeout(timer);

@@ -83,12 +83,13 @@ export async function POST(request: Request) {
 
     const data = await res.json().catch(() => ({}));
     const checkoutUrl = data?.data?.checkout_url;
+    const paymentId = data?.data?.id || "";
     if (!res.ok || !checkoutUrl) {
       console.error("[checkout] Moneroo init échec:", data);
       return NextResponse.json({ error: "Échec de l'initialisation du paiement." }, { status: 502 });
     }
 
-    return NextResponse.json({ checkoutUrl });
+    return NextResponse.json({ checkoutUrl, paymentId });
   } catch (err: any) {
     console.error("[checkout] exception:", err);
     return NextResponse.json({ error: "Erreur interne du serveur." }, { status: 500 });
