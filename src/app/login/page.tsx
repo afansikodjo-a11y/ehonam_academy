@@ -83,12 +83,12 @@ export default function LoginPage() {
       <div className="glass-panel p-8 rounded-3xl border-white/5 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1.5 gradient-btn"></div>
 
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center justify-center gap-2 mb-2">
           <LogIn className="w-5 h-5 text-emerald-400" />
           <span className="text-xs font-bold text-emerald-300 uppercase tracking-widest">Connexion</span>
         </div>
-        <h1 className="text-2xl font-extrabold text-white mb-1">Connectez-vous à votre compte</h1>
-        <p className="text-sm text-gray-400 mb-6">Un seul accès, quel que soit votre type de compte.</p>
+        <h1 className="text-2xl font-extrabold text-white mb-1 text-center">Connectez-vous à votre compte</h1>
+        <p className="text-sm text-gray-400 mb-6 text-center">Un seul accès, quel que soit votre type de compte.</p>
 
         {!isSupabaseConfigured ? (
           <div className="flex items-start gap-2 text-sm text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3">
