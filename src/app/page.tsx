@@ -10,6 +10,7 @@ import { fetchPublishedCoaching } from "@/lib/coaching-db";
 import { staticPosts as staticBlogPosts, formatPostDate, type BlogPost } from "@/lib/blog";
 import { fetchLivePosts } from "@/lib/blog-db";
 import CheckoutModal from "@/components/CheckoutModal";
+import Reveal from "@/components/Reveal";
 
 export default function HomePage() {
   const [selectedOffer, setSelectedOffer] = useState<CoachingOffer | null>(null);
@@ -31,19 +32,19 @@ export default function HomePage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-emerald-500/20 rounded-full filter blur-[100px] pointer-events-none"></div>
 
         {/* Main Heading */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
+        <h1 className="animate-fade-up text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
           Propulsez votre carrière,{" "}<br className="hidden sm:inline" />
           appréhendez votre{" "}
           <span className="gradient-text font-black">reconversion professionnelle</span>
         </h1>
 
         {/* Description */}
-        <p className="max-w-2xl mx-auto text-lg text-gray-400 mb-10 leading-relaxed">
+        <p className="animate-fade-up ad-1 max-w-2xl mx-auto text-lg text-gray-400 mb-10 leading-relaxed">
           Accédez à des formations et accompagnements qui vous outillent pour faire face aux grands changements de notre siècle.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="animate-fade-up ad-2 flex flex-col sm:flex-row items-center justify-center gap-4">
           <a href="#accompagnement" className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-white gradient-btn flex items-center justify-center gap-2 shadow-lg cursor-pointer">
             Découvrir l'accompagnement
             <ArrowRight className="w-5 h-5" />
@@ -97,7 +98,7 @@ export default function HomePage() {
 
       {/* Accompagnement Privé Section */}
       <section id="accompagnement" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 border-t border-white/5">
-        <div className="text-center max-w-2xl mx-auto mb-14">
+        <Reveal className="text-center max-w-2xl mx-auto mb-14">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-xs font-bold text-orange-300 mb-5">
             <Sparkles className="w-3.5 h-3.5" />
             Accompagnement privé
@@ -108,7 +109,7 @@ export default function HomePage() {
           <p className="text-gray-400">
             Au-delà des formations, bénéficiez d'un accompagnement personnalisé en visio, pensé pour votre projet et votre rythme.
           </p>
-        </div>
+        </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {offers.map((offer) => (
@@ -162,7 +163,7 @@ export default function HomePage() {
 
       {/* Courses Catalogue Grid */}
       <section id="courses" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+        <Reveal className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
               Explorez nos Formations Disponibles
@@ -174,7 +175,7 @@ export default function HomePage() {
           <span className="text-sm font-semibold text-orange-400 hover:text-orange-300 transition-colors flex items-center gap-1 mt-4 md:mt-0">
             {courses.length} cours actifs
           </span>
-        </div>
+        </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {courses.map((course) => (
@@ -326,9 +327,11 @@ export default function HomePage() {
 
       {/* Testimonials */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 border-t border-white/5 mt-10">
-        <h2 className="text-3xl font-extrabold text-white text-center mb-12">
-          Ils apprennent avec nous
-        </h2>
+        <Reveal>
+          <h2 className="text-3xl font-extrabold text-white text-center mb-12">
+            Ils apprennent avec nous
+          </h2>
+        </Reveal>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <div className="glass-panel p-7 rounded-xl border-white/5">
             <p className="text-gray-300 italic text-sm leading-relaxed mb-4">
@@ -365,7 +368,7 @@ export default function HomePage() {
       {/* Derniers articles du blog */}
       {posts.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 border-t border-white/5">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+          <Reveal className="flex flex-col md:flex-row md:items-end justify-between mb-12">
             <div>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-xs font-bold text-emerald-300 mb-4">
                 <Newspaper className="w-3.5 h-3.5" />
@@ -383,7 +386,7 @@ export default function HomePage() {
               Voir tout le blog
               <ArrowRight className="w-4 h-4" />
             </Link>
-          </div>
+          </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {posts.map((post) => (
