@@ -31,7 +31,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-20">
+    <div className="max-w-md mx-auto px-4 py-12 sm:py-20">
       <Link
         href="/login"
         className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-white mb-6 transition-colors"

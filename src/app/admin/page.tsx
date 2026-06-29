@@ -217,7 +217,7 @@ export default function AdminPage() {
   // ─── Guards ───────────────────────────────────────────────
   if (!ready) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center text-gray-400">
+      <div className="max-w-7xl mx-auto px-4 py-12 sm:py-20 text-center text-gray-400">
         <Loader2 className="w-6 h-6 animate-spin mx-auto" />
       </div>
     );
@@ -225,7 +225,7 @@ export default function AdminPage() {
 
   if (!isSupabaseConfigured) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-20">
+      <div className="max-w-2xl mx-auto px-4 py-12 sm:py-20">
         <div className="glass-panel p-8 rounded-3xl border-white/5 space-y-3">
           <div className="flex items-center gap-2 text-amber-300">
             <AlertCircle className="w-5 h-5" />

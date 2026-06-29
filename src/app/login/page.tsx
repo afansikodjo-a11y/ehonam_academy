@@ -79,7 +79,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-20">
+    <div className="max-w-md mx-auto px-4 py-12 sm:py-20">
       <div className="glass-panel p-8 rounded-3xl border-white/5 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1.5 gradient-btn"></div>
 

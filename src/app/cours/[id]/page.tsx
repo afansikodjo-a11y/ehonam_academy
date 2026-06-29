@@ -31,7 +31,7 @@ export default function CourseDetailPage() {
 
   if (!course) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-24 text-center">
+      <div className="max-w-3xl mx-auto px-4 py-16 sm:py-24 text-center">
         {loading ? (
           <Loader2 className="w-7 h-7 text-emerald-400 animate-spin mx-auto" />
         ) : (
