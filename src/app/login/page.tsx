@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, Loader2, LogIn, AlertCircle } from "lucide-react";
+import { Lock, Mail, Loader2, LogIn, AlertCircle, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
 import { isCurrentUserAdmin } from "@/lib/auth";
@@ -24,45 +24,33 @@ function GoogleIcon({ className = "w-5 h-5" }: { className?: string }) {
 
 export default function LoginPage() {
   const router = useRouter();
+  const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  // After a successful auth, only AUTHORIZED accounts (admins) may enter.
-  // Any other authenticated account (e.g. an unknown email signed in via
-  // Google) is signed out immediately with an alert — no silent access.
+  // Route by role after a successful auth: admin → dashboard, student → space.
   const completeLogin = async () => {
-    if (await isCurrentUserAdmin()) {
-      router.replace("/admin");
-      return;
-    }
-    await supabase.auth.signOut();
-    setLoading(false);
-    setGoogleLoading(false);
-    setError(
-      "Aucun accès pour cet email : ce compte n'est pas autorisé. Vérifiez vos identifiants ou contactez l'administrateur."
-    );
+    router.replace((await isCurrentUserAdmin()) ? "/admin" : "/mon-espace");
   };
 
-  // Surface OAuth/redirect errors (e.g. Supabase signups disabled → unknown
-  // account) returned in the URL, and complete login on a fresh sign-in.
   useEffect(() => {
     if (!isSupabaseConfigured) return;
+    // Surface OAuth/redirect errors returned in the URL.
     const hash = window.location.hash.replace(/^#/, "");
     const search = window.location.search.replace(/^\?/, "");
     const params = new URLSearchParams(hash || search);
     if (params.get("error")) {
-      setError("Connexion impossible : aucun compte associé à cet email (ou accès refusé).");
+      setError("Connexion impossible : " + (params.get("error_description") || "accès refusé") + ".");
       window.history.replaceState({}, "", window.location.pathname);
     }
 
     let active = true;
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (active && event === "SIGNED_IN" && session) {
-        completeLogin();
-      }
+      if (active && event === "SIGNED_IN" && session) completeLogin();
     });
     return () => {
       active = false;
@@ -75,6 +63,26 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setInfo("");
+
+    if (mode === "signup") {
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        setLoading(false);
+        setError(error.message || "Inscription impossible.");
+        return;
+      }
+      if (!data.session) {
+        // Email confirmation required.
+        setLoading(false);
+        setInfo("Compte créé ! Vérifiez votre email pour confirmer, puis connectez-vous.");
+        setMode("login");
+        return;
+      }
+      await completeLogin();
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setLoading(false);
@@ -97,6 +105,8 @@ export default function LoginPage() {
     }
   };
 
+  const isSignup = mode === "signup";
+
   return (
     <div className="max-w-md mx-auto px-4 py-12 sm:py-20">
       <div className="glass-panel p-8 rounded-3xl border-white/5 shadow-2xl relative overflow-hidden">
@@ -104,10 +114,16 @@ export default function LoginPage() {
 
         <div className="flex items-center justify-center gap-2 mb-2">
           <LogIn className="w-5 h-5 text-emerald-400" />
-          <span className="text-xs font-bold text-emerald-300 uppercase tracking-widest">Connexion</span>
+          <span className="text-xs font-bold text-emerald-300 uppercase tracking-widest">
+            {isSignup ? "Inscription" : "Connexion"}
+          </span>
         </div>
-        <h1 className="text-2xl font-extrabold text-white mb-1 text-center">Connectez-vous à votre compte</h1>
-        <p className="text-sm text-gray-400 mb-6 text-center">Un seul accès, quel que soit votre type de compte.</p>
+        <h1 className="text-2xl font-extrabold text-white mb-1 text-center">
+          {isSignup ? "Créer votre compte" : "Connectez-vous à votre compte"}
+        </h1>
+        <p className="text-sm text-gray-400 mb-6 text-center">
+          {isSignup ? "Accédez à vos formations et accompagnements." : "Un seul accès, quel que soit votre type de compte."}
+        </p>
 
         {!isSupabaseConfigured ? (
           <div className="flex items-start gap-2 text-sm text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3">
@@ -133,14 +149,12 @@ export default function LoginPage() {
               Continuer avec Google
             </button>
 
-            {/* Divider */}
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-gray-200 dark:bg-white/10"></div>
               <span className="text-xs text-gray-500">ou</span>
               <div className="h-px flex-1 bg-gray-200 dark:bg-white/10"></div>
             </div>
 
-            {/* Email / password */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -164,20 +178,25 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={isSignup ? "Au moins 6 caractères" : "••••••••"}
                   className={inputClass}
                 />
               </div>
 
-              <div className="flex justify-end -mt-1">
-                <Link
-                  href="/mot-de-passe-oublie"
-                  className="text-xs font-semibold text-emerald-400 hover:text-emerald-300"
-                >
-                  Mot de passe oublié ?
-                </Link>
-              </div>
+              {!isSignup && (
+                <div className="flex justify-end -mt-1">
+                  <Link href="/mot-de-passe-oublie" className="text-xs font-semibold text-emerald-400 hover:text-emerald-300">
+                    Mot de passe oublié ?
+                  </Link>
+                </div>
+              )}
 
+              {info && (
+                <div className="flex items-center gap-2 text-sm text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3">
+                  <Check className="w-4 h-4 shrink-0" />
+                  {info}
+                </div>
+              )}
               {error && (
                 <div className="flex items-center gap-2 text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
                   <AlertCircle className="w-4 h-4 shrink-0" />
@@ -193,16 +212,31 @@ export default function LoginPage() {
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Connexion…
+                    {isSignup ? "Création…" : "Connexion…"}
                   </>
                 ) : (
                   <>
                     <LogIn className="w-5 h-5" />
-                    Se connecter
+                    {isSignup ? "Créer mon compte" : "Se connecter"}
                   </>
                 )}
               </button>
             </form>
+
+            <p className="text-center text-xs text-gray-400">
+              {isSignup ? "Déjà un compte ? " : "Pas encore de compte ? "}
+              <button
+                type="button"
+                onClick={() => {
+                  setMode(isSignup ? "login" : "signup");
+                  setError("");
+                  setInfo("");
+                }}
+                className="font-semibold text-emerald-400 hover:text-emerald-300"
+              >
+                {isSignup ? "Se connecter" : "Créer un compte"}
+              </button>
+            </p>
           </div>
         )}
       </div>

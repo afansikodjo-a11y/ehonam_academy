@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { Play, Sparkles, BookOpen, Clock, Users, ArrowRight, Star, Smartphone, ShieldCheck, Zap, CreditCard, Video, Check, Newspaper, Calendar } from "lucide-react";
 import { courses as staticCourses, type Course } from "@/lib/courses";
 import { fetchPublishedCourses } from "@/lib/courses-db";
@@ -13,6 +15,7 @@ import CheckoutModal from "@/components/CheckoutModal";
 import Reveal from "@/components/Reveal";
 
 export default function HomePage() {
+  const router = useRouter();
   const [selectedOffer, setSelectedOffer] = useState<CoachingOffer | null>(null);
   const [courses, setCourses] = useState<Course[]>(staticCourses);
   const [offers, setOffers] = useState<CoachingOffer[]>(staticOffers);
@@ -23,6 +26,15 @@ export default function HomePage() {
     fetchPublishedCoaching().then(setOffers);
     fetchLivePosts().then((p) => setPosts(p.slice(0, 3)));
   }, []);
+
+  const startCoaching = async (offer: CoachingOffer) => {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      router.push("/login");
+      return;
+    }
+    setSelectedOffer(offer);
+  };
 
   return (
     <div className="w-full pb-12 sm:pb-24">
@@ -148,7 +160,7 @@ export default function HomePage() {
                     <span className="text-lg font-black text-white">{offer.price}</span>
                   </div>
                   <button
-                    onClick={() => setSelectedOffer(offer)}
+                    onClick={() => startCoaching(offer)}
                     className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md shrink-0"
                   >
                     <CreditCard className="w-3.5 h-3.5" />
@@ -433,7 +445,9 @@ export default function HomePage() {
         onClose={() => setSelectedOffer(null)}
         itemTitle={selectedOffer?.title ?? ""}
         price={selectedOffer?.price ?? ""}
-        successMessage="Paiement validé via Moneroo. Je vous recontacte sous 24h pour planifier votre accompagnement."
+        itemType="coaching"
+        itemId={selectedOffer?.id ?? ""}
+        successMessage="Paiement validé ! Votre accompagnement apparaît dans « Mon espace ». Je vous recontacte sous 24h."
       />
     </div>
   );

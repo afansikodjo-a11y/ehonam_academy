@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, CreditCard, Award, BookOpen, Layers, Check, Clock, PlayCircle, Loader2 } from "lucide-react";
 import { getCourse, getAllLessons, type Course } from "@/lib/courses";
 import { fetchCourseById } from "@/lib/courses-db";
+import { supabase } from "@/lib/supabase";
 import CheckoutModal from "@/components/CheckoutModal";
 
 export default function CourseDetailPage() {
@@ -51,6 +52,15 @@ export default function CourseDetailPage() {
   }
 
   const allLessons = getAllLessons(course);
+
+  const handleBuy = async () => {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      router.push("/login");
+      return;
+    }
+    setCheckoutOpen(true);
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative">
@@ -143,14 +153,14 @@ export default function CourseDetailPage() {
 
             <div className="space-y-4">
               <button
-                onClick={() => setCheckoutOpen(true)}
+                onClick={handleBuy}
                 className="w-full py-4 rounded-2xl font-bold text-white gradient-btn flex items-center justify-center gap-2 shadow-lg cursor-pointer"
               >
                 <CreditCard className="w-5 h-5" />
                 Acheter la formation
               </button>
               <p className="text-center text-xs text-gray-500 leading-relaxed">
-                Paiement sécurisé via <span className="text-white font-semibold">Moneroo</span>. Accès envoyé après confirmation.
+                Paiement sécurisé via <span className="text-white font-semibold">Moneroo</span>. Vous devez être connecté ; l'accès apparaît dans <span className="text-white font-semibold">Mon espace</span>.
               </p>
             </div>
 
@@ -181,7 +191,9 @@ export default function CourseDetailPage() {
         onClose={() => setCheckoutOpen(false)}
         itemTitle={course.title}
         price={course.price}
-        successMessage="Paiement validé via Moneroo. Vous recevrez vos accès et le lien de démarrage par email."
+        itemType="course"
+        itemId={course.id}
+        successMessage="Paiement validé ! Votre formation est désormais disponible dans « Mon espace »."
       />
     </div>
   );

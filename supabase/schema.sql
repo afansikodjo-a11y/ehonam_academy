@@ -384,3 +384,43 @@ create policy "Admin delete posts" on public.blog_posts for delete to authentica
 -- CONTACTS (lecture réservée aux admins)
 drop policy if exists "Authenticated read contacts" on public.contacts;
 create policy "Admin read contacts" on public.contacts for select to authenticated using ( public.is_admin() );
+
+-- ════════════════════════════════════════════════════════════════
+-- ACHATS (espace étudiant : chaque utilisateur ne voit que SES achats)
+-- ════════════════════════════════════════════════════════════════
+create table if not exists public.purchases (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  item_type  text not null check (item_type in ('course','coaching')),
+  item_id    text not null,
+  title      text not null default '',
+  price      text not null default '',
+  created_at timestamptz not null default now(),
+  unique (user_id, item_type, item_id)
+);
+
+alter table public.purchases enable row level security;
+
+-- Un utilisateur lit ses propres achats ; l'admin voit tout
+drop policy if exists "Users read own purchases" on public.purchases;
+create policy "Users read own purchases"
+  on public.purchases for select to authenticated
+  using ( auth.uid() = user_id or public.is_admin() );
+
+-- Un utilisateur n'enregistre que SES achats
+drop policy if exists "Users insert own purchases" on public.purchases;
+create policy "Users insert own purchases"
+  on public.purchases for insert to authenticated
+  with check ( auth.uid() = user_id );
+
+-- L'admin peut corriger / retirer un accès
+drop policy if exists "Admin update purchases" on public.purchases;
+create policy "Admin update purchases"
+  on public.purchases for update to authenticated
+  using ( public.is_admin() ) with check ( public.is_admin() );
+drop policy if exists "Admin delete purchases" on public.purchases;
+create policy "Admin delete purchases"
+  on public.purchases for delete to authenticated
+  using ( public.is_admin() );
+
+grant select, insert, update, delete on public.purchases to authenticated;

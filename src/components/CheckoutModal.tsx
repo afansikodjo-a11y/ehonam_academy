@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Shield, Smartphone, CreditCard, ArrowRight, Loader2, Check } from "lucide-react";
+import { recordPurchase, type ItemType } from "@/lib/purchases-db";
 
 interface CheckoutModalProps {
   open: boolean;
@@ -10,6 +11,9 @@ interface CheckoutModalProps {
   itemTitle: string;
   /** Formatted price, e.g. "45 000 FCFA" */
   price: string;
+  /** Type & id of the item, used to record the purchase on the user's account */
+  itemType: ItemType;
+  itemId: string;
   /** Message shown on the success step */
   successMessage?: string;
 }
@@ -27,6 +31,8 @@ export default function CheckoutModal({
   onClose,
   itemTitle,
   price,
+  itemType,
+  itemId,
   successMessage = "La transaction a été validée avec succès via Moneroo. Vous recevrez les détails par email.",
 }: CheckoutModalProps) {
   const [step, setStep] = useState<Step>("method");
@@ -40,7 +46,11 @@ export default function CheckoutModal({
 
   const selectMethod = (_method: "momo" | "card") => {
     setStep("processing");
-    setTimeout(() => setStep("success"), 3000);
+    // Simulate the transaction, then record the purchase on the user's account.
+    setTimeout(async () => {
+      await recordPurchase({ itemType, itemId, title: itemTitle, price });
+      setStep("success");
+    }, 3000);
   };
 
   return (
