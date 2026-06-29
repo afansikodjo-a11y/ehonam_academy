@@ -29,23 +29,16 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  // While true, we don't show the form (avoids the form flashing before a redirect).
-  const [checking, setChecking] = useState(isSupabaseConfigured);
 
+  // Only redirect on a *fresh* sign-in (password or OAuth return), never on an
+  // existing session at mount — this avoids any flash on the login page.
   useEffect(() => {
     if (!isSupabaseConfigured) return;
     let active = true;
-    const onSession = async (session: unknown) => {
-      if (!active) return;
-      if (session) {
-        router.replace(await destinationAfterLogin()); // keep "checking" → no form flash
-      } else {
-        setChecking(false); // not logged in → show the form
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (active && event === "SIGNED_IN" && session) {
+        router.replace(await destinationAfterLogin());
       }
-    };
-    supabase.auth.getSession().then(({ data }) => onSession(data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) onSession(session);
     });
     return () => {
       active = false;
@@ -91,11 +84,7 @@ export default function LoginPage() {
         <h1 className="text-2xl font-extrabold text-white mb-1 text-center">Connectez-vous à votre compte</h1>
         <p className="text-sm text-gray-400 mb-6 text-center">Un seul accès, quel que soit votre type de compte.</p>
 
-        {checking ? (
-          <div className="py-10 flex justify-center">
-            <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
-          </div>
-        ) : !isSupabaseConfigured ? (
+        {!isSupabaseConfigured ? (
           <div className="flex items-start gap-2 text-sm text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
