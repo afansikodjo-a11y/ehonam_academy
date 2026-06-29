@@ -116,11 +116,6 @@ export default function HomePage() {
               key={offer.id}
               className={`group glass-panel rounded-2xl border-white/5 overflow-hidden flex flex-col glass-panel-hover relative ${offer.popular ? "ring-1 ring-orange-500/40" : ""}`}
             >
-              {offer.popular && (
-                <div className="absolute top-4 right-4 bg-orange-600 px-3 py-1 rounded-full text-xs font-bold text-white shadow-md z-10">
-                  Le plus demandé
-                </div>
-              )}
               {/* Accent header */}
               <div className={`h-2 w-full bg-gradient-to-r ${offer.gradient}`}></div>
 
