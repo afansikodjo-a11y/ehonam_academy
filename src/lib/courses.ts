@@ -167,15 +167,23 @@ export function formatPrice(n: number | null | undefined): string {
   return `${v.toLocaleString("fr-FR").replace(/ | /g, " ")} FCFA`;
 }
 
+// Paramètres pour un lecteur YouTube le plus épuré possible :
+// nocookie (privacy), pas d'annotations, suggestions limitées à la chaîne,
+// lecture inline sur mobile. (YouTube impose tout de même son logo, le titre
+// et l'écran de fin — non supprimables dans une vidéo intégrée.)
+function youtubeEmbed(id: string): string {
+  return `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&color=white`;
+}
+
 /** Turn a YouTube or Google Drive link (or bare YouTube id) into an embeddable URL. */
 export function videoEmbedUrl(input: string): string {
   const s = (input || "").trim();
   if (!s) return "";
   // YouTube (watch, youtu.be, embed)
   const yt = s.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
-  if (yt) return `https://www.youtube.com/embed/${yt[1]}?rel=0&modestbranding=1`;
+  if (yt) return youtubeEmbed(yt[1]);
   // Bare 11-char YouTube id
-  if (/^[\w-]{11}$/.test(s)) return `https://www.youtube.com/embed/${s}?rel=0&modestbranding=1`;
+  if (/^[\w-]{11}$/.test(s)) return youtubeEmbed(s);
   // Google Drive
   if (s.includes("drive.google.")) {
     const gd = s.match(/\/file\/d\/([\w-]+)/) || s.match(/[?&]id=([\w-]+)/);
