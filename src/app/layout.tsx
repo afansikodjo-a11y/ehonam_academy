@@ -24,8 +24,8 @@ export default function RootLayout({
           {/* Header / Navbar */}
           <Navbar />
 
-          {/* Main Content */}
-          <main className="flex-grow z-10 relative">
+          {/* Main Content (z-20 so modals inside pages stack above the footer) */}
+          <main className="flex-grow z-20 relative">
             {children}
           </main>
 
