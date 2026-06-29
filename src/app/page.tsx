@@ -24,9 +24,9 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="w-full pb-24">
+    <div className="w-full pb-12 sm:pb-24">
       {/* Hero Section */}
-      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
+      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-10 sm:pb-16 text-center">
         {/* Glow behind Title */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-emerald-500/20 rounded-full filter blur-[100px] pointer-events-none"></div>
 
@@ -61,7 +61,7 @@ export default function HomePage() {
       </section>
 
       {/* Benefits / Features Section */}
-      <section id="benefits" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section id="benefits" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Card 1 */}
           <div className="glass-panel p-8 rounded-2xl border-white/5 relative overflow-hidden group">
@@ -102,7 +102,7 @@ export default function HomePage() {
       </section>
 
       {/* Accompagnement Privé Section */}
-      <section id="accompagnement" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">
+      <section id="accompagnement" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 border-t border-white/5">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-xs font-bold text-orange-300 mb-5">
             <Sparkles className="w-3.5 h-3.5" />
@@ -172,7 +172,7 @@ export default function HomePage() {
       </section>
 
       {/* Courses Catalogue Grid */}
-      <section id="courses" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section id="courses" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
@@ -248,7 +248,7 @@ export default function HomePage() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5 relative">
+      <section id="about" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 border-t border-white/5 relative">
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[300px] h-[300px] bg-orange-500/10 rounded-full filter blur-[120px] pointer-events-none"></div>
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -336,7 +336,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-white/5 mt-10">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 border-t border-white/5 mt-10">
         <h2 className="text-3xl font-extrabold text-white text-center mb-12">
           Ils apprennent avec nous
         </h2>
@@ -375,7 +375,7 @@ export default function HomePage() {
 
       {/* Derniers articles du blog */}
       {posts.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 border-t border-white/5">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
             <div>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-xs font-bold text-emerald-300 mb-4">
