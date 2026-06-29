@@ -237,7 +237,9 @@ export default function HomePage() {
                 {/* Purchase Area */}
                 <div className="flex items-center justify-between mt-auto">
                   <div className="flex flex-col">
-                    <span className="text-xs text-gray-500 line-through">{course.originalPrice}</span>
+                    {course.originalPrice && (
+                      <span className="text-xs text-gray-500 line-through">{course.originalPrice}</span>
+                    )}
                     <span className="text-lg font-black text-white">{course.price}</span>
                   </div>
                   <Link href={`/cours/${course.id}`} className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md">

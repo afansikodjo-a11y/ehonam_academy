@@ -25,6 +25,7 @@ create table if not exists public.courses (
 
 alter table public.courses add column if not exists show_duration boolean not null default true;
 alter table public.courses add column if not exists show_lessons boolean not null default true;
+alter table public.courses add column if not exists original_price_numeric integer not null default 0;
 
 alter table public.courses enable row level security;
 

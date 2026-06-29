@@ -5,7 +5,7 @@
 // ──────────────────────────────────────────────────────────────
 
 import { supabase } from "@/lib/supabase";
-import { courses as staticCourses, type Course, type Chapter } from "@/lib/courses";
+import { courses as staticCourses, formatPrice, type Course, type Chapter } from "@/lib/courses";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 export const isSupabaseConfigured = url.length > 0 && !url.includes("placeholder");
@@ -21,6 +21,7 @@ interface CourseRow {
   price: string;
   price_numeric: number;
   original_price: string;
+  original_price_numeric?: number;
   duration: string;
   students: string;
   rating: number;
@@ -40,9 +41,10 @@ function rowToCourse(r: CourseRow): AdminCourse {
     id: r.id,
     title: r.title,
     description: r.description,
-    price: r.price,
+    price: formatPrice(r.price_numeric),
     priceNumeric: r.price_numeric,
-    originalPrice: r.original_price,
+    originalPrice: formatPrice(r.original_price_numeric),
+    originalPriceNumeric: r.original_price_numeric ?? 0,
     duration: r.duration,
     students: r.students,
     rating: Number(r.rating),
@@ -62,9 +64,10 @@ function courseToRow(c: AdminCourse) {
     id: c.id,
     title: c.title,
     description: c.description,
-    price: c.price,
+    price: formatPrice(c.priceNumeric),
     price_numeric: c.priceNumeric,
-    original_price: c.originalPrice,
+    original_price: formatPrice(c.originalPriceNumeric),
+    original_price_numeric: c.originalPriceNumeric ?? 0,
     duration: c.duration,
     students: c.students,
     rating: c.rating,

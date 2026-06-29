@@ -151,7 +151,9 @@ export default function CourseDetailPage() {
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Tarif Unique</span>
               <div className="flex items-baseline gap-2.5">
                 <span className="text-3xl font-black text-white">{course.price}</span>
-                <span className="text-xs text-gray-500 line-through">{course.originalPrice}</span>
+                {course.originalPrice && (
+                  <span className="text-xs text-gray-500 line-through">{course.originalPrice}</span>
+                )}
               </div>
             </div>
 

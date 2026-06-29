@@ -24,8 +24,10 @@ export interface Course {
   price: string;
   /** Raw amount used for payment/checkout */
   priceNumeric: number;
-  /** Strikethrough reference price */
+  /** Strikethrough reference price (formatted, derived from originalPriceNumeric) */
   originalPrice: string;
+  /** Raw strikethrough amount (0 = none) */
+  originalPriceNumeric?: number;
   duration: string;
   students: string;
   rating: number;
@@ -154,6 +156,13 @@ export const courses: Course[] = [
     ],
   },
 ];
+
+/** Format an amount as a price, e.g. 45000 → "45 000 FCFA". 0/empty → "". */
+export function formatPrice(n: number | null | undefined): string {
+  const v = Number(n);
+  if (!v || v <= 0) return "";
+  return `${v.toLocaleString("fr-FR").replace(/ | /g, " ")} FCFA`;
+}
 
 /** Find a course by its id. */
 export function getCourse(id: string): Course | undefined {

@@ -11,7 +11,7 @@ import {
   fetchAllCourses, upsertCourse, deleteCourse, isSupabaseConfigured,
   type AdminCourse,
 } from "@/lib/courses-db";
-import { lessonCount, type Chapter, type Lesson } from "@/lib/courses";
+import { lessonCount, formatPrice, type Chapter, type Lesson } from "@/lib/courses";
 import AdminTabs from "@/components/AdminTabs";
 import { isCurrentUserAdmin } from "@/lib/auth";
 
@@ -31,9 +31,8 @@ function freshForm() {
     description: "",
     category: "",
     tag: "",
-    price: "",
     priceNumeric: 0,
-    originalPrice: "",
+    originalPriceNumeric: 0,
     duration: "",
     students: "0",
     rating: 5,
@@ -112,9 +111,8 @@ export default function AdminPage() {
       description: c.description,
       category: c.category,
       tag: c.tag ?? "",
-      price: c.price,
       priceNumeric: c.priceNumeric,
-      originalPrice: c.originalPrice,
+      originalPriceNumeric: c.originalPriceNumeric ?? 0,
       duration: c.duration,
       students: c.students,
       rating: c.rating,
@@ -187,9 +185,10 @@ export default function AdminPage() {
       id,
       title: form.title.trim(),
       description: form.description.trim(),
-      price: form.price.trim(),
       priceNumeric: Number(form.priceNumeric) || 0,
-      originalPrice: form.originalPrice.trim(),
+      price: formatPrice(Number(form.priceNumeric) || 0),
+      originalPriceNumeric: Number(form.originalPriceNumeric) || 0,
+      originalPrice: formatPrice(Number(form.originalPriceNumeric) || 0),
       duration: form.duration.trim(),
       students: form.students.trim() || "0",
       rating: Number(form.rating) || 0,
@@ -406,34 +405,30 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className={labelClass}>Prix affiché</label>
-                  <input
-                    className={inputClass}
-                    value={form.price}
-                    onChange={(e) => setForm({ ...form, price: e.target.value })}
-                    placeholder="45 000 FCFA"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className={labelClass}>Prix (chiffre)</label>
+                  <label className={labelClass}>Prix (FCFA) *</label>
                   <input
                     type="number"
+                    min="0"
                     className={inputClass}
                     value={form.priceNumeric}
                     onChange={(e) => setForm({ ...form, priceNumeric: Number(e.target.value) })}
                     placeholder="45000"
                   />
+                  <p className="text-[10px] text-gray-500">Affiché : {formatPrice(Number(form.priceNumeric)) || "—"}</p>
                 </div>
                 <div className="space-y-1.5">
-                  <label className={labelClass}>Prix barré</label>
+                  <label className={labelClass}>Prix barré (FCFA) — optionnel</label>
                   <input
+                    type="number"
+                    min="0"
                     className={inputClass}
-                    value={form.originalPrice}
-                    onChange={(e) => setForm({ ...form, originalPrice: e.target.value })}
-                    placeholder="90 000 FCFA"
+                    value={form.originalPriceNumeric}
+                    onChange={(e) => setForm({ ...form, originalPriceNumeric: Number(e.target.value) })}
+                    placeholder="90000"
                   />
+                  <p className="text-[10px] text-gray-500">Affiché : {formatPrice(Number(form.originalPriceNumeric)) || "— (aucun)"}</p>
                 </div>
               </div>
 
