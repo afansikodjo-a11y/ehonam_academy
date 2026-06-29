@@ -29,21 +29,23 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  // While true, we don't show the form (avoids the form flashing before a redirect).
+  const [checking, setChecking] = useState(isSupabaseConfigured);
 
-  // Redirect by role if a session exists or appears (handles OAuth return,
-  // where the session is established asynchronously after the code exchange).
   useEffect(() => {
     if (!isSupabaseConfigured) return;
     let active = true;
-    const redirectByRole = async () => {
-      const dest = await destinationAfterLogin();
-      if (active) router.replace(dest);
+    const onSession = async (session: unknown) => {
+      if (!active) return;
+      if (session) {
+        router.replace(await destinationAfterLogin()); // keep "checking" → no form flash
+      } else {
+        setChecking(false); // not logged in → show the form
+      }
     };
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) redirectByRole();
-    });
+    supabase.auth.getSession().then(({ data }) => onSession(data.session));
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) redirectByRole();
+      if (session) onSession(session);
     });
     return () => {
       active = false;
@@ -71,7 +73,6 @@ export default function LoginPage() {
       provider: "google",
       options: { redirectTo: `${window.location.origin}/login` },
     });
-    // En cas de succès, le navigateur est redirigé vers Google (rien ne s'exécute après).
     if (error) {
       setGoogleLoading(false);
       setError("Connexion avec Google impossible pour le moment.");
@@ -90,7 +91,11 @@ export default function LoginPage() {
         <h1 className="text-2xl font-extrabold text-white mb-1 text-center">Connectez-vous à votre compte</h1>
         <p className="text-sm text-gray-400 mb-6 text-center">Un seul accès, quel que soit votre type de compte.</p>
 
-        {!isSupabaseConfigured ? (
+        {checking ? (
+          <div className="py-10 flex justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
+          </div>
+        ) : !isSupabaseConfigured ? (
           <div className="flex items-start gap-2 text-sm text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
