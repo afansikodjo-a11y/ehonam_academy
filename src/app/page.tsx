@@ -30,12 +30,6 @@ export default function HomePage() {
         {/* Glow behind Title */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-emerald-500/20 rounded-full filter blur-[100px] pointer-events-none"></div>
 
-        {/* Badge Banner */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border-white/10 text-sm font-semibold text-orange-300 mb-8 shadow-sm">
-          <Sparkles className="w-4 h-4 text-orange-400" />
-          <span>La référence de l'apprentissage en Afrique</span>
-        </div>
-
         {/* Main Heading */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
           Propulsez votre carrière,{" "}<br className="hidden sm:inline" />
