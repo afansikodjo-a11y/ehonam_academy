@@ -60,7 +60,7 @@ export default function HomePage() {
           {/* Card 1 */}
           <div className="glass-panel p-8 rounded-2xl border-white/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/10 rounded-full filter blur-xl group-hover:scale-125 transition-transform"></div>
-            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/25 flex items-center justify-center mb-6">
+            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/25 flex items-center justify-center mb-6 mx-auto">
               <Users className="w-6 h-6 text-orange-400" />
             </div>
             <h3 className="text-xl font-bold text-white mb-3">Accompagnement Personnalisé</h3>
@@ -72,7 +72,7 @@ export default function HomePage() {
           {/* Card 2 */}
           <div className="glass-panel p-8 rounded-2xl border-white/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full filter blur-xl group-hover:scale-125 transition-transform"></div>
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center mb-6">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center mb-6 mx-auto">
               <Video className="w-6 h-6 text-emerald-400" />
             </div>
             <h3 className="text-xl font-bold text-white mb-3">Sessions Privées en Visio</h3>
@@ -84,7 +84,7 @@ export default function HomePage() {
           {/* Card 3 */}
           <div className="glass-panel p-8 rounded-2xl border-white/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/10 rounded-full filter blur-xl group-hover:scale-125 transition-transform"></div>
-            <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/25 flex items-center justify-center mb-6">
+            <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/25 flex items-center justify-center mb-6 mx-auto">
               <Zap className="w-6 h-6 text-teal-400" />
             </div>
             <h3 className="text-xl font-bold text-white mb-3">Accès à Vie & Mises à jour</h3>
