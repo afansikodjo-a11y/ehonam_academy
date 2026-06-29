@@ -128,9 +128,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #158f51 0%, #2fac66 45%, #ef7c1e 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #ef7c1e;
+}
+.light .gradient-text {
+  color: #c2410c;
 }
 
 .gradient-btn {
