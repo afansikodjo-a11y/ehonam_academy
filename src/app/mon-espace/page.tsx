@@ -22,12 +22,14 @@ export default function MonEspacePage() {
   const [authed, setAuthed] = useState(false);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState(true);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
       setReady(true);
       return;
     }
+    let timer: ReturnType<typeof setTimeout>;
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) {
         router.replace("/login");
@@ -37,7 +39,15 @@ export default function MonEspacePage() {
       setReady(true);
       setPurchases(await fetchMyPurchases());
       setLoading(false);
+
+      // Retour de paiement : le webhook peut arriver après la redirection,
+      // on recharge la liste quelques secondes plus tard.
+      if (new URLSearchParams(window.location.search).get("paiement") === "succes") {
+        setPaymentSuccess(true);
+        timer = setTimeout(async () => setPurchases(await fetchMyPurchases()), 4000);
+      }
     });
+    return () => clearTimeout(timer);
   }, [router]);
 
   if (!ready) {
@@ -69,6 +79,16 @@ export default function MonEspacePage() {
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-1">Mes formations & accompagnements</h1>
         <p className="text-gray-400 mt-2">Retrouvez ici tout ce que vous avez acquis.</p>
       </div>
+
+      {paymentSuccess && (
+        <div className="mb-8 flex items-start gap-2 text-sm text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-4 py-3">
+          <span className="mt-0.5">✅</span>
+          <span>
+            Merci pour votre paiement ! Votre accès est en cours de validation et apparaîtra ici dans un instant
+            (actualisez la page si besoin).
+          </span>
+        </div>
+      )}
 
       {loading ? (
         <div className="py-16 text-center text-gray-400">
