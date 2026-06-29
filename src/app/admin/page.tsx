@@ -39,6 +39,8 @@ function freshForm() {
     rating: 5,
     colorKey: "Vert",
     published: true,
+    showDuration: true,
+    showLessons: true,
     chapters: [emptyChapter()] as Chapter[],
   };
 }
@@ -118,6 +120,8 @@ export default function AdminPage() {
       rating: c.rating,
       colorKey,
       published: c.published,
+      showDuration: c.showDuration !== false,
+      showLessons: c.showLessons !== false,
       chapters: c.chapters.map((ch) => ({
         title: ch.title,
         lessons: ch.lessons.map((l) => ({ ...l })),
@@ -195,6 +199,8 @@ export default function AdminPage() {
       borderColor: color.border,
       chapters,
       published: form.published,
+      showDuration: form.showDuration,
+      showLessons: form.showLessons,
     };
 
     setSaving(true);
@@ -485,6 +491,27 @@ export default function AdminPage() {
                     className="w-4 h-4 accent-emerald-500"
                   />
                   Publier (visible sur le site)
+                </label>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                <label className="flex items-center gap-2.5 text-sm font-semibold text-gray-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.showDuration}
+                    onChange={(e) => setForm({ ...form, showDuration: e.target.checked })}
+                    className="w-4 h-4 accent-emerald-500"
+                  />
+                  Afficher la durée (heures)
+                </label>
+                <label className="flex items-center gap-2.5 text-sm font-semibold text-gray-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.showLessons}
+                    onChange={(e) => setForm({ ...form, showLessons: e.target.checked })}
+                    className="w-4 h-4 accent-emerald-500"
+                  />
+                  Afficher le nombre de leçons
                 </label>
               </div>
 

@@ -36,6 +36,10 @@ export interface Course {
   /** Tailwind hover border classes for the card */
   borderColor: string;
   chapters: Chapter[];
+  /** Show the "X heures" duration mention (default true) */
+  showDuration?: boolean;
+  /** Show the "X leçons" count mention (default true) */
+  showLessons?: boolean;
 }
 
 export const courses: Course[] = [

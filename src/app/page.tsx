@@ -218,10 +218,12 @@ export default function HomePage() {
 
                 {/* Metrics */}
                 <div className="flex items-center justify-between text-xs text-gray-500 border-t border-white/5 pt-4 mb-6">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />
-                    {course.duration}
-                  </span>
+                  {course.showDuration !== false && course.duration && (
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      {course.duration}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1">
                     <Users className="w-3.5 h-3.5" />
                     {course.students} apprenants

@@ -91,14 +91,18 @@ export default function CourseDetailPage() {
               {course.description}
             </p>
             <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400">
-              <span className="flex items-center gap-2">
-                <Clock className="w-4.5 h-4.5 text-emerald-400" />
-                {course.duration} de formation
-              </span>
-              <span className="flex items-center gap-2">
-                <BookOpen className="w-4.5 h-4.5 text-emerald-400" />
-                {allLessons.length} leçons
-              </span>
+              {course.showDuration !== false && course.duration && (
+                <span className="flex items-center gap-2">
+                  <Clock className="w-4.5 h-4.5 text-emerald-400" />
+                  {course.duration} de formation
+                </span>
+              )}
+              {course.showLessons !== false && (
+                <span className="flex items-center gap-2">
+                  <BookOpen className="w-4.5 h-4.5 text-emerald-400" />
+                  {allLessons.length} leçons
+                </span>
+              )}
             </div>
           </div>
 

@@ -30,6 +30,8 @@ interface CourseRow {
   border_color: string;
   chapters: Chapter[];
   published: boolean;
+  show_duration?: boolean;
+  show_lessons?: boolean;
   created_at?: string;
 }
 
@@ -50,6 +52,8 @@ function rowToCourse(r: CourseRow): AdminCourse {
     borderColor: r.border_color,
     chapters: Array.isArray(r.chapters) ? r.chapters : [],
     published: r.published,
+    showDuration: r.show_duration !== false,
+    showLessons: r.show_lessons !== false,
   };
 }
 
@@ -70,6 +74,8 @@ function courseToRow(c: AdminCourse) {
     border_color: c.borderColor,
     chapters: c.chapters,
     published: c.published,
+    show_duration: c.showDuration !== false,
+    show_lessons: c.showLessons !== false,
   };
 }
 

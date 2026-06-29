@@ -23,6 +23,9 @@ create table if not exists public.courses (
   created_at    timestamptz not null default now()
 );
 
+alter table public.courses add column if not exists show_duration boolean not null default true;
+alter table public.courses add column if not exists show_lessons boolean not null default true;
+
 alter table public.courses enable row level security;
 
 -- Lecture publique : tout le monde voit les formations publiées
