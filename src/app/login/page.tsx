@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Lock, Mail, Loader2, LogIn, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
-import { destinationAfterLogin } from "@/lib/auth";
+import { isCurrentUserAdmin } from "@/lib/auth";
 
 const inputClass =
   "w-full rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-emerald-500 dark:focus:border-emerald-500/60 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-colors";
@@ -30,20 +30,45 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  // Only redirect on a *fresh* sign-in (password or OAuth return), never on an
-  // existing session at mount — this avoids any flash on the login page.
+  // After a successful auth, only AUTHORIZED accounts (admins) may enter.
+  // Any other authenticated account (e.g. an unknown email signed in via
+  // Google) is signed out immediately with an alert — no silent access.
+  const completeLogin = async () => {
+    if (await isCurrentUserAdmin()) {
+      router.replace("/admin");
+      return;
+    }
+    await supabase.auth.signOut();
+    setLoading(false);
+    setGoogleLoading(false);
+    setError(
+      "Aucun accès pour cet email : ce compte n'est pas autorisé. Vérifiez vos identifiants ou contactez l'administrateur."
+    );
+  };
+
+  // Surface OAuth/redirect errors (e.g. Supabase signups disabled → unknown
+  // account) returned in the URL, and complete login on a fresh sign-in.
   useEffect(() => {
     if (!isSupabaseConfigured) return;
+    const hash = window.location.hash.replace(/^#/, "");
+    const search = window.location.search.replace(/^\?/, "");
+    const params = new URLSearchParams(hash || search);
+    if (params.get("error")) {
+      setError("Connexion impossible : aucun compte associé à cet email (ou accès refusé).");
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+
     let active = true;
-    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (active && event === "SIGNED_IN" && session) {
-        router.replace(await destinationAfterLogin());
+        completeLogin();
       }
     });
     return () => {
       active = false;
       sub.subscription.unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,7 +81,7 @@ export default function LoginPage() {
       setError("Email ou mot de passe incorrect.");
       return;
     }
-    router.replace(await destinationAfterLogin());
+    await completeLogin();
   };
 
   const handleGoogle = async () => {
