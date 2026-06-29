@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Sparkles, Loader2, GraduationCap, ArrowRight, Calendar } from "lucide-react";
+import { BookOpen, Sparkles, Loader2, GraduationCap, ArrowRight, Calendar, Award } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
 import { fetchMyPurchases, type Purchase } from "@/lib/purchases-db";
@@ -135,17 +135,28 @@ export default function MonEspacePage() {
                   <Calendar className="w-3.5 h-3.5" />
                   Acquis le {formatDate(p.createdAt)}
                 </div>
-                <div className="mt-auto flex items-center justify-between gap-3">
-                  <span className="text-sm font-black text-white">{p.price}</span>
-                  {p.itemType === "course" && (
-                    <Link
-                      href={`/cours/${p.itemId}`}
-                      className="px-4 py-2 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md"
-                    >
-                      Accéder
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  )}
+                <div className="mt-auto pt-2 space-y-3">
+                  <span className="text-sm font-black text-white block">{p.price}</span>
+                  <div className="flex flex-wrap gap-2">
+                    {p.itemType === "course" && (
+                      <Link
+                        href={`/cours/${p.itemId}`}
+                        className="px-4 py-2 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md"
+                      >
+                        Accéder
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
+                    {p.itemType === "course" && p.certified && (
+                      <Link
+                        href={`/certificat/${p.itemId}`}
+                        className="px-4 py-2 rounded-xl text-xs font-extrabold text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 flex items-center gap-1.5 transition-colors"
+                      >
+                        <Award className="w-3.5 h-3.5" />
+                        Certificat
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

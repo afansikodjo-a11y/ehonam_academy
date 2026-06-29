@@ -61,6 +61,7 @@ export async function POST(request: Request) {
         item_id: md.item_id,
         title: md.title || "",
         price: md.price || (tx.amount ? `${tx.amount} ${tx.currency || "XOF"}` : ""),
+        email: md.user_email || tx.customer?.email || "",
       },
       { onConflict: "user_id,item_type,item_id" }
     );

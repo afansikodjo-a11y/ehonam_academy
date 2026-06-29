@@ -402,6 +402,10 @@ create table if not exists public.purchases (
   unique (user_id, item_type, item_id)
 );
 
+alter table public.purchases add column if not exists email text;
+alter table public.purchases add column if not exists certified boolean not null default false;
+alter table public.purchases add column if not exists certified_at timestamptz;
+
 alter table public.purchases enable row level security;
 
 -- Un utilisateur lit ses propres achats ; l'admin voit tout

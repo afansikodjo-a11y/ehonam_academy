@@ -72,6 +72,7 @@ export async function POST(request: Request) {
         return_url: `${origin}/mon-espace?paiement=succes`,
         metadata: {
           user_id: user.id,
+          user_email: user.email || "",
           item_type: itemType,
           item_id: itemId,
           title: (item as { title: string }).title || "",

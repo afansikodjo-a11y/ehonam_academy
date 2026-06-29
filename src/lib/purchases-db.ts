@@ -1,6 +1,6 @@
 // ──────────────────────────────────────────────────────────────
-// Purchases data-access: each user only sees/records their own.
-// Used by the checkout (record) and the student space (list).
+// Purchases data-access: each user only sees/records their own;
+// admins can read all and grant/revoke certificates.
 // ──────────────────────────────────────────────────────────────
 
 import { supabase } from "@/lib/supabase";
@@ -14,6 +14,9 @@ export interface Purchase {
   itemId: string;
   title: string;
   price: string;
+  email: string;
+  certified: boolean;
+  certifiedAt: string | null;
   createdAt: string;
 }
 
@@ -24,6 +27,9 @@ interface PurchaseRow {
   item_id: string;
   title: string;
   price: string;
+  email: string | null;
+  certified: boolean | null;
+  certified_at: string | null;
   created_at: string;
 }
 
@@ -34,32 +40,11 @@ function rowToPurchase(r: PurchaseRow): Purchase {
     itemId: r.item_id,
     title: r.title,
     price: r.price,
+    email: r.email || "",
+    certified: !!r.certified,
+    certifiedAt: r.certified_at,
     createdAt: r.created_at,
   };
-}
-
-/** Record a purchase for the currently signed-in user (idempotent). */
-export async function recordPurchase(p: {
-  itemType: ItemType;
-  itemId: string;
-  title: string;
-  price: string;
-}): Promise<Error | null> {
-  if (!isSupabaseConfigured) return new Error("Supabase non configuré");
-  const { data: sess } = await supabase.auth.getSession();
-  const user = sess.session?.user;
-  if (!user) return new Error("Vous devez être connecté");
-  const { error } = await supabase.from("purchases").upsert(
-    {
-      user_id: user.id,
-      item_type: p.itemType,
-      item_id: p.itemId,
-      title: p.title,
-      price: p.price,
-    },
-    { onConflict: "user_id,item_type,item_id" }
-  );
-  return error;
 }
 
 /** All purchases of the signed-in user (newest first). RLS limits to own rows. */
@@ -71,4 +56,24 @@ export async function fetchMyPurchases(): Promise<Purchase[]> {
     .order("created_at", { ascending: false });
   if (error || !data) return [];
   return (data as PurchaseRow[]).map(rowToPurchase);
+}
+
+/** All purchases — admin only (RLS allows admins to read every row). */
+export async function fetchAllPurchases(): Promise<Purchase[]> {
+  if (!isSupabaseConfigured) return [];
+  const { data, error } = await supabase
+    .from("purchases")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error || !data) return [];
+  return (data as PurchaseRow[]).map(rowToPurchase);
+}
+
+/** Grant or revoke the certificate for a purchase — admin only. */
+export async function setCertified(purchaseId: string, value: boolean) {
+  const { error } = await supabase
+    .from("purchases")
+    .update({ certified: value, certified_at: value ? new Date().toISOString() : null })
+    .eq("id", purchaseId);
+  return error;
 }

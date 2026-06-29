@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Sparkles, Newspaper } from "lucide-react";
+import { BookOpen, Sparkles, Newspaper, Award } from "lucide-react";
 
 const TABS = [
   { href: "/admin", label: "Formations", icon: BookOpen },
   { href: "/admin/accompagnements", label: "Accompagnements", icon: Sparkles },
   { href: "/admin/blog", label: "Blog", icon: Newspaper },
+  { href: "/admin/certificats", label: "Certificats", icon: Award },
 ];
 
 export default function AdminTabs() {
