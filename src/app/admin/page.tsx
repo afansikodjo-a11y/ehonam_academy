@@ -342,9 +342,9 @@ export default function AdminPage() {
 
       {/* Create / Edit form modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-start justify-center p-4 overflow-y-auto">
-          <div className="glass-panel w-full max-w-2xl rounded-3xl border-white/10 shadow-2xl my-8 relative">
-            <div className="sticky top-0 z-10 px-6 py-4 border-b border-white/10 flex items-center justify-between glass-panel rounded-t-3xl">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="glass-panel w-full max-w-2xl rounded-3xl border-white/10 shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between shrink-0">
               <h2 className="text-lg font-bold text-white">
                 {editing ? "Modifier la formation" : "Nouvelle formation"}
               </h2>
@@ -356,7 +356,8 @@ export default function AdminPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="p-6 space-y-4">
+            <form onSubmit={handleSave} className="flex flex-col min-h-0 flex-1">
+              <div className="p-6 space-y-4 overflow-y-auto flex-1">
               <div className="space-y-1.5">
                 <label className={labelClass}>Titre *</label>
                 <input
@@ -575,29 +576,32 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {error && (
-                <div className="flex items-center gap-2 text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  {error}
-                </div>
-              )}
+              </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-300 hover:text-white border border-white/10 hover:bg-white/5 transition-all"
-                >
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="px-6 py-2.5 rounded-xl text-sm font-bold text-white gradient-btn flex items-center gap-2 shadow-md disabled:opacity-70"
-                >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  {editing ? "Enregistrer" : "Créer"}
-                </button>
+              <div className="px-6 py-4 border-t border-white/10 shrink-0 space-y-3 rounded-b-3xl">
+                {error && (
+                  <div className="flex items-center gap-2 text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    {error}
+                  </div>
+                )}
+                <div className="flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-300 hover:text-white border border-white/10 hover:bg-white/5 transition-all"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="px-6 py-2.5 rounded-xl text-sm font-bold text-white gradient-btn flex items-center gap-2 shadow-md disabled:opacity-70"
+                  >
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                    {editing ? "Enregistrer" : "Créer"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
