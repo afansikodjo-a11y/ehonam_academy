@@ -333,3 +333,54 @@ create trigger on_auth_user_created
 insert into public.profiles (id, is_admin)
 select id, true from auth.users where email = 'ehonam2000@gmail.com'
 on conflict (id) do update set is_admin = true;
+
+-- ════════════════════════════════════════════════════════════════
+-- DURCISSEMENT RLS : écriture (et lecture des brouillons) réservée
+-- aux administrateurs. La lecture publique des contenus publiés reste
+-- ouverte (policies "Public read ..." définies plus haut).
+-- ════════════════════════════════════════════════════════════════
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $func$
+  select coalesce((select is_admin from public.profiles where id = auth.uid()), false);
+$func$;
+
+grant execute on function public.is_admin() to anon, authenticated;
+
+-- COURSES
+drop policy if exists "Authenticated read all courses" on public.courses;
+create policy "Admin read all courses" on public.courses for select to authenticated using ( public.is_admin() );
+drop policy if exists "Authenticated insert courses" on public.courses;
+create policy "Admin insert courses" on public.courses for insert to authenticated with check ( public.is_admin() );
+drop policy if exists "Authenticated update courses" on public.courses;
+create policy "Admin update courses" on public.courses for update to authenticated using ( public.is_admin() ) with check ( public.is_admin() );
+drop policy if exists "Authenticated delete courses" on public.courses;
+create policy "Admin delete courses" on public.courses for delete to authenticated using ( public.is_admin() );
+
+-- COACHING
+drop policy if exists "Authenticated read all coaching" on public.coaching_offers;
+create policy "Admin read all coaching" on public.coaching_offers for select to authenticated using ( public.is_admin() );
+drop policy if exists "Authenticated insert coaching" on public.coaching_offers;
+create policy "Admin insert coaching" on public.coaching_offers for insert to authenticated with check ( public.is_admin() );
+drop policy if exists "Authenticated update coaching" on public.coaching_offers;
+create policy "Admin update coaching" on public.coaching_offers for update to authenticated using ( public.is_admin() ) with check ( public.is_admin() );
+drop policy if exists "Authenticated delete coaching" on public.coaching_offers;
+create policy "Admin delete coaching" on public.coaching_offers for delete to authenticated using ( public.is_admin() );
+
+-- BLOG
+drop policy if exists "Authenticated read all posts" on public.blog_posts;
+create policy "Admin read all posts" on public.blog_posts for select to authenticated using ( public.is_admin() );
+drop policy if exists "Authenticated insert posts" on public.blog_posts;
+create policy "Admin insert posts" on public.blog_posts for insert to authenticated with check ( public.is_admin() );
+drop policy if exists "Authenticated update posts" on public.blog_posts;
+create policy "Admin update posts" on public.blog_posts for update to authenticated using ( public.is_admin() ) with check ( public.is_admin() );
+drop policy if exists "Authenticated delete posts" on public.blog_posts;
+create policy "Admin delete posts" on public.blog_posts for delete to authenticated using ( public.is_admin() );
+
+-- CONTACTS (lecture réservée aux admins)
+drop policy if exists "Authenticated read contacts" on public.contacts;
+create policy "Admin read contacts" on public.contacts for select to authenticated using ( public.is_admin() );

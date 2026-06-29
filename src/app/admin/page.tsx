@@ -13,6 +13,7 @@ import {
 } from "@/lib/courses-db";
 import { lessonCount, type Chapter, type Lesson } from "@/lib/courses";
 import AdminTabs from "@/components/AdminTabs";
+import { isCurrentUserAdmin } from "@/lib/auth";
 
 const COLORS: Record<string, { gradient: string; border: string }> = {
   Vert: { gradient: "from-emerald-600/20 to-teal-600/20", border: "group-hover:border-emerald-500/50" },
@@ -73,9 +74,13 @@ export default function AdminPage() {
       setReady(true);
       return;
     }
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) {
         router.replace("/login");
+        return;
+      }
+      if (!(await isCurrentUserAdmin())) {
+        router.replace("/");
         return;
       }
       setAuthed(true);

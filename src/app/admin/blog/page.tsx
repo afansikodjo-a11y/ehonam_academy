@@ -11,6 +11,7 @@ import { fetchAllPosts, upsertPost, deletePost } from "@/lib/blog-db";
 import { isSupabaseConfigured } from "@/lib/courses-db";
 import { formatPostDate, type BlogPost, type PostStatus } from "@/lib/blog";
 import AdminTabs from "@/components/AdminTabs";
+import { isCurrentUserAdmin } from "@/lib/auth";
 
 const COLORS: Record<string, string> = {
   Vert: "from-emerald-600/20 to-teal-600/20",
@@ -78,9 +79,13 @@ export default function AdminBlogPage() {
       setReady(true);
       return;
     }
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) {
         router.replace("/login");
+        return;
+      }
+      if (!(await isCurrentUserAdmin())) {
+        router.replace("/");
         return;
       }
       setAuthed(true);
