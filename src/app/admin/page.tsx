@@ -21,7 +21,7 @@ const COLORS: Record<string, { gradient: string; border: string }> = {
   "Bleu-vert": { gradient: "from-teal-600/20 to-emerald-600/20", border: "group-hover:border-teal-500/50" },
 };
 
-const emptyLesson = (): Lesson => ({ title: "", duration: "", youtubeId: "" });
+const emptyLesson = (): Lesson => ({ title: "", duration: "", videoUrl: "" });
 const emptyChapter = (): Chapter => ({ title: "", lessons: [emptyLesson()] });
 
 function freshForm() {
@@ -122,7 +122,11 @@ export default function AdminPage() {
       showLessons: c.showLessons !== false,
       chapters: c.chapters.map((ch) => ({
         title: ch.title,
-        lessons: ch.lessons.map((l) => ({ ...l })),
+        lessons: ch.lessons.map((l) => ({
+          title: l.title,
+          duration: l.duration,
+          videoUrl: l.videoUrl || (l.youtubeId ? `https://youtu.be/${l.youtubeId}` : ""),
+        })),
       })),
     });
     setEditing(true);
@@ -173,7 +177,7 @@ export default function AdminPage() {
           .map((l) => ({
             title: l.title.trim(),
             duration: l.duration.trim(),
-            youtubeId: l.youtubeId.trim(),
+            videoUrl: (l.videoUrl || "").trim(),
           })),
       }))
       .filter((ch) => ch.title !== "" || ch.lessons.length > 0);
@@ -578,9 +582,9 @@ export default function AdminPage() {
                               />
                               <input
                                 className={`${inputClass} flex-1`}
-                                value={l.youtubeId}
-                                onChange={(e) => setLessonField(ci, li, "youtubeId", e.target.value)}
-                                placeholder="ID YouTube (ex : ScMzIvxBSi4)"
+                                value={l.videoUrl || ""}
+                                onChange={(e) => setLessonField(ci, li, "videoUrl", e.target.value)}
+                                placeholder="Lien vidéo (YouTube ou Google Drive)"
                               />
                             </div>
                           </div>

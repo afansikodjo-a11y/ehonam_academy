@@ -8,7 +8,10 @@
 export interface Lesson {
   title: string;
   duration: string;
-  youtubeId: string;
+  /** Legacy: bare YouTube id (still supported for playback) */
+  youtubeId?: string;
+  /** Full video link (YouTube watch/share, youtu.be, or Google Drive share) */
+  videoUrl?: string;
 }
 
 export interface Chapter {
@@ -162,6 +165,29 @@ export function formatPrice(n: number | null | undefined): string {
   const v = Number(n);
   if (!v || v <= 0) return "";
   return `${v.toLocaleString("fr-FR").replace(/ | /g, " ")} FCFA`;
+}
+
+/** Turn a YouTube or Google Drive link (or bare YouTube id) into an embeddable URL. */
+export function videoEmbedUrl(input: string): string {
+  const s = (input || "").trim();
+  if (!s) return "";
+  // YouTube (watch, youtu.be, embed)
+  const yt = s.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}?rel=0&modestbranding=1`;
+  // Bare 11-char YouTube id
+  if (/^[\w-]{11}$/.test(s)) return `https://www.youtube.com/embed/${s}?rel=0&modestbranding=1`;
+  // Google Drive
+  if (s.includes("drive.google.")) {
+    const gd = s.match(/\/file\/d\/([\w-]+)/) || s.match(/[?&]id=([\w-]+)/);
+    if (gd) return `https://drive.google.com/file/d/${gd[1]}/preview`;
+  }
+  // Fallback: assume it's already a valid embed URL
+  return s;
+}
+
+/** Embeddable URL for a lesson (prefers videoUrl, falls back to youtubeId). */
+export function lessonVideoSrc(lesson: Lesson): string {
+  return videoEmbedUrl(lesson.videoUrl || lesson.youtubeId || "");
 }
 
 /** Find a course by its id. */

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Sparkles, Loader2, GraduationCap, ArrowRight, Calendar, Award } from "lucide-react";
+import { BookOpen, Sparkles, Loader2, GraduationCap, ArrowRight, Calendar, Award, PlayCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
 import { fetchMyPurchases, type Purchase } from "@/lib/purchases-db";
@@ -140,11 +140,11 @@ export default function MonEspacePage() {
                   <div className="flex flex-wrap gap-2">
                     {p.itemType === "course" && (
                       <Link
-                        href={`/cours/${p.itemId}`}
+                        href={`/apprendre/${p.itemId}`}
                         className="px-4 py-2 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md"
                       >
-                        Accéder
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <PlayCircle className="w-3.5 h-3.5" />
+                        Accéder aux cours
                       </Link>
                     )}
                     {p.itemType === "course" && p.certified && (
