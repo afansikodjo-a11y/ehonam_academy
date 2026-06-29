@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { supabaseAdmin, isServiceConfigured } from "@/lib/supabase-admin";
 
 const MONEROO_SECRET = process.env.MONEROO_SECRET_KEY || "";
 const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -10,32 +9,41 @@ const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 // de paiement. L'accès est accordé plus tard par le webhook (après paiement).
 export async function POST(request: Request) {
   try {
-    if (!MONEROO_SECRET || !isServiceConfigured) {
-      return NextResponse.json({ error: "Paiement non configuré sur le serveur." }, { status: 500 });
+    if (!MONEROO_SECRET) {
+      return NextResponse.json({ error: "Paiement non configuré (clé Moneroo manquante)." }, { status: 500 });
     }
+
+    const supa = createClient(SUPA_URL, ANON);
 
     // 1. Authentifie l'utilisateur via son token Supabase
     const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
     if (!token) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
-    const { data: userData, error: userErr } = await createClient(SUPA_URL, ANON).auth.getUser(token);
+    const { data: userData, error: userErr } = await supa.auth.getUser(token);
     if (userErr || !userData.user) {
       return NextResponse.json({ error: "Session invalide. Reconnectez-vous." }, { status: 401 });
     }
     const user = userData.user;
 
-    // 2. Récupère l'article et son prix EN BASE (on ne fait pas confiance au client)
+    // 2. Récupère l'article et son prix EN BASE (lecture publique des éléments publiés)
     const body = await request.json();
     const itemType: "course" | "coaching" = body.itemType === "coaching" ? "coaching" : "course";
     const itemId = String(body.itemId || "");
     if (!itemId) return NextResponse.json({ error: "Article manquant." }, { status: 400 });
 
     const table = itemType === "coaching" ? "coaching_offers" : "courses";
-    const { data: item, error: itemErr } = await supabaseAdmin
+    const { data: item, error: itemErr } = await supa
       .from(table)
       .select("title, price, price_numeric")
       .eq("id", itemId)
       .maybeSingle();
-    if (itemErr || !item) return NextResponse.json({ error: "Article introuvable." }, { status: 404 });
+
+    if (itemErr) {
+      console.error("[checkout] erreur lecture article:", itemErr, { table, itemId });
+      return NextResponse.json({ error: "Erreur d'accès aux données." }, { status: 500 });
+    }
+    if (!item) {
+      return NextResponse.json({ error: `Article introuvable (${itemType} : ${itemId}).` }, { status: 404 });
+    }
 
     const amount = Number((item as { price_numeric: number }).price_numeric) || 0;
     if (amount <= 0) return NextResponse.json({ error: "Prix invalide." }, { status: 400 });
