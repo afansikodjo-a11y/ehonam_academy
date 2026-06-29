@@ -169,16 +169,19 @@ export default function AdminPage() {
     }
 
     // Clean up the program: trim, drop empty lessons and empty modules.
+    // On GARDE une leçon dès qu'elle a un titre OU un lien vidéo (sinon un
+    // lien collé sans titre serait perdu). Titre par défaut si vide.
     const chapters: Chapter[] = form.chapters
       .map((ch) => ({
         title: ch.title.trim(),
         lessons: ch.lessons
-          .filter((l) => l.title.trim() !== "")
           .map((l) => ({
             title: l.title.trim(),
             duration: l.duration.trim(),
             videoUrl: (l.videoUrl || "").trim(),
-          })),
+          }))
+          .filter((l) => l.title !== "" || l.videoUrl !== "")
+          .map((l, i) => ({ ...l, title: l.title || `Leçon ${i + 1}` })),
       }))
       .filter((ch) => ch.title !== "" || ch.lessons.length > 0);
 
