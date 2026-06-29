@@ -39,7 +39,7 @@ export default function HomePage() {
 
         {/* Description */}
         <p className="max-w-2xl mx-auto text-lg text-gray-400 mb-10 leading-relaxed">
-          Accédez à des formations et accompagnements qui vous outillent pour faire face aux grands changements de notre siècle. Payez en toute sécurité par <span className="text-white font-semibold">Carte bancaire ou Mobile Money</span>.
+          Accédez à des formations et accompagnements qui vous outillent pour faire face aux grands changements de notre siècle.
         </p>
 
         {/* CTA Buttons */}
