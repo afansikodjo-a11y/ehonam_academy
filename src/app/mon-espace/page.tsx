@@ -5,8 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BookOpen, Sparkles, Loader2, GraduationCap, ArrowRight, Calendar, Award, PlayCircle, UserCog } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { isSupabaseConfigured } from "@/lib/courses-db";
+import { isSupabaseConfigured, fetchCourseById } from "@/lib/courses-db";
 import { fetchMyPurchases, type Purchase } from "@/lib/purchases-db";
+import { fetchCourseProgress } from "@/lib/progress-db";
+import { lessonCount } from "@/lib/courses";
+
+type CourseProgress = { done: number; total: number; pct: number };
 
 function formatDate(iso: string): string {
   try {
@@ -48,6 +52,32 @@ export default function MonEspacePage() {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState(true);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [progress, setProgress] = useState<Record<string, CourseProgress>>({});
+
+  // Calcule la progression (leçons terminées / total) de chaque cours acheté.
+  const loadProgress = async (list: Purchase[]) => {
+    const courseItems = list.filter((p) => p.itemType === "course");
+    const entries = await Promise.all(
+      courseItems.map(async (p) => {
+        const [course, doneSet] = await Promise.all([
+          fetchCourseById(p.itemId),
+          fetchCourseProgress(p.itemId),
+        ]);
+        if (!course) return null;
+        let done = 0;
+        course.chapters.forEach((ch, ci) =>
+          ch.lessons.forEach((_, li) => {
+            if (doneSet.has(`${ci}:${li}`)) done++;
+          })
+        );
+        const total = lessonCount(course);
+        return [p.itemId, { done, total, pct: total ? Math.round((done / total) * 100) : 0 }] as const;
+      })
+    );
+    const map: Record<string, CourseProgress> = {};
+    for (const e of entries) if (e) map[e[0]] = e[1];
+    setProgress(map);
+  };
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -70,12 +100,18 @@ export default function MonEspacePage() {
         await confirmReturnPayment(data.session.access_token);
       }
 
-      setPurchases(await fetchMyPurchases());
+      const list = await fetchMyPurchases();
+      setPurchases(list);
       setLoading(false);
+      loadProgress(list);
 
       // Filet de sécurité : le webhook peut aussi arriver un peu après.
       if (isReturn) {
-        timer = setTimeout(async () => setPurchases(await fetchMyPurchases()), 5000);
+        timer = setTimeout(async () => {
+          const fresh = await fetchMyPurchases();
+          setPurchases(fresh);
+          loadProgress(fresh);
+        }, 5000);
       }
     });
     return () => clearTimeout(timer);
@@ -175,6 +211,24 @@ export default function MonEspacePage() {
                   <Calendar className="w-3.5 h-3.5" />
                   Acquis le {formatDate(p.createdAt)}
                 </div>
+
+                {p.itemType === "course" && progress[p.itemId] && progress[p.itemId].total > 0 && (
+                  <div className="mb-5 -mt-2">
+                    <div className="flex items-center justify-between text-[11px] text-gray-400 mb-1">
+                      <span>
+                        {progress[p.itemId].done}/{progress[p.itemId].total} leçons
+                      </span>
+                      <span className="font-semibold text-emerald-300">{progress[p.itemId].pct}%</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                      <div
+                        className="h-full gradient-btn transition-all duration-500"
+                        style={{ width: `${progress[p.itemId].pct}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-auto pt-2 space-y-3">
                   <span className="text-sm font-black text-white block">{p.price}</span>
                   <div className="flex flex-wrap gap-2">
