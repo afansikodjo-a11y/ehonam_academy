@@ -468,12 +468,15 @@ create policy "Enrolled read comments"
     )
   );
 
--- Écriture : on poste en son propre nom, et seulement si admin ou inscrit
+-- Écriture : on poste en son propre nom, et seulement si admin ou inscrit.
+-- Le badge "Formateur" (author_is_admin=true) n'est autorisé que pour un admin
+-- → empêche un étudiant d'usurper l'identité du formateur.
 drop policy if exists "Enrolled insert comments" on public.lesson_comments;
 create policy "Enrolled insert comments"
   on public.lesson_comments for insert to authenticated
   with check (
     user_id = auth.uid()
+    and (author_is_admin = false or public.is_admin())
     and (
       public.is_admin()
       or exists (

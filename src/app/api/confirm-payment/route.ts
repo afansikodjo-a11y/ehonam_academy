@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     const user = userData.user;
 
     // Revérifie la transaction auprès de Moneroo
-    const verifyRes = await fetch(`https://api.moneroo.io/v1/payments/${paymentId}/verify`, {
+    const verifyRes = await fetch(`https://api.moneroo.io/v1/payments/${encodeURIComponent(paymentId)}/verify`, {
       headers: { Authorization: `Bearer ${MONEROO_SECRET}`, Accept: "application/json" },
     });
     const verifyData = await verifyRes.json().catch(() => ({}));

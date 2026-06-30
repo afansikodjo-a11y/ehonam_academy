@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     // 2. Re-vérifie la transaction pour récupérer le statut + les métadonnées
-    const verifyRes = await fetch(`https://api.moneroo.io/v1/payments/${paymentId}/verify`, {
+    const verifyRes = await fetch(`https://api.moneroo.io/v1/payments/${encodeURIComponent(paymentId)}/verify`, {
       headers: { Authorization: `Bearer ${MONEROO_SECRET}`, Accept: "application/json" },
     });
     const verifyData = await verifyRes.json().catch(() => ({}));
@@ -81,8 +81,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ received: true, granted: true }, { status: 200 });
-  } catch (err: any) {
+  } catch (err) {
     console.error("[webhook] exception:", err);
-    return NextResponse.json({ error: "Erreur interne", details: err.message }, { status: 500 });
+    return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
   }
 }
