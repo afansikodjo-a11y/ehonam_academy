@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { notifyNewPurchase } from "@/lib/notify";
 
 const MONEROO_SECRET = process.env.MONEROO_SECRET_KEY || "";
 const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -61,20 +62,25 @@ export async function POST(request: Request) {
     const itemId = String(md.item_id || "");
     if (!itemId) return NextResponse.json({ granted: false, reason: "no_item" }, { status: 200 });
 
-    const { error: insErr } = await supa.from("purchases").upsert(
-      {
-        user_id: user.id,
-        item_type: itemType,
-        item_id: itemId,
-        title: md.title || "",
-        price: md.price || (tx.amount ? `${tx.amount} ${tx.currency || "XOF"}` : ""),
-        email: md.user_email || user.email || "",
-      },
-      { onConflict: "user_id,item_type,item_id", ignoreDuplicates: true }
-    );
+    const title = md.title || "";
+    const price = md.price || (tx.amount ? `${tx.amount} ${tx.currency || "XOF"}` : "");
+    const email = md.user_email || user.email || "";
+
+    const { data: inserted, error: insErr } = await supa
+      .from("purchases")
+      .upsert(
+        { user_id: user.id, item_type: itemType, item_id: itemId, title, price, email },
+        { onConflict: "user_id,item_type,item_id", ignoreDuplicates: true }
+      )
+      .select();
     if (insErr) {
       console.error("[confirm-payment] enregistrement échoué:", insErr);
       return NextResponse.json({ error: "Enregistrement échoué." }, { status: 500 });
+    }
+
+    // Notifie l'admin uniquement si une nouvelle ligne a été créée (pas de doublon).
+    if (inserted && inserted.length > 0) {
+      await notifyNewPurchase({ title, price, email, itemType });
     }
 
     return NextResponse.json({ granted: true, itemType, itemId });

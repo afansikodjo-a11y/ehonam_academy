@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin, isServiceConfigured } from "@/lib/supabase-admin";
+import { notifyNewPurchase } from "@/lib/notify";
 
 const WEBHOOK_SECRET = process.env.MONEROO_WEBHOOK_SECRET || "";
 const MONEROO_SECRET = process.env.MONEROO_SECRET_KEY || "";
@@ -57,21 +58,26 @@ export async function POST(request: Request) {
     }
 
     // 3. Accorde l'achat (idempotent)
-    const { error } = await supabaseAdmin.from("purchases").upsert(
-      {
-        user_id: md.user_id,
-        item_type: md.item_type,
-        item_id: md.item_id,
-        title: md.title || "",
-        price: md.price || (tx.amount ? `${tx.amount} ${tx.currency || "XOF"}` : ""),
-        email: md.user_email || tx.customer?.email || "",
-      },
-      { onConflict: "user_id,item_type,item_id" }
-    );
+    const title = md.title || "";
+    const price = md.price || (tx.amount ? `${tx.amount} ${tx.currency || "XOF"}` : "");
+    const email = md.user_email || tx.customer?.email || "";
+
+    const { data: inserted, error } = await supabaseAdmin
+      .from("purchases")
+      .upsert(
+        { user_id: md.user_id, item_type: md.item_type, item_id: md.item_id, title, price, email },
+        { onConflict: "user_id,item_type,item_id", ignoreDuplicates: true }
+      )
+      .select();
 
     if (error) {
       console.error("[webhook] enregistrement achat échoué:", error);
       return NextResponse.json({ error: "Enregistrement échoué" }, { status: 500 });
+    }
+
+    // Notifie l'admin uniquement si une nouvelle ligne a été créée (pas de doublon).
+    if (inserted && inserted.length > 0) {
+      await notifyNewPurchase({ title, price, email, itemType: md.item_type });
     }
 
     return NextResponse.json({ received: true, granted: true }, { status: 200 });
