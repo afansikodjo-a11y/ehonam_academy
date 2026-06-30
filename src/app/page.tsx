@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Play, Sparkles, BookOpen, Clock, Users, ArrowRight, Star, Smartphone, ShieldCheck, Zap, CreditCard, Video, Check, Newspaper, Calendar } from "lucide-react";
-import { courses as staticCourses, type Course } from "@/lib/courses";
+import { courses as staticCourses, courseImageSrc, type Course } from "@/lib/courses";
 import { fetchPublishedCourses } from "@/lib/courses-db";
 import { coachingOffers as staticOffers, type CoachingOffer } from "@/lib/coaching";
 import { fetchPublishedCoaching } from "@/lib/coaching-db";
@@ -192,17 +192,28 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {courses.map((course) => (
             <div key={course.id} className="group glass-panel rounded-2xl border-white/5 overflow-hidden flex flex-col justify-between glass-panel-hover cursor-pointer">
-              {/* Header Image Gradient */}
-              <div className={`h-48 w-full bg-gradient-to-br ${course.gradient} relative flex items-center justify-center border-b border-white/5`}>
-                <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-xs font-bold text-white">
+              {/* Header : image de couverture ou dégradé par défaut */}
+              <div className={`h-48 w-full relative flex items-center justify-center border-b border-white/5 overflow-hidden ${course.image ? "bg-black/30" : `bg-gradient-to-br ${course.gradient}`}`}>
+                {course.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={courseImageSrc(course.image)}
+                    alt={course.title}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                )}
+                <div className="absolute top-4 left-4 z-10 bg-white/10 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-xs font-bold text-white">
                   {course.category}
                 </div>
                 {course.tag && (
-                  <div className="absolute top-4 right-4 bg-orange-600 px-3 py-1 rounded-full text-xs font-bold text-white shadow-md">
+                  <div className="absolute top-4 right-4 z-10 bg-orange-600 px-3 py-1 rounded-full text-xs font-bold text-white shadow-md">
                     {course.tag}
                   </div>
                 )}
-                <BookOpen className="w-16 h-16 text-white/40 group-hover:scale-110 transition-transform duration-300" />
+                {!course.image && (
+                  <BookOpen className="w-16 h-16 text-white/40 group-hover:scale-110 transition-transform duration-300" />
+                )}
               </div>
 
               {/* Course Info */}

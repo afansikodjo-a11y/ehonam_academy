@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, CreditCard, Award, BookOpen, Layers, Check, Clock, PlayCircle, Loader2 } from "lucide-react";
-import { getCourse, getAllLessons, type Course } from "@/lib/courses";
+import { getCourse, getAllLessons, courseImageSrc, type Course } from "@/lib/courses";
 import { fetchCourseById } from "@/lib/courses-db";
 import { supabase } from "@/lib/supabase";
 import CheckoutModal from "@/components/CheckoutModal";
@@ -77,6 +77,15 @@ export default function CourseDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
         {/* Left Column: Presentation + Programme */}
         <div className="lg:col-span-2 space-y-8">
+          {/* Cover image */}
+          {course.image && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={courseImageSrc(course.image)}
+              alt={course.title}
+              className="w-full aspect-[16/9] object-cover rounded-3xl border border-white/5"
+            />
+          )}
           {/* HERO PRESENTATION */}
           <div className="p-8 sm:p-12 glass-panel rounded-3xl border-white/5 space-y-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full filter blur-3xl"></div>

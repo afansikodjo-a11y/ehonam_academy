@@ -29,6 +29,7 @@ interface CourseRow {
   tag: string | null;
   gradient: string;
   border_color: string;
+  image?: string;
   chapters: Chapter[];
   published: boolean;
   show_duration?: boolean;
@@ -52,6 +53,7 @@ function rowToCourse(r: CourseRow): AdminCourse {
     tag: r.tag ?? undefined,
     gradient: r.gradient,
     borderColor: r.border_color,
+    image: r.image || "",
     chapters: Array.isArray(r.chapters) ? r.chapters : [],
     published: r.published,
     showDuration: r.show_duration !== false,
@@ -75,6 +77,7 @@ function courseToRow(c: AdminCourse) {
     tag: c.tag ?? null,
     gradient: c.gradient,
     border_color: c.borderColor,
+    image: c.image || "",
     chapters: c.chapters,
     published: c.published,
     show_duration: c.showDuration !== false,

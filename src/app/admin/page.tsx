@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Shield, Plus, Pencil, Trash2, LogOut, BookOpen, Eye, EyeOff,
-  Loader2, AlertCircle, X, Check, Video,
+  Loader2, AlertCircle, X, Check, Video, Image as ImageIcon,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import {
   fetchAllCourses, upsertCourse, deleteCourse, isSupabaseConfigured,
   type AdminCourse,
 } from "@/lib/courses-db";
-import { lessonCount, formatPrice, type Chapter, type Lesson } from "@/lib/courses";
+import { lessonCount, formatPrice, courseImageSrc, type Chapter, type Lesson } from "@/lib/courses";
 import AdminTabs from "@/components/AdminTabs";
 import { isCurrentUserAdmin } from "@/lib/auth";
 
@@ -31,6 +31,7 @@ function freshForm() {
     description: "",
     category: "",
     tag: "",
+    image: "",
     priceNumeric: 0,
     originalPriceNumeric: 0,
     duration: "",
@@ -111,6 +112,7 @@ export default function AdminPage() {
       description: c.description,
       category: c.category,
       tag: c.tag ?? "",
+      image: c.image ?? "",
       priceNumeric: c.priceNumeric,
       originalPriceNumeric: c.originalPriceNumeric ?? 0,
       duration: c.duration,
@@ -201,6 +203,7 @@ export default function AdminPage() {
       rating: Number(form.rating) || 0,
       category: form.category.trim(),
       tag: form.tag.trim() || undefined,
+      image: form.image.trim(),
       gradient: color.gradient,
       borderColor: color.border,
       chapters,
@@ -409,6 +412,32 @@ export default function AdminPage() {
                     onChange={(e) => setForm({ ...form, tag: e.target.value })}
                     placeholder="Populaire"
                   />
+                </div>
+              </div>
+
+              {/* Image de couverture (miniature) */}
+              <div className="space-y-1.5">
+                <label className={labelClass}>Image de couverture (URL) — optionnel</label>
+                <div className="flex items-start gap-3">
+                  <div className="h-20 w-32 shrink-0 rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+                    {form.image.trim() ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={courseImageSrc(form.image)} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <ImageIcon className="w-6 h-6 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-1.5">
+                    <input
+                      className={inputClass}
+                      value={form.image}
+                      onChange={(e) => setForm({ ...form, image: e.target.value })}
+                      placeholder="https://… (lien image ou Google Drive)"
+                    />
+                    <p className="text-[10px] text-gray-500">
+                      Lien d'une image (JPG/PNG) ou de partage Google Drive. Vide = dégradé par défaut.
+                    </p>
+                  </div>
                 </div>
               </div>
 

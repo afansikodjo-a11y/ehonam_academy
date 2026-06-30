@@ -40,6 +40,8 @@ export interface Course {
   gradient: string;
   /** Tailwind hover border classes for the card */
   borderColor: string;
+  /** Cover image URL (thumbnail). Empty = dégradé + icône par défaut. */
+  image?: string;
   chapters: Chapter[];
   /** Show the "X heures" duration mention (default true) */
   showDuration?: boolean;
@@ -196,6 +198,17 @@ export function videoEmbedUrl(input: string): string {
 /** Embeddable URL for a lesson (prefers videoUrl, falls back to youtubeId). */
 export function lessonVideoSrc(lesson: Lesson): string {
   return videoEmbedUrl(lesson.videoUrl || lesson.youtubeId || "");
+}
+
+/** Direct <img> src for a cover image (convertit les liens de partage Google Drive). */
+export function courseImageSrc(input: string | undefined | null): string {
+  const s = (input || "").trim();
+  if (!s) return "";
+  if (s.includes("drive.google.")) {
+    const gd = s.match(/\/file\/d\/([\w-]+)/) || s.match(/[?&]id=([\w-]+)/);
+    if (gd) return `https://drive.google.com/thumbnail?id=${gd[1]}&sz=w1200`;
+  }
+  return s;
 }
 
 /** Find a course by its id. */
