@@ -432,3 +432,62 @@ create policy "Admin delete purchases"
   using ( public.is_admin() );
 
 grant select, insert, update, delete on public.purchases to authenticated;
+
+-- ════════════════════════════════════════════════════════════════
+-- QUESTIONS & COMMENTAIRES sous les leçons (Q&A par leçon)
+-- Lecture/écriture réservées aux étudiants INSCRITS au cours + admin.
+-- ════════════════════════════════════════════════════════════════
+create table if not exists public.lesson_comments (
+  id              uuid primary key default gen_random_uuid(),
+  course_id       text not null,
+  lesson_key      text not null default '',
+  user_id         uuid not null references auth.users(id) on delete cascade,
+  author_name     text not null default '',
+  author_is_admin boolean not null default false,
+  content         text not null,
+  created_at      timestamptz not null default now()
+);
+
+create index if not exists lesson_comments_course_lesson_idx
+  on public.lesson_comments (course_id, lesson_key, created_at);
+
+alter table public.lesson_comments enable row level security;
+
+-- Lecture : admin, ou étudiant ayant acheté ce cours
+drop policy if exists "Enrolled read comments" on public.lesson_comments;
+create policy "Enrolled read comments"
+  on public.lesson_comments for select to authenticated
+  using (
+    public.is_admin()
+    or exists (
+      select 1 from public.purchases p
+      where p.user_id = auth.uid()
+        and p.item_type = 'course'
+        and p.item_id = lesson_comments.course_id
+    )
+  );
+
+-- Écriture : on poste en son propre nom, et seulement si admin ou inscrit
+drop policy if exists "Enrolled insert comments" on public.lesson_comments;
+create policy "Enrolled insert comments"
+  on public.lesson_comments for insert to authenticated
+  with check (
+    user_id = auth.uid()
+    and (
+      public.is_admin()
+      or exists (
+        select 1 from public.purchases p
+        where p.user_id = auth.uid()
+          and p.item_type = 'course'
+          and p.item_id = lesson_comments.course_id
+      )
+    )
+  );
+
+-- Suppression : l'auteur ou l'admin
+drop policy if exists "Author or admin delete comments" on public.lesson_comments;
+create policy "Author or admin delete comments"
+  on public.lesson_comments for delete to authenticated
+  using ( user_id = auth.uid() or public.is_admin() );
+
+grant select, insert, delete on public.lesson_comments to authenticated;
