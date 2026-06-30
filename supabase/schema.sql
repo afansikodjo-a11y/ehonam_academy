@@ -497,6 +497,37 @@ create policy "Author or admin delete comments"
 grant select, insert, delete on public.lesson_comments to authenticated;
 
 -- ════════════════════════════════════════════════════════════════
+-- PROGRESSION : leçons terminées par utilisateur (suivi d'avancement)
+-- Chaque utilisateur ne lit/écrit que SA propre progression.
+-- ════════════════════════════════════════════════════════════════
+create table if not exists public.lesson_progress (
+  user_id      uuid not null references auth.users(id) on delete cascade,
+  course_id    text not null,
+  lesson_key   text not null,
+  completed_at timestamptz not null default now(),
+  primary key (user_id, course_id, lesson_key)
+);
+
+alter table public.lesson_progress enable row level security;
+
+drop policy if exists "Users read own progress" on public.lesson_progress;
+create policy "Users read own progress"
+  on public.lesson_progress for select to authenticated
+  using ( user_id = auth.uid() );
+
+drop policy if exists "Users insert own progress" on public.lesson_progress;
+create policy "Users insert own progress"
+  on public.lesson_progress for insert to authenticated
+  with check ( user_id = auth.uid() );
+
+drop policy if exists "Users delete own progress" on public.lesson_progress;
+create policy "Users delete own progress"
+  on public.lesson_progress for delete to authenticated
+  using ( user_id = auth.uid() );
+
+grant select, insert, delete on public.lesson_progress to authenticated;
+
+-- ════════════════════════════════════════════════════════════════
 -- STORAGE : images de couverture des cours (upload depuis l'admin)
 -- Bucket public en lecture ; écriture réservée aux administrateurs.
 -- ════════════════════════════════════════════════════════════════

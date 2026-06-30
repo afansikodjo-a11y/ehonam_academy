@@ -13,6 +13,8 @@ import {
   Send,
   Trash2,
   ShieldCheck,
+  CheckCircle2,
+  Circle,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
@@ -25,7 +27,8 @@ import {
   deleteComment,
   type LessonComment,
 } from "@/lib/comments-db";
-import { lessonVideoSrc, type Course } from "@/lib/courses";
+import { fetchCourseProgress, setLessonProgress } from "@/lib/progress-db";
+import { lessonVideoSrc, lessonCount, type Course } from "@/lib/courses";
 
 function formatWhen(iso: string): string {
   try {
@@ -61,6 +64,9 @@ export default function LearnPage() {
   const [commentText, setCommentText] = useState("");
   const [posting, setPosting] = useState(false);
 
+  // Progression : clés des leçons terminées
+  const [completed, setCompleted] = useState<Set<string>>(new Set());
+
   const lessonKey = `${active.ci}:${active.li}`;
 
   useEffect(() => {
@@ -88,6 +94,7 @@ export default function LearnPage() {
       setIsAdmin(admin);
       setMyUserId(u.id);
       setMyName(m.full_name || m.name || (u.email ? u.email.split("@")[0] : "Étudiant"));
+      setCompleted(await fetchCourseProgress(id));
       setAllowed(true);
       setReady(true);
     });
@@ -132,6 +139,27 @@ export default function LearnPage() {
     if (ok) setComments((prev) => prev.filter((c) => c.id !== cid));
   };
 
+  // Bascule "terminé" pour une leçon (mise à jour optimiste).
+  const toggleComplete = async (key: string) => {
+    const willComplete = !completed.has(key);
+    setCompleted((prev) => {
+      const next = new Set(prev);
+      if (willComplete) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+    const ok = await setLessonProgress(id, key, willComplete);
+    if (!ok) {
+      // En cas d'échec, on annule la mise à jour optimiste.
+      setCompleted((prev) => {
+        const next = new Set(prev);
+        if (willComplete) next.delete(key);
+        else next.add(key);
+        return next;
+      });
+    }
+  };
+
   if (!ready) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-24 text-center text-gray-400">
@@ -160,6 +188,17 @@ export default function LearnPage() {
 
   const activeLesson = course.chapters[active.ci]?.lessons[active.li];
   const src = activeLesson ? lessonVideoSrc(activeLesson) : "";
+
+  // Progression (ne compte que les leçons réellement présentes)
+  const total = lessonCount(course);
+  let completedCount = 0;
+  course.chapters.forEach((ch, ci) =>
+    ch.lessons.forEach((_, li) => {
+      if (completed.has(`${ci}:${li}`)) completedCount++;
+    })
+  );
+  const pct = total ? Math.round((completedCount / total) * 100) : 0;
+  const activeDone = completed.has(lessonKey);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
@@ -191,11 +230,24 @@ export default function LearnPage() {
               </div>
             )}
           </div>
-          <div className="glass-panel rounded-2xl border-white/5 p-5">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Lecture en cours</span>
-            <h1 className="text-lg sm:text-xl font-bold text-white mt-1">
-              {activeLesson?.title || course.title}
-            </h1>
+          <div className="glass-panel rounded-2xl border-white/5 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="min-w-0">
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Lecture en cours</span>
+              <h1 className="text-lg sm:text-xl font-bold text-white mt-1">
+                {activeLesson?.title || course.title}
+              </h1>
+            </div>
+            <button
+              onClick={() => toggleComplete(lessonKey)}
+              className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-bold inline-flex items-center justify-center gap-2 transition-all ${
+                activeDone
+                  ? "text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20"
+                  : "text-white gradient-btn shadow-md"
+              }`}
+            >
+              {activeDone ? <CheckCircle2 className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
+              {activeDone ? "Terminé" : "Marquer comme terminé"}
+            </button>
           </div>
 
           {/* Questions & commentaires */}
@@ -276,6 +328,20 @@ export default function LearnPage() {
                 <Layers className="w-4 h-4 text-emerald-400" />
                 {course.title}
               </h2>
+              <div className="mt-3">
+                <div className="flex items-center justify-between text-xs text-gray-400 mb-1.5">
+                  <span className="font-semibold">Progression</span>
+                  <span>
+                    {completedCount}/{total} · {pct}%
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full gradient-btn transition-all duration-500"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
             </div>
             <div className="max-h-[60vh] overflow-y-auto divide-y divide-white/5">
               {course.chapters.map((chapter, ci) => (
@@ -285,6 +351,7 @@ export default function LearnPage() {
                   </div>
                   {chapter.lessons.map((lesson, li) => {
                     const isActive = active.ci === ci && active.li === li;
+                    const isDone = completed.has(`${ci}:${li}`);
                     return (
                       <button
                         key={li}
@@ -294,10 +361,18 @@ export default function LearnPage() {
                         }`}
                       >
                         <span className="flex items-center gap-2 min-w-0">
-                          <PlayCircle
-                            className={`w-4 h-4 shrink-0 ${isActive ? "text-emerald-400" : "text-gray-500"}`}
-                          />
-                          <span className={`text-sm truncate ${isActive ? "text-emerald-300 font-semibold" : "text-gray-300"}`}>
+                          {isDone ? (
+                            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                          ) : (
+                            <PlayCircle
+                              className={`w-4 h-4 shrink-0 ${isActive ? "text-emerald-400" : "text-gray-500"}`}
+                            />
+                          )}
+                          <span
+                            className={`text-sm truncate ${
+                              isActive ? "text-emerald-300 font-semibold" : isDone ? "text-gray-400" : "text-gray-300"
+                            }`}
+                          >
                             {lesson.title}
                           </span>
                         </span>
