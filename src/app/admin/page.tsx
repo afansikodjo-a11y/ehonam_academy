@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Shield, Plus, Pencil, Trash2, LogOut, BookOpen, Eye, EyeOff,
-  Loader2, AlertCircle, X, Check, Video, Image as ImageIcon,
+  Loader2, AlertCircle, X, Check, Video, Image as ImageIcon, Upload,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import {
@@ -12,6 +12,7 @@ import {
   type AdminCourse,
 } from "@/lib/courses-db";
 import { lessonCount, formatPrice, courseImageSrc, type Chapter, type Lesson } from "@/lib/courses";
+import { uploadCourseImage } from "@/lib/storage";
 import AdminTabs from "@/components/AdminTabs";
 import { isCurrentUserAdmin } from "@/lib/auth";
 
@@ -70,6 +71,33 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  const handleImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // permet de re-sélectionner le même fichier
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setUploadError("Veuillez choisir un fichier image.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("Image trop lourde (max 5 Mo).");
+      return;
+    }
+    setUploadError("");
+    setUploading(true);
+    const { url, error: upErr } = await uploadCourseImage(file);
+    setUploading(false);
+    if (upErr) {
+      setUploadError(upErr);
+      return;
+    }
+    if (url) setForm((f) => ({ ...f, image: url }));
+  };
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -417,25 +445,49 @@ export default function AdminPage() {
 
               {/* Image de couverture (miniature) */}
               <div className="space-y-1.5">
-                <label className={labelClass}>Image de couverture (URL) — optionnel</label>
+                <label className={labelClass}>Image de couverture — optionnel</label>
                 <div className="flex items-start gap-3">
                   <div className="h-20 w-32 shrink-0 rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 flex items-center justify-center">
-                    {form.image.trim() ? (
+                    {uploading ? (
+                      <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
+                    ) : form.image.trim() ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={courseImageSrc(form.image)} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <ImageIcon className="w-6 h-6 text-gray-400" />
                     )}
                   </div>
-                  <div className="flex-1 space-y-1.5">
+                  <div className="flex-1 space-y-2">
                     <input
-                      className={inputClass}
-                      value={form.image}
-                      onChange={(e) => setForm({ ...form, image: e.target.value })}
-                      placeholder="https://… (lien image ou Google Drive)"
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageFile}
                     />
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="px-4 py-2 rounded-xl text-xs font-bold text-white gradient-btn shadow-md inline-flex items-center gap-2 disabled:opacity-60"
+                      >
+                        {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        {form.image ? "Changer l'image" : "Téléverser une image"}
+                      </button>
+                      {form.image && !uploading && (
+                        <button
+                          type="button"
+                          onClick={() => setForm({ ...form, image: "" })}
+                          className="px-3 py-2 rounded-xl text-xs font-semibold text-gray-500 hover:text-rose-400 border border-gray-200 dark:border-white/10 hover:bg-rose-500/10 inline-flex items-center gap-1.5 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" /> Retirer
+                        </button>
+                      )}
+                    </div>
+                    {uploadError && <p className="text-[10px] text-rose-400">{uploadError}</p>}
                     <p className="text-[10px] text-gray-500">
-                      Lien d'une image (JPG/PNG) ou de partage Google Drive. Vide = dégradé par défaut.
+                      JPG/PNG, idéalement paysage 16:9 (ex. 1280×720). Max 5 Mo. Vide = dégradé par défaut.
                     </p>
                   </div>
                 </div>

@@ -492,3 +492,34 @@ create policy "Author or admin delete comments"
   using ( user_id = auth.uid() or public.is_admin() );
 
 grant select, insert, delete on public.lesson_comments to authenticated;
+
+-- ════════════════════════════════════════════════════════════════
+-- STORAGE : images de couverture des cours (upload depuis l'admin)
+-- Bucket public en lecture ; écriture réservée aux administrateurs.
+-- ════════════════════════════════════════════════════════════════
+insert into storage.buckets (id, name, public)
+values ('course-images', 'course-images', true)
+on conflict (id) do nothing;
+
+-- Lecture publique des images
+drop policy if exists "Public read course images" on storage.objects;
+create policy "Public read course images"
+  on storage.objects for select
+  using ( bucket_id = 'course-images' );
+
+-- Téléversement / modification / suppression réservés aux admins
+drop policy if exists "Admin upload course images" on storage.objects;
+create policy "Admin upload course images"
+  on storage.objects for insert to authenticated
+  with check ( bucket_id = 'course-images' and public.is_admin() );
+
+drop policy if exists "Admin update course images" on storage.objects;
+create policy "Admin update course images"
+  on storage.objects for update to authenticated
+  using ( bucket_id = 'course-images' and public.is_admin() )
+  with check ( bucket_id = 'course-images' and public.is_admin() );
+
+drop policy if exists "Admin delete course images" on storage.objects;
+create policy "Admin delete course images"
+  on storage.objects for delete to authenticated
+  using ( bucket_id = 'course-images' and public.is_admin() );
