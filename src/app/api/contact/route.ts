@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 
 // Supabase is only "really" configured when the env var is set to a real URL
 // (not the placeholder fallback in lib/supabase.ts).
@@ -10,6 +11,13 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: Request) {
   try {
+    if (!(await checkRateLimit("contact", clientIp(request)))) {
+      return NextResponse.json(
+        { error: "Trop de messages envoyés. Réessayez dans quelques minutes." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const name = (body.name || "").toString().trim();
     const email = (body.email || "").toString().trim();

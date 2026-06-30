@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const MONEROO_SECRET = process.env.MONEROO_SECRET_KEY || "";
 const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -23,6 +24,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Session invalide. Reconnectez-vous." }, { status: 401 });
     }
     const user = userData.user;
+
+    if (!(await checkRateLimit("checkout", user.id))) {
+      return NextResponse.json(
+        { error: "Trop de tentatives de paiement. Réessayez dans un instant." },
+        { status: 429 }
+      );
+    }
 
     // 2. Récupère l'article et son prix EN BASE (lecture publique des éléments publiés)
     const body = await request.json();

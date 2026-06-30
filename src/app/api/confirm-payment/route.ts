@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { notifyNewPurchase } from "@/lib/notify";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const MONEROO_SECRET = process.env.MONEROO_SECRET_KEY || "";
 const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -35,6 +36,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Session invalide." }, { status: 401 });
     }
     const user = userData.user;
+
+    if (!(await checkRateLimit("confirm", user.id))) {
+      return NextResponse.json({ error: "Trop de requêtes. Réessayez dans un instant." }, { status: 429 });
+    }
 
     // Revérifie la transaction auprès de Moneroo
     const verifyRes = await fetch(`https://api.moneroo.io/v1/payments/${encodeURIComponent(paymentId)}/verify`, {
