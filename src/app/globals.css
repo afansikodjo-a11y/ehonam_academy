@@ -237,6 +237,56 @@ select option {
 }
 
 /* ──────────────────────────────────────────────────────────
+   VIBE CODING MASTERY — landing page helpers
+   (marquee des projets, curseur du terminal, grille de fond)
+   ────────────────────────────────────────────────────────── */
+@keyframes vibe-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.vibe-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: vibe-marquee 32s linear infinite;
+}
+.vibe-marquee:hover .vibe-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes vibe-blink {
+  0%, 49%  { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.vibe-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: #2fac66;
+  animation: vibe-blink 1s step-end infinite;
+}
+
+.vibe-grid {
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+}
+.light .vibe-grid {
+  background-image:
+    linear-gradient(to right, rgba(20,20,31,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20,20,31,0.05) 1px, transparent 1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vibe-marquee-track { animation: none !important; }
+  .vibe-cursor { animation: none !important; }
+}
+
+/* ──────────────────────────────────────────────────────────
    LIGHT MODE — readability overrides
    The UI was authored dark-first with hardcoded utility colors
    (text-white / text-gray-*). On light surfaces these become

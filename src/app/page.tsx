@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Play, Sparkles, BookOpen, Clock, Users, ArrowRight, Star, Smartphone, ShieldCheck, Zap, CreditCard, Video, Check, Newspaper, Calendar } from "lucide-react";
-import { courses as staticCourses, courseImageSrc, type Course } from "@/lib/courses";
+import { courses as staticCourses, courseImageSrc, VIBE_COURSE_ID, type Course } from "@/lib/courses";
 import { fetchPublishedCourses } from "@/lib/courses-db";
 import { coachingOffers as staticOffers, type CoachingOffer } from "@/lib/coaching";
 import { fetchPublishedCoaching } from "@/lib/coaching-db";
@@ -35,6 +35,10 @@ export default function HomePage() {
     }
     setSelectedOffer(offer);
   };
+
+  // « Vibe Coding Mastery » possède sa propre page de vente dédiée
+  // (/vibe-coding-mastery) et est volontairement masqué du catalogue.
+  const visibleCourses = courses.filter((c) => c.id !== VIBE_COURSE_ID);
 
   return (
     <div className="w-full pb-12 sm:pb-24">
@@ -185,12 +189,12 @@ export default function HomePage() {
             </p>
           </div>
           <span className="text-sm font-semibold text-orange-400 hover:text-orange-300 transition-colors flex items-center gap-1 mt-4 md:mt-0">
-            {courses.length} cours actifs
+            {visibleCourses.length} cours actifs
           </span>
         </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {courses.map((course) => (
+          {visibleCourses.map((course) => (
             <div key={course.id} className="group glass-panel rounded-2xl border-white/5 overflow-hidden flex flex-col justify-between glass-panel-hover cursor-pointer">
               {/* Header : image de couverture ou dégradé par défaut */}
               <div className={`h-48 w-full relative flex items-center justify-center border-b border-white/5 overflow-hidden ${course.image ? "bg-black/30" : `bg-gradient-to-br ${course.gradient}`}`}>

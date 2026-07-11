@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Menu, X, Compass, Sparkles, Mail, Newspaper, LogOut, LayoutDashboard, UserCog } from "lucide-react";
+import { User, Menu, X, Compass, Sparkles, Mail, Newspaper, LogOut, LayoutDashboard, UserCog, Rocket } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
@@ -70,6 +70,10 @@ export default function Navbar() {
           <Link href="/#courses" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-1.5">
             <Compass className="w-4 h-4" />
             Formations
+          </Link>
+          <Link href="/vibe-coding-mastery" className="text-sm font-semibold text-orange-300 hover:text-orange-200 transition-colors flex items-center gap-1.5">
+            <Rocket className="w-4 h-4" />
+            Vibe Coding
           </Link>
           <Link href="/blog" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-1.5">
             <Newspaper className="w-4 h-4" />
@@ -145,6 +149,14 @@ export default function Navbar() {
             >
               <Compass className="w-4.5 h-4.5" />
               Formations
+            </Link>
+            <Link
+              href="/vibe-coding-mastery"
+              onClick={() => setIsOpen(false)}
+              className="text-sm font-semibold text-orange-300 hover:text-orange-200 transition-colors flex items-center gap-2 py-2"
+            >
+              <Rocket className="w-4.5 h-4.5" />
+              Vibe Coding
             </Link>
             <Link
               href="/blog"

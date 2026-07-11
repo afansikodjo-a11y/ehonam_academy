@@ -49,7 +49,66 @@ export interface Course {
   showLessons?: boolean;
 }
 
+/**
+ * Identifiant du programme « Vibe Coding Mastery ».
+ * Il possède sa propre page de vente dédiée (/vibe-coding-mastery) et est
+ * volontairement masqué de la grille du catalogue de l'accueil.
+ */
+export const VIBE_COURSE_ID = "vibe-coding-mastery";
+
 export const courses: Course[] = [
+  {
+    id: VIBE_COURSE_ID,
+    title: "Vibe Coding Mastery",
+    description:
+      "Le bootcamp pour concevoir et lancer vos applications et SaaS en pilotant l'IA — Antigravity, Claude Code, Gemini, Supabase, Vercel, Git & GitHub — sans écrire de code manuellement.",
+    price: "15 000 FCFA",
+    priceNumeric: 15000,
+    originalPrice: "85 000 FCFA",
+    originalPriceNumeric: 85000,
+    duration: "Accès à vie",
+    students: "320",
+    rating: 4.9,
+    category: "Développement",
+    tag: "Nouveau",
+    gradient: "from-emerald-600/20 to-orange-600/20",
+    borderColor: "group-hover:border-emerald-500/50",
+    showDuration: false,
+    chapters: [
+      {
+        title: "Fondations & Écosystème IA",
+        lessons: [
+          { title: "Prise en main d'Antigravity pour le co-développement", duration: "—" },
+          { title: "Lancement rapide de Claude Code dans votre terminal", duration: "—" },
+          { title: "Modèles Gemini : paramètres avancés de contexte", duration: "—" },
+        ],
+      },
+      {
+        title: "L'Art du Prompting Structurel",
+        lessons: [
+          { title: "Rédaction de documents de spécifications pour l'IA", duration: "—" },
+          { title: "Guidage itératif étape par étape (prompt chaining)", duration: "—" },
+          { title: "Gestion du contexte et des jetons (token management)", duration: "—" },
+        ],
+      },
+      {
+        title: "Débogage & Résolution Contextuelle",
+        lessons: [
+          { title: "Lecture et transmission des logs de la console", duration: "—" },
+          { title: "Technique du « sandboxing » pour tester les modules", duration: "—" },
+          { title: "Briser les boucles d'erreurs récurrentes de l'IA", duration: "—" },
+        ],
+      },
+      {
+        title: "Déploiement Cloud & Supabase",
+        lessons: [
+          { title: "Déploiement automatisé en production sur Vercel", duration: "—" },
+          { title: "Base de données SQL et authentification avec Supabase", duration: "—" },
+          { title: "Intégration et sécurisation des webhooks de paiement", duration: "—" },
+        ],
+      },
+    ],
+  },
   {
     id: "nextjs-fullstack",
     title: "Devenir Développeur Full-Stack avec React, Next.js & Supabase",
