@@ -368,7 +368,7 @@ export default function VibeCodingMasteryPage() {
             <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
             ⚡ Méthode révolutionnaire · 100 % pratique · sans code
           </span>
-          <h1 className="brand-font animate-fade-up text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-white leading-[0.95] mb-5">
+          <h1 className="brand-font animate-fade-up text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white leading-[0.95] mb-5 whitespace-normal lg:whitespace-nowrap">
             VIBE CODING <span className="gradient-text">MASTERY</span>
           </h1>
           <h2 className="animate-fade-up ad-1 text-xl sm:text-2xl font-bold tracking-tight text-gray-300 leading-snug mb-6">
