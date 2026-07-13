@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { User, Menu, X, Compass, Sparkles, Mail, Newspaper, LogOut, LayoutDashboard, UserCog } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import { supabase } from "@/lib/supabase";
@@ -14,6 +14,10 @@ export default function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [spaceHref, setSpaceHref] = useState("/");
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Landing page dédiée : aucune navigation (funnel de vente).
+  const hideNav = pathname === "/vibe-coding-mastery";
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -44,6 +48,8 @@ export default function Navbar() {
 
   const accountBtnClass =
     "flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold text-white gradient-btn shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap";
+
+  if (hideNav) return null;
 
   return (
     <header className="sticky top-0 z-50 w-full glass-panel border-b border-white/5 backdrop-blur-md">

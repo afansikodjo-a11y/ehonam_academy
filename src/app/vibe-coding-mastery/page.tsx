@@ -368,10 +368,12 @@ export default function VibeCodingMasteryPage() {
             <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
             ⚡ Méthode révolutionnaire · 100 % pratique · sans code
           </span>
-          <h1 className="animate-fade-up ad-1 text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6">
-            Donnez vie à vos projets avec le{" "}
-            <span className="gradient-text">Vibe Coding</span>.
+          <h1 className="brand-font animate-fade-up text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-white leading-[0.95] mb-5">
+            VIBE CODING <span className="gradient-text">MASTERY</span>
           </h1>
+          <h2 className="animate-fade-up ad-1 text-xl sm:text-2xl font-bold tracking-tight text-gray-300 leading-snug mb-6">
+            Donnez vie à vos projets avec le <span className="gradient-text">Vibe Coding</span>.
+          </h2>
           <p className="animate-fade-up ad-2 text-lg text-gray-400 leading-relaxed mb-9 max-w-2xl mx-auto">
             Le problème n'est plus votre niveau technique, c'est votre méthodologie.
             Pilotez les technologies d'Ehonam Academy —{" "}
