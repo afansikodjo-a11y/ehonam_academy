@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Zap, Sparkles, Rocket, Check, ShieldCheck, ArrowRight,
-  Plus, Minus, CreditCard, Boxes, Database, GitBranch, Cloud,
-  Wand2, XCircle, Hourglass, Wallet, BadgeCheck,
+  Rocket, Zap, Sparkles, Check, CheckCircle2, ShieldCheck, ArrowRight, ArrowDown,
+  Plus, Minus, CreditCard, Database, GitBranch, Cloud, Wand2, XCircle,
+  Hourglass, Wallet, BadgeCheck, Users, Lightbulb, Target, Palette, Lock,
+  TrendingUp, Star, Quote, Globe, FileText, GraduationCap, Briefcase,
+  Gift, LineChart, Flame, PlayCircle, Camera,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getCourse, VIBE_COURSE_ID } from "@/lib/courses";
@@ -16,181 +18,40 @@ const PRICE = course?.price ?? "15 000 FCFA";
 const ORIGINAL_PRICE = course?.originalPrice ?? "85 000 FCFA";
 const TITLE = course?.title ?? "Vibe Coding Mastery";
 
-const TECH_STACK = [
-  { name: "Antigravity", Icon: Sparkles },
-  { name: "Claude Code", Icon: Wand2 },
-  { name: "Gemini", Icon: Zap },
-  { name: "Supabase", Icon: Database },
-  { name: "Vercel", Icon: Cloud },
-  { name: "Git", Icon: GitBranch },
-  { name: "GitHub", Icon: Boxes },
-];
-
-const PROJECTS = [
-  { icon: "💡", title: "SaaS Facturation IA", time: "Généré en 4h" },
-  { icon: "📈", title: "Dashboard Crypto", time: "Généré en 6h" },
-  { icon: "🎨", title: "Créateur de Landing", time: "Généré en 2h" },
-  { icon: "🤖", title: "Agent Client Discord", time: "Généré en 5h" },
-  { icon: "🏋️", title: "Planificateur Fitness", time: "Généré en 3h" },
-];
-
-const PROBLEMS = [
-  {
-    Icon: XCircle,
-    title: "L'enfer de la syntaxe",
-    text: "Passer des heures à traquer une virgule manquante ou une accolade mal fermée au lieu de vous concentrer sur la logique et la valeur de votre produit.",
-  },
-  {
-    Icon: Wallet,
-    title: "Coûts astronomiques",
-    text: "Dépenser des sommes énormes en sous-traitant à des agences ou freelances pour un MVP instable qui ne correspond pas exactement à vos attentes.",
-  },
-  {
-    Icon: Hourglass,
-    title: "Le syndrome du sur-place",
-    text: "Apprendre pendant des mois sans jamais rien lancer de concret, par manque de temps ou découragement face à la complexité des frameworks modernes.",
-  },
-];
-
-const METHOD_FEATURES = [
-  {
-    title: "Rapidité multipliée par 10",
-    text: "Ce qui prenait autrefois des semaines à coder se réalise désormais en quelques heures de « vibe » active avec l'agent.",
-  },
-  {
-    title: "Autonomie technique complète",
-    text: "Créez, corrigez et faites évoluer vos applications sans dépendre d'un tiers et sans barrière d'entrée technique.",
-  },
-  {
-    title: "Focalisation sur l'utilisateur",
-    text: "Passez 90 % de votre temps sur l'expérience utilisateur, le marketing et le produit, et seulement 10 % sur le code.",
-  },
-];
-
-const PROGRAM = [
-  {
-    num: "Étape 01",
-    title: "Fondations & Écosystème IA",
-    text: "Découvrez la boîte à outils ultime du Vibe Coder. Installez et configurez les outils phares (Antigravity, Claude Code, Gemini) pour maximiser votre efficacité.",
-    points: [
-      "Prise en main d'Antigravity pour le co-développement",
-      "Lancement rapide de Claude Code dans votre terminal",
-      "Modèles Gemini : paramètres avancés de contexte",
-    ],
-  },
-  {
-    num: "Étape 02",
-    title: "L'Art du Prompting Structurel",
-    text: "Apprenez à rédiger des briefs précis et des prompts hiérarchisés pour que l'IA comprenne la structure de votre application du premier coup, sans s'égarer.",
-    points: [
-      "Rédaction de documents de spécifications pour l'IA",
-      "Guidage itératif étape par étape (prompt chaining)",
-      "Gestion du contexte et des jetons (token management)",
-    ],
-  },
-  {
-    num: "Étape 03",
-    title: "Débogage & Résolution Contextuelle",
-    text: "Savoir quoi faire quand l'IA se trompe ou tourne en boucle. La méthodologie pour isoler les bugs, fournir les bons logs et faire corriger l'agent.",
-    points: [
-      "Lecture et transmission des logs de la console",
-      "Technique du « sandboxing » pour tester les modules",
-      "Briser les boucles d'erreurs récurrentes de l'IA",
-    ],
-  },
-  {
-    num: "Étape 04",
-    title: "Déploiement Cloud & Supabase",
-    text: "Mettez votre produit entre les mains de vos utilisateurs. Connectez votre backend sur Supabase et déployez en continu sur Vercel en quelques secondes.",
-    points: [
-      "Déploiement automatisé en production sur Vercel",
-      "Base de données SQL et authentification avec Supabase",
-      "Intégration et sécurisation des webhooks de paiement",
-    ],
-  },
-];
-
-const BONUSES = [
-  {
-    badge: "BONUS #1",
-    title: "Le Discord privé des Vibe Coders",
-    text: "Ne restez jamais bloqué. Rejoignez notre communauté active pour partager vos prompts, vos applications et obtenir de l'aide en direct.",
-    value: "Valeur : accès offert",
-  },
-  {
-    badge: "BONUS #2",
-    title: "La bibliothèque de « prompts modèles »",
-    text: "Copiez-collez nos structures de prompts éprouvées pour générer instantanément des bases de SaaS, des formulaires de paiement et des bases de données.",
-    value: "Valeur : offert",
-  },
-  {
-    badge: "BONUS #3",
-    title: "Coaching live mensuel Q&R",
-    text: "Une session live par mois pour analyser vos projets, débloquer vos difficultés en direct et découvrir les dernières avancées des outils de Vibe Coding.",
-    value: "Valeur : offert",
-  },
-];
-
-const FAQ = [
-  {
-    q: "Faut-il avoir des bases en programmation pour commencer ?",
-    a: "Absolument pas. Le Vibe Coding est conçu pour contourner la barrière technique du code traditionnel. Nous partons de zéro : vous apprendrez à penser de façon logique et structurée pour orienter l'IA, sans avoir à mémoriser des lignes de code.",
-  },
-  {
-    q: "Quels outils allons-nous utiliser durant la formation ?",
-    a: "Vous apprendrez à maîtriser Antigravity (assistant de programmation agentique), Claude Code (environnement de terminal rapide), Gemini (moteur de raisonnement contextuel), Supabase (base de données et authentification) et Vercel (hébergement et déploiement continu).",
-  },
-  {
-    q: "Puis-je créer n'importe quel type de projet avec le Vibe Coding ?",
-    a: "Oui, la méthode est idéale pour les applications web (SaaS, dashboards, CRM, formulaires de paiement), les sites interactifs, les extensions de navigateur, et même les applications mobiles légères. Seuls les moteurs de jeux 3D avancés ou architectures systèmes complexes demandent encore beaucoup de code manuel.",
-  },
-  {
-    q: "Combien de temps faut-il pour créer son premier projet ?",
-    a: "En suivant les étapes de la formation, la plupart des élèves parviennent à concevoir et mettre en ligne leur première application fonctionnelle en moins de 48 heures de travail effectif.",
-  },
-  {
-    q: "Comment se passe le paiement et l'accès ?",
-    a: "Le paiement est sécurisé via Moneroo (Carte Visa/Mastercard ou Mobile Money : Orange, MTN, Moov, Wave). Vous devez être connecté ; une fois le paiement confirmé, l'accès apparaît immédiatement dans « Mon espace ».",
-  },
-];
+// ⚙️ À personnaliser : colle l'URL d'une photo d'Ehonam (ou téléverse-la sur ton Supabase Storage).
+const FOUNDER_PHOTO = "";
 
 /* ── Terminal animé : simulation d'une session de Vibe Coding ── */
 type Step = { type: "log" | "code" | "success" | "link"; text: string };
 
 const SCRIPTS: { prompt: string; steps: Step[] }[] = [
   {
-    prompt: 'antigravity --create "saas-facturation-ia" --stack next,supabase',
+    prompt: 'vibe build "mon-saas" --idea "gestion de factures" --stack next,supabase',
     steps: [
-      { type: "log", text: "🤖 Antigravity : analyse de l'idée et planification structurelle..." },
-      { type: "log", text: "📦 Génération du squelette Next.js + configuration Supabase..." },
+      { type: "log", text: "🤖 L'IA analyse votre idée et planifie l'architecture du produit..." },
+      { type: "log", text: "📦 Génération de l'interface, des pages et de la logique..." },
       {
         type: "code",
-        text: "📁 saas-facturation-ia/\n├── components/ (Dashboard, InvoiceGrid, InvoiceForm)\n├── lib/\n│   ├── supabaseClient.ts   ← connexion Supabase\n│   └── auth.ts             ← Row Level Security\n└── app/\n    ├── page.tsx\n    └── api/invoices/route.ts",
+        text: "📁 mon-saas/\n├── app/ (Dashboard, Factures, Clients)\n├── lib/supabase.ts   ← base de données\n└── app/api/paiements/route.ts",
       },
-      { type: "log", text: "⚙️ Claude Code : génération du schéma de base de données SQL..." },
-      {
-        type: "code",
-        text: "-- Supabase SQL Migration\ncreate table invoices (\n  id uuid default gen_random_uuid() primary key,\n  user_id uuid references auth.users,\n  amount numeric(10,2) not null,\n  status text default 'pending',\n  created_at timestamptz default now()\n);",
-      },
-      { type: "log", text: "🧠 Gemini : optimisation du rendu et de l'expérience utilisateur..." },
-      { type: "log", text: "🚀 Vercel : déploiement continu en production déclenché..." },
-      { type: "success", text: "✨ Succès ! Votre SaaS est live sur Vercel + Supabase :" },
-      { type: "link", text: "https://saas-facturation.vercel.app" },
+      { type: "log", text: "🗄️ Création de la base de données sécurisée (Supabase)..." },
+      { type: "log", text: "🔒 Authentification + comptes utilisateurs activés..." },
+      { type: "log", text: "🚀 Déploiement en production sur Vercel..." },
+      { type: "success", text: "✨ Votre SaaS est EN LIGNE, prêt pour vos premiers clients :" },
+      { type: "link", text: "https://mon-saas.vercel.app" },
     ],
   },
   {
-    prompt: 'claude --code "ajouter authentification Supabase Auth + RLS"',
+    prompt: 'vibe add "abonnements + paiement mobile money"',
     steps: [
-      { type: "log", text: "🤖 Claude Code : analyse du schéma d'authentification requis..." },
-      { type: "log", text: "🔧 Activation de Supabase Auth + configuration des politiques RLS..." },
+      { type: "log", text: "🤖 Intégration du système d'abonnement et de paiement..." },
+      { type: "log", text: "💳 Connexion Mobile Money + Carte bancaire..." },
       {
         type: "code",
-        text: "// lib/auth.ts — Supabase Auth Helper\nimport { createClient } from '@supabase/supabase-js';\n\nexport const supabase = createClient(\n  process.env.NEXT_PUBLIC_SUPABASE_URL!,\n  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!\n);\n\nexport const signIn = (email, password) =>\n  supabase.auth.signInWithPassword({ email, password });",
+        text: "// Encaissez vos premiers revenus\nexport async function checkout(plan) {\n  return pay({ plan, method: 'mobile_money' });\n}",
       },
-      { type: "log", text: "🔒 Antigravity : ajout de la protection des routes API..." },
-      { type: "log", text: "🧠 Gemini : vérification de la cohérence de la logique d'accès..." },
-      { type: "log", text: "🚀 Vercel : re-déploiement avec les nouvelles variables d'environnement..." },
-      { type: "success", text: "✓ Authentification sécurisée activée en production !" },
+      { type: "log", text: "🧠 L'IA vérifie la sécurité et la cohérence du flux..." },
+      { type: "success", text: "✓ Vos utilisateurs peuvent maintenant PAYER dans votre app." },
     ],
   },
 ];
@@ -203,8 +64,7 @@ function TerminalSimulator() {
   useEffect(() => {
     let cancelled = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
-    const wait = (ms: number) =>
-      new Promise<void>((res) => timers.push(setTimeout(res, ms)));
+    const wait = (ms: number) => new Promise<void>((res) => timers.push(setTimeout(res, ms)));
 
     async function run() {
       let si = 0;
@@ -214,15 +74,15 @@ function TerminalSimulator() {
         setPrompt("");
         for (let i = 0; i < script.prompt.length && !cancelled; i++) {
           setPrompt(script.prompt.slice(0, i + 1));
-          await wait(42);
+          await wait(38);
         }
         await wait(500);
         for (const step of script.steps) {
           if (cancelled) break;
           setLines((prev) => [...prev, step]);
-          await wait(step.type === "code" ? 1050 : 520);
+          await wait(step.type === "code" ? 1050 : 540);
         }
-        await wait(4500);
+        await wait(4200);
         si++;
       }
     }
@@ -238,20 +98,18 @@ function TerminalSimulator() {
   }, [lines, prompt]);
 
   return (
-    <div className="glass-panel rounded-2xl border-white/10 overflow-hidden shadow-2xl flex flex-col">
-      {/* Header */}
+    <div className="glass-panel rounded-2xl border-white/10 overflow-hidden shadow-2xl">
       <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5 bg-black/30">
         <div className="flex gap-1.5">
           <span className="w-3 h-3 rounded-full bg-rose-500/80" />
           <span className="w-3 h-3 rounded-full bg-amber-400/80" />
           <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
         </div>
-        <span className="text-xs text-gray-400 font-mono">vibe-terminal — agentic-builder</span>
+        <span className="text-xs text-gray-400 font-mono">vibe-builder — votre SaaS en direct</span>
       </div>
-      {/* Body */}
       <div
         ref={bodyRef}
-        className="p-4 h-[300px] sm:h-[360px] overflow-y-auto font-mono text-[11.5px] sm:text-xs leading-relaxed bg-black/40 space-y-1.5"
+        className="p-4 h-[280px] sm:h-[340px] overflow-y-auto font-mono text-[11.5px] sm:text-xs leading-relaxed bg-black/40 space-y-1.5"
       >
         <div className="text-gray-200 break-words">
           <span className="text-emerald-400 mr-1.5">$</span>
@@ -259,35 +117,17 @@ function TerminalSimulator() {
           <span className="vibe-cursor" />
         </div>
         {lines.map((line, i) => {
-          if (line.type === "code") {
+          if (line.type === "code")
             return (
-              <pre
-                key={i}
-                className="my-2 p-3 rounded-lg bg-black/50 border border-white/5 text-emerald-200/90 overflow-x-auto whitespace-pre"
-              >
+              <pre key={i} className="my-2 p-3 rounded-lg bg-black/50 border border-white/5 text-emerald-200/90 overflow-x-auto whitespace-pre">
                 {line.text}
               </pre>
             );
-          }
-          if (line.type === "success") {
-            return (
-              <div key={i} className="text-emerald-400 font-bold break-words">
-                {line.text}
-              </div>
-            );
-          }
-          if (line.type === "link") {
-            return (
-              <div key={i} className="break-all">
-                🔗 <span className="text-orange-300 underline">{line.text}</span>
-              </div>
-            );
-          }
-          return (
-            <div key={i} className="text-gray-300 break-words">
-              {line.text}
-            </div>
-          );
+          if (line.type === "success")
+            return <div key={i} className="text-emerald-400 font-bold break-words">{line.text}</div>;
+          if (line.type === "link")
+            return <div key={i} className="break-all">🔗 <span className="text-orange-300 underline">{line.text}</span></div>;
+          return <div key={i} className="text-gray-300 break-words">{line.text}</div>;
         })}
       </div>
     </div>
@@ -297,48 +137,162 @@ function TerminalSimulator() {
 /* ── Compte à rebours (offre de lancement) ── */
 function Countdown() {
   const [t, setT] = useState({ h: "23", m: "59", s: "59" });
-
   useEffect(() => {
     const KEY = "vibe_countdown_seconds";
     let left = parseInt(localStorage.getItem(KEY) || "", 10);
-    if (isNaN(left) || left <= 0) left = 23 * 3600 + 59 * 60 + 59;
-
+    if (isNaN(left) || left <= 0) left = 47 * 3600 + 59 * 60 + 59;
     const id = setInterval(() => {
-      if (left <= 0) left = 23 * 3600 + 59 * 60 + 59;
-      const h = Math.floor(left / 3600);
-      const m = Math.floor((left % 3600) / 60);
-      const s = left % 60;
-      setT({
-        h: String(h).padStart(2, "0"),
-        m: String(m).padStart(2, "0"),
-        s: String(s).padStart(2, "0"),
-      });
+      if (left <= 0) left = 47 * 3600 + 59 * 60 + 59;
+      const h = Math.floor(left / 3600), m = Math.floor((left % 3600) / 60), s = left % 60;
+      setT({ h: String(h).padStart(2, "0"), m: String(m).padStart(2, "0"), s: String(s).padStart(2, "0") });
       left -= 1;
       localStorage.setItem(KEY, String(left));
     }, 1000);
     return () => clearInterval(id);
   }, []);
-
   const Block = ({ value, unit }: { value: string; unit: string }) => (
     <div className="flex flex-col items-center">
-      <span className="text-2xl sm:text-3xl font-black text-white tabular-nums bg-black/40 rounded-xl px-3.5 py-2 border border-white/5">
-        {value}
-      </span>
+      <span className="text-2xl sm:text-3xl font-black text-white tabular-nums bg-black/40 rounded-xl px-3.5 py-2 border border-white/5">{value}</span>
       <span className="text-[10px] uppercase tracking-widest text-gray-500 mt-1.5">{unit}</span>
     </div>
   );
-
   return (
     <div className="mt-8">
-      <p className="text-xs text-gray-400 mb-3">Cette offre de lancement se termine dans :</p>
+      <p className="text-xs text-gray-400 mb-3">L'offre de lancement se termine dans :</p>
       <div className="flex items-center justify-center gap-3">
-        <Block value={t.h} unit="heures" />
-        <span className="text-2xl font-black text-gray-600">:</span>
-        <Block value={t.m} unit="min" />
-        <span className="text-2xl font-black text-gray-600">:</span>
+        <Block value={t.h} unit="heures" /><span className="text-2xl font-black text-gray-600">:</span>
+        <Block value={t.m} unit="min" /><span className="text-2xl font-black text-gray-600">:</span>
         <Block value={t.s} unit="sec" />
       </div>
     </div>
+  );
+}
+
+/* ── Données des sections ── */
+const HERO_BADGES = [
+  { Icon: Flame, text: "Le Défi 30 jours pour lancer votre SaaS" },
+  { Icon: Sparkles, text: "Propulsé par l'IA générative" },
+];
+const TRUST = ["Sans écrire de code", "100 % guidé, étape par étape", "Accès à vie", "Paiement sécurisé Moneroo"];
+
+const NEW_REALITY = [
+  { Icon: Zap, title: "Ce qui prenait 1 an prend 30 jours", text: "Hier, créer un logiciel demandait des années d'études et une équipe de développeurs. Aujourd'hui, vous pilotez l'IA et elle construit à votre place." },
+  { Icon: TrendingUp, title: "Une longueur d'avance décisive", text: "Ceux qui maîtrisent l'IA maintenant prendront des années d'avance sur ceux qui hésitent. La fenêtre est ouverte — pour l'instant." },
+  { Icon: Globe, title: "Le meilleur moment de l'histoire", text: "Jamais il n'a été aussi simple de transformer une idée en produit réel, rentable et mondial. Depuis chez vous, sans dépendre de personne." },
+];
+
+const IMAGINE = [
+  "Vous ouvrez votre propre SaaS, en ligne, à votre nom.",
+  "Vous voyez vos premiers utilisateurs créer un compte.",
+  "Vous partagez le lien de votre application autour de vous.",
+  "Vous corrigez un détail en une phrase, l'IA s'en occupe.",
+  "Vous ajoutez une nouvelle fonctionnalité en un après-midi.",
+  "Vous recevez votre tout premier paiement.",
+];
+
+const MISTAKES = [
+  { Icon: XCircle, title: "YouTube ne suffit pas", text: "Des dizaines de vidéos décousues, aucune méthode. Vous accumulez de la théorie… et vous ne lancez jamais rien." },
+  { Icon: Hourglass, title: "Apprendre à coder « à l'ancienne »", text: "Passer des années sur JavaScript pendant que d'autres livrent leur produit en semaines grâce à l'IA. Le monde a changé." },
+  { Icon: Wallet, title: "Payer une agence 5 chiffres", text: "Dépenser une fortune pour un produit instable, qui ne correspond pas à votre vision, et rester dépendant pour la moindre modification." },
+  { Icon: Flame, title: "Abandonner avant la ligne d'arrivée", text: "Sans accompagnement, on bloque, on se décourage, on range son idée dans un tiroir. C'est là que la plupart perdent des années." },
+];
+
+const WHY = [
+  { Icon: Target, title: "Une méthode, pas un catalogue", text: "Un chemin clair du premier jour à la mise en ligne. Vous savez toujours quoi faire ensuite." },
+  { Icon: Wand2, title: "L'IA fait le gros du travail", text: "Vous apprenez à donner les bonnes instructions. L'IA écrit le code, vous gardez le contrôle." },
+  { Icon: ShieldCheck, title: "Zéro blocage possible", text: "Chaque étape est guidée. Quand vous coincez, vous savez exactement comment débloquer l'IA." },
+  { Icon: Rocket, title: "Un objectif : publier", text: "On ne regarde pas des vidéos pour le plaisir. On met votre application en ligne." },
+];
+
+const PRODUCTS = [
+  { name: "GeScole", tag: "EdTech · Gestion scolaire", Icon: GraduationCap, desc: "Plateforme 100 % cloud qui digitalise la gestion des établissements : élèves, notes, présences, finances et communication.", accent: "text-emerald-400" },
+  { name: "Edossime", tag: "Marketplace · Talents africains", Icon: Users, desc: "La marketplace de l'élite du freelancing africain, où expertise humaine et IA se combinent pour livrer plus vite.", accent: "text-orange-400" },
+  { name: "ChapFacture", tag: "FinTech · Gestion commerciale", Icon: FileText, desc: "Devis, factures, proformas, bons de commande et de livraison — avec suivi des paiements, en quelques secondes.", accent: "text-emerald-400" },
+];
+
+const JOURNEY = [
+  { Icon: Lightbulb, title: "Idée", text: "Clarifier le problème que votre SaaS résout." },
+  { Icon: Target, title: "Validation", text: "Vérifier que l'idée mérite d'être construite." },
+  { Icon: Palette, title: "Design", text: "Dessiner une interface claire et pro." },
+  { Icon: Wand2, title: "Développement IA", text: "Faire construire l'application par l'IA." },
+  { Icon: Database, title: "Base de données", text: "Stocker et organiser vos données en sécurité." },
+  { Icon: Lock, title: "Authentification", text: "Comptes, connexions et sécurité (RLS)." },
+  { Icon: Cloud, title: "Déploiement", text: "Mettre l'application en ligne sur Vercel." },
+  { Icon: Rocket, title: "Publication", text: "Ouvrir votre SaaS au monde." },
+  { Icon: TrendingUp, title: "Commercialisation", text: "Trouver et convaincre vos premiers clients." },
+  { Icon: LineChart, title: "Évolution", text: "Ajouter des fonctions et faire grandir le produit." },
+];
+
+const MODULES = [
+  {
+    week: "Semaine 1", title: "Fondations & idéation assistée par l'IA",
+    outcome: "Vous saurez transformer une simple idée en plan de produit clair, et parler à l'IA comme un véritable chef de produit.",
+    points: ["Installer et maîtriser votre boîte à outils IA", "Rédiger un cahier des charges que l'IA comprend du premier coup", "Cadrer un SaaS vendable, pas un gadget"],
+  },
+  {
+    week: "Semaine 2", title: "Construction du produit avec l'IA",
+    outcome: "Vous saurez faire construire une vraie application par l'IA, écran par écran, en gardant le contrôle total.",
+    points: ["L'art du prompting structurel (guidage étape par étape)", "Générer interfaces, pages et logique métier", "Déboguer et briser les boucles d'erreurs de l'IA"],
+  },
+  {
+    week: "Semaine 3", title: "Données, comptes & paiements",
+    outcome: "Vous saurez gérer des utilisateurs, sécuriser vos données et encaisser des paiements dans votre app.",
+    points: ["Base de données Supabase & sécurité (RLS)", "Authentification et espaces membres", "Intégrer un paiement (carte / Mobile Money)"],
+  },
+  {
+    week: "Semaine 4", title: "Déploiement, lancement & premiers clients",
+    outcome: "Vous saurez mettre votre SaaS en ligne et le présenter à vos premiers utilisateurs.",
+    points: ["Déploiement continu en production sur Vercel", "Checklist de lancement d'un SaaS", "Présenter et commercialiser votre produit"],
+  },
+];
+
+const BONUSES = [
+  { badge: "BONUS #1", title: "La bibliothèque de prompts SaaS", value: "97 000 FCFA", text: "Des structures de prompts éprouvées à copier-coller pour générer instantanément des bases de SaaS, des paiements et des dashboards." },
+  { badge: "BONUS #2", title: "Le Discord privé des SaaS Builders", value: "197 000 FCFA / an", text: "Ne restez jamais bloqué. Une communauté active pour partager vos projets, obtenir du feedback et de l'aide en direct." },
+  { badge: "BONUS #3", title: "Coaching live mensuel (Q&R)", value: "297 000 FCFA", text: "Chaque mois, une session en direct pour analyser votre SaaS, débloquer vos difficultés et avancer plus vite." },
+  { badge: "BONUS #4", title: "Les modèles de déploiement & sécurité", value: "67 000 FCFA", text: "Nos configurations prêtes à l'emploi pour déployer et sécuriser votre application sans stress." },
+];
+
+const OUTCOMES = [
+  "Transformer n'importe quelle idée en produit SaaS concret",
+  "Piloter l'IA pour construire des applications complètes",
+  "Concevoir des interfaces modernes et professionnelles",
+  "Créer et sécuriser une base de données",
+  "Gérer des comptes utilisateurs et l'authentification",
+  "Intégrer un système de paiement dans votre app",
+  "Déployer en production en quelques minutes",
+  "Déboguer et faire évoluer votre produit avec l'IA",
+  "Lancer votre SaaS et accueillir vos premiers utilisateurs",
+  "Bâtir une compétence rare, utile toute votre vie",
+];
+
+const AUDIENCE = [
+  { Icon: Briefcase, t: "Entrepreneurs" }, { Icon: Users, t: "Freelances & consultants" },
+  { Icon: Sparkles, t: "Créateurs de contenu" }, { Icon: GraduationCap, t: "Étudiants" },
+  { Icon: GitBranch, t: "Développeurs débutants" }, { Icon: TrendingUp, t: "Salariés en quête d'un revenu" },
+];
+
+const TESTIMONIALS = [
+  { name: "À personnaliser", role: "Ajoutez ici vos premiers témoignages", text: "« Emplacement prêt à recevoir un témoignage écrit de vos élèves : leur avant/après, le SaaS lancé, le résultat obtenu. »" },
+  { name: "À personnaliser", role: "Format vidéo", text: "« Insérez ici une vidéo témoignage : rien de plus puissant qu'un élève qui montre son application en ligne. »", video: true },
+  { name: "À personnaliser", role: "Capture de résultat", text: "« Montrez la capture d'un SaaS créé pendant le Défi 30 jours, ou un premier paiement reçu. »" },
+];
+
+const FAQ = [
+  { q: "Je suis totalement débutant, est-ce fait pour moi ?", a: "Oui — c'est même conçu pour ça. Nous partons de zéro. Vous n'avez pas besoin de connaissances techniques : vous apprenez à guider l'IA, pas à mémoriser du code." },
+  { q: "Je ne sais pas coder. C'est un problème ?", a: "Non. Le principe du Vibe Coding est justement de contourner le code traditionnel. Vous décrivez ce que vous voulez, l'IA le construit, vous gardez le contrôle." },
+  { q: "Je manque de temps, comment ça se passe ?", a: "Le Défi 30 jours est pensé pour les emplois du temps chargés : des étapes courtes et concrètes. Quelques heures par semaine suffisent pour avancer et publier votre SaaS." },
+  { q: "Quel ordinateur faut-il ?", a: "Un ordinateur portable classique (Windows ou Mac) et une connexion internet suffisent. Aucune machine puissante n'est nécessaire — tout se passe dans le cloud." },
+  { q: "Comment se déroule le Défi 30 jours ?", a: "Un parcours guidé, semaine après semaine : idée, construction, données & paiements, puis lancement. À la fin, votre application est en ligne, prête pour vos premiers utilisateurs." },
+  { q: "Et si je bloque en cours de route ?", a: "Vous n'êtes jamais seul : la méthode vous montre exactement comment débloquer l'IA, et la communauté privée + le coaching live sont là pour vous aider." },
+];
+
+/* ── UI helpers ── */
+function Eyebrow({ children, color = "emerald" }: { children: React.ReactNode; color?: "emerald" | "orange" }) {
+  return (
+    <span className={`text-xs font-black uppercase tracking-widest ${color === "orange" ? "text-orange-400" : "text-emerald-400"}`}>
+      {children}
+    </span>
   );
 }
 
@@ -346,6 +300,13 @@ export default function VibeCodingMasteryPage() {
   const router = useRouter();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [showSticky, setShowSticky] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowSticky(window.scrollY > 720);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleBuy = async () => {
     const { data } = await supabase.auth.getSession();
@@ -356,105 +317,85 @@ export default function VibeCodingMasteryPage() {
     setCheckoutOpen(true);
   };
 
+  const PrimaryCTA = ({ label, className = "" }: { label: string; className?: string }) => (
+    <button
+      onClick={handleBuy}
+      className={`px-8 py-4 rounded-xl font-bold text-white gradient-btn inline-flex items-center justify-center gap-2 shadow-lg cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform ${className}`}
+    >
+      {label}
+      <Rocket className="w-5 h-5" />
+    </button>
+  );
+
   return (
-    <div className="w-full overflow-hidden pb-16">
-      {/* ══ HERO ══ */}
+    <div className="w-full overflow-hidden pb-24">
+      {/* ══════════ 1. HERO ══════════ */}
       <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20">
         <div className="vibe-grid absolute inset-0 -z-10 pointer-events-none" aria-hidden />
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-emerald-500/15 rounded-full blur-[120px] -z-10 pointer-events-none" aria-hidden />
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[520px] h-[320px] bg-emerald-500/15 rounded-full blur-[130px] -z-10 pointer-events-none" aria-hidden />
 
-        <div className="text-center max-w-3xl mx-auto">
-          <span className="animate-fade-up inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-xs font-bold text-orange-300 mb-7">
-            <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
-            ⚡ Méthode révolutionnaire · 100 % pratique · sans code
-          </span>
-          <h1 className="brand-font animate-fade-up text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white leading-[0.95] mb-5 whitespace-normal lg:whitespace-nowrap">
-            VIBE CODING <span className="gradient-text">MASTERY</span>
-          </h1>
-          <h2 className="animate-fade-up ad-1 text-xl sm:text-2xl font-bold tracking-tight text-gray-300 leading-snug mb-6">
-            Donnez vie à vos projets avec le <span className="gradient-text">Vibe Coding</span>.
-          </h2>
-          <p className="animate-fade-up ad-2 text-lg text-gray-400 leading-relaxed mb-9 max-w-2xl mx-auto">
-            Le problème n'est plus votre niveau technique, c'est votre méthodologie.
-            Pilotez les technologies d'Ehonam Academy —{" "}
-            <span className="text-white font-semibold">
-              Antigravity, Claude Code, Gemini, Supabase, Vercel, Git &amp; GitHub
-            </span>{" "}
-            — pour concevoir et lancer vos logiciels en un temps record.
-          </p>
-          <button
-            onClick={handleBuy}
-            className="animate-fade-up ad-3 px-8 py-4 rounded-xl font-bold text-white gradient-btn inline-flex items-center gap-2 shadow-lg cursor-pointer"
-          >
-            Commencer à Vibe Coder maintenant
-            <Rocket className="w-5 h-5" />
-          </button>
-        </div>
+        <div className="text-center max-w-4xl mx-auto">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-7">
+            {HERO_BADGES.map(({ Icon, text }) => (
+              <span key={text} className="animate-fade-up inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-xs font-bold text-orange-300">
+                <Icon className="w-3.5 h-3.5" /> {text}
+              </span>
+            ))}
+          </div>
 
-        {/* Tech stack pills */}
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-2.5">
-          <span className="text-xs text-gray-500 font-semibold uppercase tracking-widest mr-1">
-            Stack officiel :
+          <span className="animate-fade-up brand-font block text-sm sm:text-base font-black tracking-[0.35em] text-emerald-400 mb-4">
+            VIBE CODING MASTERY
           </span>
-          {TECH_STACK.map(({ name, Icon }) => (
-            <span
-              key={name}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-panel border-white/10 text-xs font-semibold text-gray-300"
-            >
-              <Icon className="w-3.5 h-3.5 text-emerald-400" />
-              {name}
+
+          <h1 className="animate-fade-up ad-1 text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.08] mb-6">
+            Créez et lancez votre propre <span className="gradient-text">SaaS</span> grâce à l'IA.
+            <span className="block text-2xl sm:text-3xl font-bold text-gray-300 mt-4">
+              Même si vous n'avez jamais écrit une ligne de code.
             </span>
-          ))}
-        </div>
+          </h1>
 
-        {/* Showcase : terminal */}
-        <div className="mt-12 max-w-3xl mx-auto">
-          <TerminalSimulator />
-        </div>
-      </section>
+          <p className="animate-fade-up ad-2 text-lg text-gray-400 leading-relaxed mb-9 max-w-2xl mx-auto">
+            À la fin de ce programme, vous aurez <span className="text-white font-semibold">développé et mis en ligne votre propre SaaS</span> — prêt à accueillir vos premiers utilisateurs et à être commercialisé.
+          </p>
 
-      {/* ══ MARQUEE ══ */}
-      <section className="mt-16 sm:mt-24">
-        <h3 className="text-center text-xs font-bold uppercase tracking-widest text-gray-500 mb-6">
-          Projets réels réalisés en Vibe Coding
-        </h3>
-        <div className="vibe-marquee relative overflow-hidden py-2 [mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]">
-          <div className="vibe-marquee-track gap-4 pr-4">
-            {[...PROJECTS, ...PROJECTS].map((p, i) => (
-              <div
-                key={i}
-                className="shrink-0 flex items-center gap-3 glass-panel rounded-xl border-white/5 px-5 py-3.5"
-              >
-                <span className="text-2xl">{p.icon}</span>
-                <div>
-                  <h4 className="text-sm font-bold text-white whitespace-nowrap">{p.title}</h4>
-                  <p className="text-xs text-emerald-400">{p.time}</p>
-                </div>
-              </div>
+          <div className="animate-fade-up ad-3 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <PrimaryCTA label="Rejoindre le Défi 30 jours" />
+            <a href="#programme" className="px-8 py-4 rounded-xl font-bold text-gray-300 hover:text-white glass-panel border-white/10 hover:border-white/25 transition-all inline-flex items-center gap-2">
+              Découvrir la méthode <ArrowDown className="w-4 h-4" />
+            </a>
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-gray-400">
+            {TRUST.map((t) => (
+              <span key={t} className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {t}
+              </span>
             ))}
           </div>
         </div>
+
+        <div className="mt-14 max-w-3xl mx-auto">
+          <TerminalSimulator />
+          <p className="text-center text-xs text-gray-500 mt-3">↑ Voilà à quoi ressemble « vibe coder » : vous décrivez, l'IA construit, votre SaaS se met en ligne.</p>
+        </div>
       </section>
 
-      {/* ══ PROBLÈME ══ */}
-      <section id="probleme" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+      {/* ══════════ 2. LA NOUVELLE RÉALITÉ ══════════ */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">
-            L'enfer du code traditionnel
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3 mb-4">
-            Pourquoi vous n'arrivez pas à lancer vos projets
+          <Eyebrow>La nouvelle réalité</Eyebrow>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
+            L'IA vient de <span className="gradient-text">tout changer</span>. Définitivement.
           </h2>
-          <p className="text-gray-400">
-            Apprendre la programmation classique aujourd'hui est la voie la plus lente et
-            frustrante vers la réussite de vos projets.
+          <p className="text-gray-400 text-lg">
+            La création de logiciels ne se joue plus au niveau technique. Elle se joue au niveau de la méthode. Ceux qui l'adoptent aujourd'hui prendront une avance impossible à rattraper.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {PROBLEMS.map(({ Icon, title, text }) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {NEW_REALITY.map(({ Icon, title, text }) => (
             <div key={title} className="glass-panel rounded-2xl border-white/5 p-8 glass-panel-hover">
-              <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-6">
-                <Icon className="w-6 h-6 text-rose-400" />
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6">
+                <Icon className="w-6 h-6 text-emerald-400" />
               </div>
               <h3 className="text-xl font-bold text-white mb-3">{title}</h3>
               <p className="text-gray-400 text-sm leading-relaxed">{text}</p>
@@ -463,133 +404,283 @@ export default function VibeCodingMasteryPage() {
         </div>
       </section>
 
-      {/* ══ MÉTHODE / SOLUTION ══ */}
-      <section id="methode" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 border-t border-white/5">
+      {/* ══════════ 3. IMAGINEZ DANS 30 JOURS ══════════ */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
-              La révolution du Vibe Coding
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3 mb-5 leading-tight">
-              Soyez le chef d'orchestre, laissez l'IA écrire les notes
+            <Eyebrow color="orange">Imaginez dans 30 jours</Eyebrow>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-5 leading-tight">
+              Dans un mois, <span className="gradient-text">votre SaaS est en ligne.</span>
             </h2>
             <p className="text-gray-300 leading-relaxed mb-8">
-              Le Vibe Coding consiste à concevoir des applications en conversant de manière
-              structurée et logique avec des intelligences artificielles spécialisées.
+              Fermez les yeux une seconde. On est dans 30 jours. Ce que vous avez aujourd'hui dans la tête est devenu une vraie application, que d'autres utilisent. Voici ce que vous vivez :
             </p>
-            <div className="space-y-5">
-              {METHOD_FEATURES.map(({ title, text }) => (
-                <div key={title} className="flex gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
-                    <Check className="w-4 h-4 text-emerald-400" />
-                  </div>
-                  <div>
-                    <h4 className="text-md font-bold text-white">{title}</h4>
-                    <p className="text-sm text-gray-400 leading-relaxed mt-0.5">{text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <PrimaryCTA label="Je veux vivre ça" />
           </div>
-
-          {/* Logic-map mockup */}
-          <div className="glass-panel rounded-2xl border-white/10 overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-black/30">
-              <span className="text-xs text-gray-400 font-mono">agentic-logic-map.json</span>
-              <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Synced
-              </span>
-            </div>
-            <div className="p-5 space-y-4 bg-black/20">
-              {[
-                { a: "[Brief]  « Créer un SaaS… »", b: "[IA]  Analyse architecture" },
-                { a: "[Debug]  Correction des lints", b: "[IA]  Résolution immédiate" },
-                { a: "[Deploy]  Vercel en 1-clic", b: "[Live]  App opérationnelle !" },
-              ].map((row, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs font-mono text-gray-300"
-                >
-                  <div className="flex-1 px-3 py-2.5 rounded-lg bg-black/40 border border-white/5">{row.a}</div>
-                  <ArrowRight className="w-4 h-4 text-orange-400 mx-auto shrink-0 rotate-90 sm:rotate-0" />
-                  <div className="flex-1 px-3 py-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/15 text-emerald-200/90">
-                    {row.b}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ul className="space-y-4">
+            {IMAGINE.map((item, i) => (
+              <li key={i} className="flex items-start gap-4 glass-panel rounded-2xl border-white/5 p-5">
+                <div className="w-8 h-8 rounded-lg gradient-btn flex items-center justify-center text-xs font-black text-white shrink-0">{i + 1}</div>
+                <span className="text-gray-200 font-medium leading-snug">{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      {/* ══ PROGRAMME ══ */}
-      <section id="programme" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
+      {/* ══════════ 4. LES ERREURS À ÉVITER ══════════ */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">
-            Le programme du bootcamp
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3 mb-4">
-            De l'idée au déploiement en 4 étapes
+          <Eyebrow color="orange">Les pièges qui coûtent des années</Eyebrow>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
+            Pourquoi 9 personnes sur 10 ne lancent jamais rien
           </h2>
-          <p className="text-gray-400">
-            Un parcours structuré conçu pour faire de vous un Vibe Coder autonome et performant.
+          <p className="text-gray-400 text-lg">Ce n'est pas une question de talent. C'est une question de chemin. Voici les 4 impasses les plus courantes.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {MISTAKES.map(({ Icon, title, text }) => (
+            <div key={title} className="glass-panel rounded-2xl border-white/5 p-8 flex gap-5">
+              <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                <Icon className="w-6 h-6 text-rose-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════ 5. POURQUOI VIBE CODING MASTERY ══════════ */}
+      <section id="methode" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <Eyebrow>La solution</Eyebrow>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
+            Une méthode. Un objectif. <span className="gradient-text">Votre SaaS en ligne.</span>
+          </h2>
+          <p className="text-gray-400 text-lg">
+            Vibe Coding Mastery n'est pas une pile de vidéos. C'est un chemin guidé, du premier jour à la publication de votre application.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {PROGRAM.map((mod) => (
-            <div key={mod.num} className="glass-panel rounded-2xl border-white/5 p-8 glass-panel-hover">
-              <span className="inline-block text-xs font-black text-orange-400 uppercase tracking-widest mb-3">
-                {mod.num}
-              </span>
-              <h3 className="text-xl font-bold text-white mb-3">{mod.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed mb-5">{mod.text}</p>
-              <ul className="space-y-2.5">
-                {mod.points.map((pt) => (
-                  <li key={pt} className="flex items-start gap-2.5 text-sm text-gray-300">
-                    <div className="w-4 h-4 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                      <Check className="w-2.5 h-2.5 text-emerald-400" />
-                    </div>
-                    {pt}
-                  </li>
-                ))}
-              </ul>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {WHY.map(({ Icon, title, text }) => (
+            <div key={title} className="glass-panel rounded-2xl border-white/5 p-7 glass-panel-hover text-center">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-5 mx-auto">
+                <Icon className="w-6 h-6 text-emerald-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">{text}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ══ BONUS ══ */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 border-t border-white/5">
+      {/* ══════════ 6. PRÉSENTATION D'EHONAM ══════════ */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
+          <div className="lg:col-span-2">
+            <div className="glass-panel rounded-3xl border-white/10 overflow-hidden aspect-[4/5] relative">
+              {FOUNDER_PHOTO ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={FOUNDER_PHOTO} alt="Ehonam, formateur & SaaS Builder" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 bg-gradient-to-br from-emerald-900/20 to-orange-900/10">
+                  <Camera className="w-10 h-10 mb-3 opacity-60" />
+                  <p className="text-sm">Photo d'Ehonam</p>
+                </div>
+              )}
+              <div className="absolute bottom-4 left-4 right-4 glass-panel rounded-xl border-white/10 px-4 py-3">
+                <p className="text-white font-bold">Ehonam</p>
+                <p className="text-xs text-emerald-400">Formateur · SaaS Builder</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-3">
+            <Eyebrow color="orange">Votre formateur</Eyebrow>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3 mb-5 leading-tight">
+              Il ne vous enseigne pas la théorie. <br className="hidden sm:inline" />Il vous montre son vrai métier.
+            </h2>
+            <p className="text-gray-300 leading-relaxed mb-4">
+              Ehonam est <span className="text-white font-semibold">SaaS Builder</span> : il conçoit et lance de vraies applications, utilisées par de vrais clients. Il ne partage pas des idées — il partage <span className="text-white font-semibold">son processus de travail exact</span>.
+            </p>
+            <p className="text-gray-400 leading-relaxed mb-8">
+              En plus de ses propres produits, il accompagne des entrepreneurs dans la création de leur SaaS. Toute la formation repose sur cette expérience de terrain.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {PRODUCTS.map(({ name, tag, Icon, desc, accent }) => (
+                <div key={name} className="glass-panel rounded-2xl border-white/5 p-5 glass-panel-hover">
+                  <Icon className={`w-6 h-6 ${accent} mb-3`} />
+                  <h3 className="text-white font-bold">{name}</h3>
+                  <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-2">{tag}</p>
+                  <p className="text-gray-400 text-xs leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ 7. LE PARCOURS COMPLET ══════════ */}
+      <section id="programme" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
-            Les accélérateurs inclus
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3">
-            Des bonus exclusifs pour décupler vos résultats
+          <Eyebrow>Le parcours complet</Eyebrow>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
+            De l'idée à la <span className="gradient-text">commercialisation</span>
+          </h2>
+          <p className="text-gray-400 text-lg">Un chemin en 10 étapes. Rien n'est laissé au hasard, rien n'est oublié.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {JOURNEY.map(({ Icon, title, text }, i) => (
+            <div key={title} className="glass-panel rounded-2xl border-white/5 p-5 relative">
+              <span className="absolute top-4 right-4 text-3xl font-black text-white/5">{String(i + 1).padStart(2, "0")}</span>
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
+                <Icon className="w-5 h-5 text-emerald-400" />
+              </div>
+              <h3 className="text-white font-bold mb-1">{title}</h3>
+              <p className="text-gray-500 text-xs leading-relaxed">{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════ 8. LES MODULES ══════════ */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <Eyebrow color="orange">Le Défi 30 jours, semaine par semaine</Eyebrow>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
+            Ce que vous serez capable de faire
+          </h2>
+          <p className="text-gray-400 text-lg">On ne vous décrit pas des vidéos. On vous dit ce que vous saurez faire à la fin de chaque semaine.</p>
+        </div>
+        <div className="space-y-5">
+          {MODULES.map(({ week, title, outcome, points }, i) => (
+            <div key={week} className="glass-panel rounded-2xl border-white/5 p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start glass-panel-hover">
+              <div className="lg:col-span-4">
+                <span className="inline-block text-xs font-black text-orange-400 uppercase tracking-widest mb-2">{week}</span>
+                <h3 className="text-xl sm:text-2xl font-bold text-white leading-tight">{title}</h3>
+              </div>
+              <div className="lg:col-span-8">
+                <div className="flex items-start gap-3 mb-5 bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-4">
+                  <Target className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                  <p className="text-emerald-100/90 text-sm font-medium">{outcome}</p>
+                </div>
+                <ul className="grid sm:grid-cols-2 gap-3">
+                  {points.map((p) => (
+                    <li key={p} className="flex items-start gap-2.5 text-sm text-gray-300">
+                      <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /> {p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════ 9. LES BONUS ══════════ */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <Eyebrow>Les accélérateurs offerts</Eyebrow>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
+            4 bonus pour aller <span className="gradient-text">deux fois plus vite</span>
+          </h2>
+          <p className="text-gray-400 text-lg">Inclus dans le programme, sans supplément.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {BONUSES.map(({ badge, title, value, text }) => (
+            <div key={badge} className="glass-panel rounded-2xl border-white/5 p-8 relative overflow-hidden glass-panel-hover">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl" />
+              <div className="flex items-center justify-between mb-4">
+                <span className="inline-flex items-center gap-1.5 text-xs font-black text-orange-300 bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full">
+                  <Gift className="w-3 h-3" /> {badge}
+                </span>
+                <span className="text-xs font-bold text-emerald-400">Valeur {value}</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════ 10. CE QUE VOUS SAUREZ FAIRE ══════════ */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <Eyebrow color="orange">Vos nouvelles compétences</Eyebrow>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
+            À la fin, voici ce que vous saurez faire
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {BONUSES.map((bonus) => (
-            <div
-              key={bonus.badge}
-              className="glass-panel rounded-2xl border-white/5 p-8 glass-panel-hover relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl" />
-              <span className="inline-flex items-center gap-1.5 text-xs font-black text-orange-300 bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full mb-5">
-                <Sparkles className="w-3 h-3" />
-                {bonus.badge}
-              </span>
-              <h3 className="text-lg font-bold text-white mb-3">{bonus.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed mb-5">{bonus.text}</p>
-              <span className="text-xs font-bold text-emerald-400">{bonus.value}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-4xl mx-auto">
+          {OUTCOMES.map((o) => (
+            <div key={o} className="flex items-center gap-3 glass-panel rounded-xl border-white/5 px-5 py-4">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+              <span className="text-gray-200 text-sm font-medium">{o}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ══ PRICING ══ */}
-      <section id="pricing" className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+      {/* ══════════ 11. À QUI S'ADRESSE ══════════ */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <Eyebrow>Pour qui ?</Eyebrow>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
+            Si vous avez une idée, <span className="gradient-text">c'est pour vous</span>
+          </h2>
+          <p className="text-gray-400 text-lg">Aucun prérequis technique. Une seule condition : l'envie de passer à l'action.</p>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          {AUDIENCE.map(({ Icon, t }) => (
+            <div key={t} className="glass-panel rounded-2xl border-white/5 p-6 text-center glass-panel-hover">
+              <Icon className="w-7 h-7 text-emerald-400 mx-auto mb-3" />
+              <p className="text-white font-semibold text-sm">{t}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-gray-400 mt-8 max-w-xl mx-auto text-sm">
+          <span className="text-white font-semibold">Ce n'est pas pour vous</span> si vous cherchez une pilule magique sans effort. Ici, on construit vraiment — et on va au bout.
+        </p>
+      </section>
+
+      {/* ══════════ 12. TÉMOIGNAGES ══════════ */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <Eyebrow color="orange">Ils sont passés à l'action</Eyebrow>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
+            Vos futurs élèves, ici
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {TESTIMONIALS.map((tm, i) => (
+            <div key={i} className="glass-panel rounded-2xl border-white/5 p-7 flex flex-col">
+              {tm.video ? (
+                <div className="aspect-video rounded-xl bg-black/40 border border-white/5 flex items-center justify-center mb-5">
+                  <PlayCircle className="w-10 h-10 text-emerald-400/70" />
+                </div>
+              ) : (
+                <Quote className="w-8 h-8 text-emerald-400/40 mb-4" />
+              )}
+              <p className="text-gray-300 text-sm leading-relaxed flex-grow italic">{tm.text}</p>
+              <div className="flex items-center gap-1 mt-4 text-orange-400">
+                {[...Array(5)].map((_, s) => <Star key={s} className="w-4 h-4 fill-current" />)}
+              </div>
+              <div className="flex items-center gap-3 mt-4 pt-4 border-t border-white/5">
+                <div className="w-9 h-9 rounded-full gradient-btn" />
+                <div>
+                  <p className="text-white text-sm font-bold">{tm.name}</p>
+                  <p className="text-gray-500 text-xs">{tm.role}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════ PRICING ══════════ */}
+      <section id="pricing" className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         <div className="glass-panel rounded-3xl border-white/10 p-8 sm:p-12 text-center shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1.5 gradient-btn" />
           <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -597,31 +688,41 @@ export default function VibeCodingMasteryPage() {
           <span className="inline-block text-xs font-black text-orange-300 bg-orange-500/10 border border-orange-500/20 px-4 py-1.5 rounded-full mb-6">
             Offre spéciale de lancement
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
-            Devenez un Vibe Coder autonome
-          </h2>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Rejoignez le Défi 30 jours</h2>
           <p className="text-gray-400 max-w-lg mx-auto mb-8">
-            Accédez à l'intégralité du bootcamp, aux mises à jour à vie et à tous les bonus pour
-            lancer vos projets dès ce soir.
+            Accès à vie au programme complet, au Défi 30 jours, aux 4 bonus et à toutes les mises à jour futures.
           </p>
 
-          {/* Prix */}
+          {/* Value stack */}
+          <div className="text-left max-w-md mx-auto mb-8 space-y-2.5">
+            {[
+              ["Programme complet Vibe Coding Mastery", "Inclus"],
+              ["Le Défi 30 jours (idée → SaaS en ligne)", "Inclus"],
+              ["Bibliothèque de prompts SaaS", "97 000 FCFA"],
+              ["Discord privé des SaaS Builders", "197 000 FCFA"],
+              ["Coaching live mensuel", "297 000 FCFA"],
+              ["Modèles de déploiement & sécurité", "67 000 FCFA"],
+            ].map(([label, val]) => (
+              <div key={label} className="flex items-center justify-between gap-4 text-sm border-b border-white/5 pb-2.5">
+                <span className="flex items-center gap-2 text-gray-300"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> {label}</span>
+                <span className="text-gray-500 shrink-0">{val}</span>
+              </div>
+            ))}
+          </div>
+
           <div className="flex flex-col items-center mb-8">
             <span className="text-lg text-gray-500 line-through">{ORIGINAL_PRICE}</span>
             <div className="flex items-baseline gap-1 mt-1">
               <span className="text-5xl sm:text-6xl font-black text-white">{PRICE}</span>
             </div>
-            <span className="text-xs text-gray-500 uppercase tracking-widest mt-2">
-              Paiement unique · accès à vie
-            </span>
+            <span className="text-xs text-gray-500 uppercase tracking-widest mt-2">Paiement unique · accès à vie</span>
           </div>
 
           <button
             onClick={handleBuy}
-            className="w-full sm:w-auto px-10 py-4 rounded-xl font-bold text-white gradient-btn inline-flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            className="w-full sm:w-auto px-10 py-4 rounded-xl font-bold text-white gradient-btn inline-flex items-center justify-center gap-2 shadow-lg cursor-pointer hover:scale-[1.02] transition-transform"
           >
-            <CreditCard className="w-5 h-5" />
-            Rejoindre le bootcamp Vibe Coding
+            <CreditCard className="w-5 h-5" /> Je rejoins le Défi 30 jours
           </button>
 
           <p className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-5">
@@ -629,86 +730,86 @@ export default function VibeCodingMasteryPage() {
             Paiement sécurisé Moneroo (Carte / Mobile Money) · accès immédiat dans « Mon espace »
           </p>
 
-          {/* Garantie */}
-          <div className="mt-8 flex items-start gap-4 text-left glass-panel rounded-2xl border-white/5 p-5">
-            <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
-              <BadgeCheck className="w-6 h-6 text-emerald-400" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-white">Garantie 14 jours satisfait ou remboursé</h4>
-              <p className="text-xs text-gray-400 leading-relaxed mt-1">
-                Testez les premiers modules, installez vos outils et commencez à concevoir. Si le
-                bootcamp ne répond pas à vos attentes, demandez un remboursement complet par simple
-                e-mail.
-              </p>
-            </div>
-          </div>
-
           <Countdown />
         </div>
       </section>
 
-      {/* ══ FAQ ══ */}
-      <section id="faq" className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 border-t border-white/5">
+      {/* ══════════ 14. GARANTIE ══════════ */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="glass-panel rounded-3xl border-emerald-500/20 p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-8 text-center sm:text-left">
+          <div className="w-20 h-20 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center shrink-0">
+            <BadgeCheck className="w-10 h-10 text-emerald-400" />
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-white mb-2">Garantie 14 jours — zéro risque</h3>
+            <p className="text-gray-400 leading-relaxed">
+              Rejoignez le programme, suivez les premières étapes du Défi 30 jours, installez vos outils et commencez à construire. Si dans les 14 jours vous estimez que ce n'est pas pour vous, un simple e-mail suffit pour être <span className="text-white font-semibold">remboursé intégralement</span>. Le seul risque, c'est de rester exactement là où vous êtes aujourd'hui.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ 13. FAQ ══════════ */}
+      <section id="faq" className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t border-white/5">
         <div className="text-center mb-12">
-          <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
-            Questions fréquentes
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3">
-            Tout ce que vous devez savoir
-          </h2>
+          <Eyebrow>On répond à tout</Eyebrow>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3">Vos questions, nos réponses</h2>
         </div>
         <div className="space-y-3">
           {FAQ.map((item, i) => {
             const open = openFaq === i;
             return (
               <div key={i} className="glass-panel rounded-2xl border-white/5 overflow-hidden">
-                <button
-                  onClick={() => setOpenFaq(open ? null : i)}
-                  className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
-                  aria-expanded={open}
-                >
+                <button onClick={() => setOpenFaq(open ? null : i)} className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left" aria-expanded={open}>
                   <span className="text-sm sm:text-md font-bold text-white">{item.q}</span>
                   <span className="w-7 h-7 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                    {open ? (
-                      <Minus className="w-4 h-4 text-orange-400" />
-                    ) : (
-                      <Plus className="w-4 h-4 text-emerald-400" />
-                    )}
+                    {open ? <Minus className="w-4 h-4 text-orange-400" /> : <Plus className="w-4 h-4 text-emerald-400" />}
                   </span>
                 </button>
-                {open && (
-                  <div className="px-6 pb-5 -mt-1">
-                    <p className="text-sm text-gray-400 leading-relaxed">{item.a}</p>
-                  </div>
-                )}
+                {open && <div className="px-6 pb-5 -mt-1"><p className="text-sm text-gray-400 leading-relaxed">{item.a}</p></div>}
               </div>
             );
           })}
         </div>
       </section>
 
-      {/* ══ CTA FINAL ══ */}
+      {/* ══════════ 15. DERNIER CTA ══════════ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
-        <div className="glass-panel rounded-3xl border-white/10 p-10 sm:p-14 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-orange-500/5 pointer-events-none" />
-          <Zap className="w-10 h-10 text-orange-400 mx-auto mb-5" />
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">
-            Prêt à transformer vos idées en applications ?
+        <div className="glass-panel rounded-3xl border-white/10 p-10 sm:p-16 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/8 to-orange-500/8 pointer-events-none" />
+          <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <Flame className="w-12 h-12 text-orange-400 mx-auto mb-6" />
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-5 leading-tight max-w-3xl mx-auto">
+            Dans 30 jours, vous aurez soit un SaaS en ligne… <span className="gradient-text">soit les mêmes regrets.</span>
           </h2>
-          <p className="text-gray-400 max-w-xl mx-auto mb-8">
-            Rejoignez {TITLE} et lancez votre premier projet ce soir, sans écrire une ligne de code
-            à la main.
+          <p className="text-gray-300 max-w-xl mx-auto mb-4 text-lg">
+            L'IA n'attendra pas. Ceux qui agissent maintenant construisent l'avenir. Les autres le regarderont passer.
           </p>
-          <button
-            onClick={handleBuy}
-            className="px-8 py-4 rounded-xl font-bold text-white gradient-btn inline-flex items-center gap-2 shadow-lg cursor-pointer"
-          >
-            Rejoindre {TITLE}
-            <ArrowRight className="w-5 h-5" />
-          </button>
+          <p className="text-gray-400 max-w-xl mx-auto mb-9">
+            Vous avez l'idée. Vous avez enfin la méthode. Il ne manque plus qu'une décision.
+          </p>
+          <PrimaryCTA label="Je lance mon SaaS maintenant" className="text-lg px-10 py-5" />
+          <p className="text-xs text-gray-500 mt-5">Accès immédiat · Garantie 14 jours · Paiement sécurisé Moneroo</p>
         </div>
       </section>
+
+      {/* Sticky CTA */}
+      {showSticky && (
+        <div className="fixed bottom-0 left-0 w-full z-40 glass-panel border-t border-white/10 backdrop-blur-md">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-white font-bold text-sm truncate">Défi 30 jours — lancez votre SaaS</p>
+              <p className="text-xs text-gray-400">
+                <span className="text-gray-500 line-through mr-2">{ORIGINAL_PRICE}</span>
+                <span className="text-emerald-400 font-bold">{PRICE}</span> · accès à vie
+              </p>
+            </div>
+            <button onClick={handleBuy} className="shrink-0 px-5 sm:px-7 py-3 rounded-xl font-bold text-white gradient-btn inline-flex items-center gap-2 shadow-md text-sm">
+              Rejoindre <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       <CheckoutModal
         open={checkoutOpen}
@@ -717,7 +818,7 @@ export default function VibeCodingMasteryPage() {
         price={PRICE}
         itemType="course"
         itemId={VIBE_COURSE_ID}
-        successMessage="Paiement validé ! Votre accès à Vibe Coding Mastery est disponible dans « Mon espace »."
+        successMessage="Bienvenue dans le Défi 30 jours ! Votre accès est disponible dans « Mon espace »."
       />
     </div>
   );
