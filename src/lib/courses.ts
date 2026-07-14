@@ -62,8 +62,8 @@ export const courses: Course[] = [
     title: "Vibe Coding Mastery",
     description:
       "Le bootcamp pour concevoir et lancer vos applications et SaaS en pilotant l'IA — Antigravity, Claude Code, Gemini, Supabase, Vercel, Git & GitHub — sans écrire de code manuellement.",
-    price: "15 000 FCFA",
-    priceNumeric: 15000,
+    price: "19 000 FCFA",
+    priceNumeric: 19000,
     originalPrice: "85 000 FCFA",
     originalPriceNumeric: 85000,
     duration: "Accès à vie",

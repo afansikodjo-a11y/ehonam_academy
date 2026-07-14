@@ -22,7 +22,7 @@ values
   $$vibe-coding-mastery$$,
   $$Vibe Coding Mastery$$,
   $$Le bootcamp pour concevoir et lancer vos applications et SaaS en pilotant l'IA — Antigravity, Claude Code, Gemini, Supabase, Vercel, Git & GitHub — sans écrire de code manuellement.$$,
-  $$15 000 FCFA$$, 15000, $$85 000 FCFA$$, 85000,
+  $$19 000 FCFA$$, 19000, $$85 000 FCFA$$, 85000,
   $$Accès à vie$$, $$320$$, 4.9, $$Développement$$, $$Nouveau$$,
   $$from-emerald-600/20 to-orange-600/20$$, $$group-hover:border-emerald-500/50$$,
   $$[

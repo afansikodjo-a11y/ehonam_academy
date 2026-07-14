@@ -11,12 +11,16 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getCourse, VIBE_COURSE_ID } from "@/lib/courses";
+import { fetchCourseById } from "@/lib/courses-db";
 import CheckoutModal from "@/components/CheckoutModal";
 
-const course = getCourse(VIBE_COURSE_ID);
-const PRICE = course?.price ?? "15 000 FCFA";
-const ORIGINAL_PRICE = course?.originalPrice ?? "85 000 FCFA";
-const TITLE = course?.title ?? "Vibe Coding Mastery";
+// Valeurs de repli le temps que la base réponde (la base = source de vérité).
+const staticCourse = getCourse(VIBE_COURSE_ID);
+const FALLBACK = {
+  price: staticCourse?.price ?? "19 000 FCFA",
+  originalPrice: staticCourse?.originalPrice ?? "85 000 FCFA",
+  title: staticCourse?.title ?? "Vibe Coding Mastery",
+};
 
 // Photo d'Ehonam (fichier dans /public).
 const FOUNDER_PHOTO = "/ehonam.jpg";
@@ -336,11 +340,19 @@ export default function VibeCodingMasteryPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [showSticky, setShowSticky] = useState(false);
+  const [info, setInfo] = useState(FALLBACK);
 
   useEffect(() => {
     const onScroll = () => setShowSticky(window.scrollY > 720);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Prix / titre lus depuis la base (modifiables dans /admin).
+  useEffect(() => {
+    fetchCourseById(VIBE_COURSE_ID).then((c) => {
+      if (c) setInfo({ price: c.price, originalPrice: c.originalPrice, title: c.title });
+    });
   }, []);
 
   const handleBuy = async () => {
@@ -768,9 +780,9 @@ export default function VibeCodingMasteryPage() {
           </div>
 
           <div className="flex flex-col items-center mb-8">
-            <span className="text-lg text-gray-500 line-through">{ORIGINAL_PRICE}</span>
+            <span className="text-lg text-gray-500 line-through">{info.originalPrice}</span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-5xl sm:text-6xl font-black text-white">{PRICE}</span>
+              <span className="text-5xl sm:text-6xl font-black text-white">{info.price}</span>
             </div>
             <span className="text-xs text-gray-500 uppercase tracking-widest mt-2">Paiement unique · accès à vie</span>
           </div>
@@ -857,8 +869,8 @@ export default function VibeCodingMasteryPage() {
             <div className="min-w-0">
               <p className="text-white font-bold text-sm truncate">Défi 30 jours — lancez votre SaaS</p>
               <p className="text-xs text-gray-400">
-                <span className="text-gray-500 line-through mr-2">{ORIGINAL_PRICE}</span>
-                <span className="text-emerald-400 font-bold">{PRICE}</span> · accès à vie
+                <span className="text-gray-500 line-through mr-2">{info.originalPrice}</span>
+                <span className="text-emerald-400 font-bold">{info.price}</span> · accès à vie
               </p>
             </div>
             <button onClick={handleBuy} className="shrink-0 px-5 sm:px-7 py-3 rounded-xl font-bold text-white gradient-btn inline-flex items-center gap-2 shadow-md text-sm">
@@ -871,8 +883,8 @@ export default function VibeCodingMasteryPage() {
       <CheckoutModal
         open={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
-        itemTitle={TITLE}
-        price={PRICE}
+        itemTitle={info.title}
+        price={info.price}
         itemType="course"
         itemId={VIBE_COURSE_ID}
         successMessage="Bienvenue dans le Défi 30 jours ! Votre accès est disponible dans « Mon espace »."
