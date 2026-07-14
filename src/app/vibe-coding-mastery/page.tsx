@@ -296,6 +296,41 @@ function Eyebrow({ children, color = "emerald" }: { children: React.ReactNode; c
   );
 }
 
+function BrowserFrame({
+  image, name, tag, desc, Icon, accent,
+}: {
+  image: string; name: string; tag: string; desc: string;
+  Icon: React.ComponentType<{ className?: string }>; accent: string;
+}) {
+  return (
+    <div className="glass-panel rounded-2xl border-white/10 overflow-hidden shadow-xl glass-panel-hover group">
+      <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 bg-black/40">
+        <span className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
+        <span className="w-2.5 h-2.5 rounded-full bg-amber-400/70" />
+        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+        <div className="ml-3 flex-1 h-5 rounded-md bg-white/5 border border-white/5" />
+      </div>
+      <div className="aspect-[16/10] overflow-hidden bg-black/20 border-b border-white/5">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={image}
+          alt={name}
+          loading="lazy"
+          className="w-full h-full object-cover object-top group-hover:scale-[1.04] transition-transform duration-700"
+        />
+      </div>
+      <div className="px-5 py-4">
+        <div className="flex items-center gap-2">
+          <Icon className={`w-5 h-5 ${accent}`} />
+          <h4 className="text-white font-bold">{name}</h4>
+        </div>
+        <p className="text-[11px] uppercase tracking-wide text-gray-500 mt-0.5">{tag}</p>
+        <p className="text-gray-400 text-xs mt-2 leading-relaxed">{desc}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function VibeCodingMasteryPage() {
   const router = useRouter();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -508,30 +543,38 @@ export default function VibeCodingMasteryPage() {
             <p className="text-gray-400 leading-relaxed mb-8">
               En plus de ses propres produits, il accompagne des entrepreneurs dans la création de leur SaaS. Toute la formation repose sur cette expérience de terrain.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {PRODUCTS.map(({ name, tag, Icon, image, desc, accent }) => (
-                <div key={name} className="glass-panel rounded-2xl border-white/5 p-5 glass-panel-hover">
-                  {image && (
-                    <div className="aspect-video rounded-lg overflow-hidden border border-white/5 mb-4 bg-black/20">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={image}
-                        alt={name}
-                        className="w-full h-full object-cover object-top"
-                        onError={(e) => {
-                          const box = e.currentTarget.parentElement as HTMLElement;
-                          if (box) box.style.display = "none";
-                        }}
-                      />
-                    </div>
-                  )}
-                  <Icon className={`w-6 h-6 ${accent} mb-3`} />
-                  <h3 className="text-white font-bold">{name}</h3>
-                  <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-2">{tag}</p>
-                  <p className="text-gray-400 text-xs leading-relaxed">{desc}</p>
-                </div>
-              ))}
+            <div className="flex flex-wrap gap-x-10 gap-y-4">
+              <div>
+                <p className="text-2xl sm:text-3xl font-black gradient-text">3 SaaS</p>
+                <p className="text-xs text-gray-500">lancés en production</p>
+              </div>
+              <div>
+                <p className="text-2xl sm:text-3xl font-black text-white">De vrais clients</p>
+                <p className="text-xs text-gray-500">écoles, entreprises, freelances</p>
+              </div>
+              <div>
+                <p className="text-2xl sm:text-3xl font-black text-white">Des entrepreneurs</p>
+                <p className="text-xs text-gray-500">accompagnés sur leurs projets</p>
+              </div>
             </div>
+          </div>
+        </div>
+
+        {/* Galerie des réalisations */}
+        <div className="mt-16 sm:mt-20">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <Eyebrow>Ses réalisations</Eyebrow>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-white mt-3">
+              Des SaaS déjà en production, utilisés chaque jour
+            </h3>
+            <p className="text-gray-400 mt-2 text-sm">
+              Ce ne sont pas des démos. Ce sont de vrais produits, en ligne, avec de vrais utilisateurs — construits avec la méthode que vous allez apprendre.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {PRODUCTS.map((p) => (
+              <BrowserFrame key={p.name} {...p} />
+            ))}
           </div>
         </div>
       </section>
