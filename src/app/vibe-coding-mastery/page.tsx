@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase";
 import { getCourse, VIBE_COURSE_ID } from "@/lib/courses";
 import { fetchCourseById } from "@/lib/courses-db";
 import CheckoutModal from "@/components/CheckoutModal";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // Valeurs de repli le temps que la base réponde (la base = source de vérité).
 const staticCourse = getCourse(VIBE_COURSE_ID);
@@ -376,6 +377,11 @@ export default function VibeCodingMasteryPage() {
 
   return (
     <div className="w-full overflow-hidden pb-24">
+      {/* Sélecteur de thème clair/sombre (la navbar est masquée sur cette landing) */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* ══════════ 1. HERO ══════════ */}
       <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20">
         <div className="vibe-grid absolute inset-0 -z-10 pointer-events-none" aria-hidden />
