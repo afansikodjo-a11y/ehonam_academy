@@ -18,8 +18,8 @@ const PRICE = course?.price ?? "15 000 FCFA";
 const ORIGINAL_PRICE = course?.originalPrice ?? "85 000 FCFA";
 const TITLE = course?.title ?? "Vibe Coding Mastery";
 
-// ⚙️ À personnaliser : colle l'URL d'une photo d'Ehonam (ou téléverse-la sur ton Supabase Storage).
-const FOUNDER_PHOTO = "";
+// Photo d'Ehonam (fichier dans /public).
+const FOUNDER_PHOTO = "/ehonam.jpg";
 
 /* ── Terminal animé : simulation d'une session de Vibe Coding ── */
 type Step = { type: "log" | "code" | "success" | "link"; text: string };
@@ -205,9 +205,9 @@ const WHY = [
 ];
 
 const PRODUCTS = [
-  { name: "GeScole", tag: "EdTech · Gestion scolaire", Icon: GraduationCap, desc: "Plateforme 100 % cloud qui digitalise la gestion des établissements : élèves, notes, présences, finances et communication.", accent: "text-emerald-400" },
-  { name: "Edossime", tag: "Marketplace · Talents africains", Icon: Users, desc: "La marketplace de l'élite du freelancing africain, où expertise humaine et IA se combinent pour livrer plus vite.", accent: "text-orange-400" },
-  { name: "ChapFacture", tag: "FinTech · Gestion commerciale", Icon: FileText, desc: "Devis, factures, proformas, bons de commande et de livraison — avec suivi des paiements, en quelques secondes.", accent: "text-emerald-400" },
+  { name: "GeScole", tag: "EdTech · Gestion scolaire", Icon: GraduationCap, image: "/gescole.png", desc: "Plateforme 100 % cloud qui digitalise la gestion des établissements : élèves, notes, présences, finances et communication.", accent: "text-emerald-400" },
+  { name: "Edossime", tag: "Marketplace · Talents africains", Icon: Users, image: "/edossime.png", desc: "La marketplace de l'élite du freelancing africain, où expertise humaine et IA se combinent pour livrer plus vite.", accent: "text-orange-400" },
+  { name: "ChapFacture", tag: "FinTech · Gestion commerciale", Icon: FileText, image: "/chapfacture.png", desc: "Devis, factures, proformas, bons de commande et de livraison — avec suivi des paiements, en quelques secondes.", accent: "text-emerald-400" },
 ];
 
 const JOURNEY = [
@@ -509,8 +509,22 @@ export default function VibeCodingMasteryPage() {
               En plus de ses propres produits, il accompagne des entrepreneurs dans la création de leur SaaS. Toute la formation repose sur cette expérience de terrain.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {PRODUCTS.map(({ name, tag, Icon, desc, accent }) => (
+              {PRODUCTS.map(({ name, tag, Icon, image, desc, accent }) => (
                 <div key={name} className="glass-panel rounded-2xl border-white/5 p-5 glass-panel-hover">
+                  {image && (
+                    <div className="aspect-video rounded-lg overflow-hidden border border-white/5 mb-4 bg-black/20">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={image}
+                        alt={name}
+                        className="w-full h-full object-cover object-top"
+                        onError={(e) => {
+                          const box = e.currentTarget.parentElement as HTMLElement;
+                          if (box) box.style.display = "none";
+                        }}
+                      />
+                    </div>
+                  )}
                   <Icon className={`w-6 h-6 ${accent} mb-3`} />
                   <h3 className="text-white font-bold">{name}</h3>
                   <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-2">{tag}</p>
