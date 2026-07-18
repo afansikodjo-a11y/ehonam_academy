@@ -5,6 +5,7 @@ import { Shield, Loader2, AlertCircle, CreditCard, Mail, Lock } from "lucide-rea
 import { supabase } from "@/lib/supabase";
 import { type ItemType } from "@/lib/purchases-db";
 import GoogleIcon from "@/components/GoogleIcon";
+import { setPendingCheckout } from "@/lib/pending-checkout";
 
 interface CheckoutModalProps {
   open: boolean;
@@ -135,6 +136,10 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
     setGoogleLoading(true);
     // On revient sur la page courante avec ?checkout=1 pour rouvrir la modale et
     // reprendre le paiement automatiquement une fois la session Google active.
+    // On mémorise aussi l'achat en cours : si Supabase ignore l'URL de retour
+    // demandée (ex. non déclarée dans sa liste blanche) et renvoie l'utilisateur
+    // ailleurs, <CheckoutResume> saura quand même où reprendre le paiement.
+    setPendingCheckout({ itemType, itemId, returnPath: window.location.pathname });
     const redirectTo = `${window.location.origin}${window.location.pathname}?checkout=1`;
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
