@@ -223,7 +223,7 @@ function HeroVideo() {
 }
 
 /* ── Compte à rebours (offre de lancement) ── */
-function Countdown() {
+function useCountdown() {
   const [t, setT] = useState({ h: "23", m: "59", s: "59" });
   useEffect(() => {
     const KEY = "vibe_countdown_seconds";
@@ -238,6 +238,11 @@ function Countdown() {
     }, 1000);
     return () => clearInterval(id);
   }, []);
+  return t;
+}
+
+function Countdown() {
+  const t = useCountdown();
   const Block = ({ value, unit }: { value: string; unit: string }) => (
     <div className="flex flex-col items-center">
       <span className="text-2xl sm:text-3xl font-black text-white tabular-nums bg-black/40 rounded-xl px-3.5 py-2 border border-white/5">{value}</span>
@@ -251,6 +256,25 @@ function Countdown() {
         <Block value={t.h} unit="heures" /><span className="text-2xl font-black text-gray-600">:</span>
         <Block value={t.m} unit="min" /><span className="text-2xl font-black text-gray-600">:</span>
         <Block value={t.s} unit="sec" />
+      </div>
+    </div>
+  );
+}
+
+/* ── Barre d'urgence fixe en haut de page ── */
+function UrgencyBar() {
+  const t = useCountdown();
+  return (
+    <div className="fixed top-0 left-0 w-full z-[60] h-10 sm:h-11 flex items-center bg-gradient-to-r from-orange-600 to-rose-600 text-white shadow-lg overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 w-full flex items-center justify-center gap-2 sm:gap-3">
+        <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+        <span className="text-[11px] sm:text-sm font-bold text-center truncate">
+          Offre de lancement — se termine dans{" "}
+          <span className="tabular-nums">{t.h}:{t.m}:{t.s}</span>
+        </span>
+        <a href="#pricing" className="hidden sm:inline-flex items-center gap-1 text-xs font-bold underline underline-offset-2 shrink-0 hover:text-white/80">
+          En profiter <ArrowRight className="w-3.5 h-3.5" />
+        </a>
       </div>
     </div>
   );
@@ -459,9 +483,12 @@ export default function VibeCodingMasteryPage() {
   );
 
   return (
-    <div className="w-full overflow-hidden pb-24">
+    <div className="w-full overflow-hidden pb-24 pt-10 sm:pt-11">
+      {/* Barre d'urgence : compte à rebours de l'offre de lancement, visible en permanence */}
+      <UrgencyBar />
+
       {/* Sélecteur de thème clair/sombre (la navbar est masquée sur cette landing) */}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-14 right-4 z-50">
         <ThemeToggle />
       </div>
 
