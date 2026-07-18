@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Rocket, Zap, Sparkles, Check, CheckCircle2, ShieldCheck, ArrowRight, ArrowDown,
   Plus, Minus, CreditCard, Database, GitBranch, Cloud, Wand2, XCircle,
@@ -444,7 +443,6 @@ function BrowserFrame({
 }
 
 export default function VibeCodingMasteryPage() {
-  const router = useRouter();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [showSticky, setShowSticky] = useState(false);
@@ -463,14 +461,23 @@ export default function VibeCodingMasteryPage() {
     });
   }, []);
 
-  const handleBuy = async () => {
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) {
-      router.push("/login");
-      return;
-    }
-    setCheckoutOpen(true);
-  };
+  // Retour d'une connexion Google (voir CheckoutModal) : on rouvre directement le
+  // paiement, sans repasser par une étape de connexion séparée.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") !== "1") return;
+    params.delete("checkout");
+    const qs = params.toString();
+    window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : ""));
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) setCheckoutOpen(true);
+    });
+  }, []);
+
+  // Le paiement dirige directement vers la modale : si l'utilisateur n'est pas
+  // encore connecté, elle crée son compte (ou le connecte) sur place avant de
+  // lancer le paiement — plus d'étape de connexion séparée avant d'acheter.
+  const handleBuy = () => setCheckoutOpen(true);
 
   const PrimaryCTA = ({ label, className = "" }: { label: string; className?: string }) => (
     <button
