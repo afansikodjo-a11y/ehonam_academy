@@ -36,9 +36,7 @@ export default function HomePage() {
     setSelectedOffer(offer);
   };
 
-  // « Vibe Coding Mastery » possède sa propre page de vente dédiée
-  // (/vibe-coding-mastery) et est volontairement masqué du catalogue.
-  const visibleCourses = courses.filter((c) => c.id !== VIBE_COURSE_ID);
+  const visibleCourses = courses;
 
   return (
     <div className="w-full pb-12 sm:pb-24">
@@ -257,7 +255,10 @@ export default function HomePage() {
                     )}
                     <span className="text-lg font-black text-white">{course.price}</span>
                   </div>
-                  <Link href={`/cours/${course.id}`} className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md">
+                  <Link
+                    href={course.id === VIBE_COURSE_ID ? "/vibe-coding-mastery" : `/cours/${course.id}`}
+                    className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md"
+                  >
                     Découvrir le cours
                     <Play className="w-3 h-3 fill-current" />
                   </Link>
