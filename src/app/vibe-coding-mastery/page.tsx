@@ -918,7 +918,7 @@ export default function VibeCodingMasteryPage() {
           <div className="flex flex-col items-center mb-8">
             <span className="text-lg text-gray-500 line-through">{info.originalPrice}</span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-5xl sm:text-6xl font-black text-white">{info.price}</span>
+              <span className="text-5xl sm:text-6xl font-black text-orange-400">{info.price}</span>
             </div>
             <span className="text-xs text-gray-500 uppercase tracking-widest mt-2">Paiement unique · accès à vie</span>
           </div>
