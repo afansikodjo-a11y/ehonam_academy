@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Printer, Award, AlertCircle } from "lucide-react";
+import { ArrowLeft, Loader2, Download, Award, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
 import { fetchMyPurchases, type Purchase } from "@/lib/purchases-db";
@@ -24,6 +24,8 @@ export default function CertificatePage() {
   const [ready, setReady] = useState(false);
   const [purchase, setPurchase] = useState<Purchase | null>(null);
   const [name, setName] = useState("");
+  const [downloading, setDownloading] = useState(false);
+  const certRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -43,6 +45,37 @@ export default function CertificatePage() {
       setReady(true);
     });
   }, [id, router]);
+
+  const handleDownload = async () => {
+    if (!name.trim() || !certRef.current) return;
+    setDownloading(true);
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+      const canvas = await html2canvas(certRef.current, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
+      const imgData = canvas.toDataURL("image/png");
+
+      // A4 paysage avec les mêmes marges que l'impression, image centrée en conservant les proportions.
+      const pageW = 297, pageH = 210, margin = 10;
+      const maxW = pageW - margin * 2, maxH = pageH - margin * 2;
+      const ratio = canvas.width / canvas.height;
+      let imgW = maxW, imgH = imgW / ratio;
+      if (imgH > maxH) {
+        imgH = maxH;
+        imgW = imgH * ratio;
+      }
+      const x = (pageW - imgW) / 2, y = (pageH - imgH) / 2;
+
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      pdf.addImage(imgData, "PNG", x, y, imgW, imgH);
+      const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      pdf.save(`certificat-${slug || "ehonam-academy"}.pdf`);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (!ready) {
     return (
@@ -96,19 +129,22 @@ export default function CertificatePage() {
             />
           </div>
           <button
-            onClick={() => window.print()}
-            disabled={!name.trim()}
+            onClick={handleDownload}
+            disabled={!name.trim() || downloading}
             className="px-6 py-2.5 rounded-xl font-bold text-white gradient-btn shadow-md inline-flex items-center justify-center gap-2 disabled:opacity-60"
           >
-            <Printer className="w-4 h-4" />
-            Imprimer / PDF
+            {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {downloading ? "Génération…" : "Télécharger le PDF"}
           </button>
         </div>
       </div>
 
-      {/* Certificate (printed) */}
+      {/* Certificate (printed / téléchargé) */}
       <div className="print-area">
-        <div className="certificate mx-auto bg-white text-gray-900 rounded-2xl shadow-2xl border-[3px] border-emerald-700/80 p-8 sm:p-14 relative overflow-hidden">
+        <div
+          ref={certRef}
+          className="certificate mx-auto bg-white text-gray-900 rounded-2xl shadow-2xl border-[3px] border-emerald-700/80 p-8 sm:p-14 relative overflow-hidden"
+        >
           <div className="absolute inset-3 border border-orange-500/40 rounded-xl pointer-events-none"></div>
 
           <div className="relative text-center">
