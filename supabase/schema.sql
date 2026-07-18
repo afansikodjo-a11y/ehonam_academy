@@ -557,3 +557,19 @@ drop policy if exists "Admin delete course images" on storage.objects;
 create policy "Admin delete course images"
   on storage.objects for delete to authenticated
   using ( bucket_id = 'course-images' and public.is_admin() );
+
+-- ════════════════════════════════════════════════════════════════
+-- CORRECTIF : privilèges manquants pour service_role.
+-- service_role CONTOURNE la RLS mais reste soumis aux GRANTs Postgres
+-- normaux. Sans ceci, le webhook Moneroo (qui utilise supabaseAdmin /
+-- service_role pour enregistrer un achat après paiement confirmé)
+-- échoue en silence avec "permission denied for table ...". Le filet
+-- de sécurité /api/confirm-payment (qui agit avec le token de
+-- l'utilisateur, donc le rôle authenticated) continue de fonctionner,
+-- mais le webhook — plus fiable, indépendant du retour navigateur —
+-- ne le peut pas tant que ceci n'est pas exécuté.
+-- ════════════════════════════════════════════════════════════════
+grant usage on schema public to service_role;
+grant select, insert, update, delete on all tables in schema public to service_role;
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to service_role;

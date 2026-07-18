@@ -30,5 +30,5 @@ export async function isCurrentUserAdmin(): Promise<boolean> {
 
 /** Where to send a user after login, based on their role. */
 export async function destinationAfterLogin(): Promise<string> {
-  return (await isCurrentUserAdmin()) ? "/admin" : "/";
+  return (await isCurrentUserAdmin()) ? "/admin/dashboard" : "/";
 }

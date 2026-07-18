@@ -24,7 +24,7 @@ export default function LoginPage() {
 
   // Route by role after a successful auth: admin → dashboard, student → space.
   const completeLogin = async () => {
-    router.replace((await isCurrentUserAdmin()) ? "/admin" : "/mon-espace");
+    router.replace((await isCurrentUserAdmin()) ? "/admin/dashboard" : "/mon-espace");
   };
 
   useEffect(() => {

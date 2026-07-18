@@ -27,7 +27,7 @@ export default function Navbar() {
       if (!active) return;
       if (data.session) {
         setLoggedIn(true);
-        setSpaceHref((await isCurrentUserAdmin()) ? "/admin" : "/mon-espace");
+        setSpaceHref((await isCurrentUserAdmin()) ? "/admin/dashboard" : "/mon-espace");
       } else {
         setLoggedIn(false);
       }

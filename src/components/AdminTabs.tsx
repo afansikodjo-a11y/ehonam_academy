@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Sparkles, Newspaper, Award } from "lucide-react";
+import { LayoutDashboard, BookOpen, Sparkles, Newspaper, Award } from "lucide-react";
 
 const TABS = [
+  { href: "/admin/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/admin", label: "Formations", icon: BookOpen },
   { href: "/admin/accompagnements", label: "Accompagnements", icon: Sparkles },
   { href: "/admin/blog", label: "Blog", icon: Newspaper },
