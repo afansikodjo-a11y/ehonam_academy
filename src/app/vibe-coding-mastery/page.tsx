@@ -26,6 +26,11 @@ const FALLBACK = {
 // Photo d'Ehonam (fichier dans /public).
 const FOUNDER_PHOTO = "/ehonam.jpg";
 
+// Vidéo de présentation du Hero (VSL). Laissez vide pour afficher l'emplacement à compléter.
+// - Fichier local : déposez le .mp4 dans /public puis mettez "/nom-du-fichier.mp4"
+// - YouTube / Vimeo : collez le lien "embed" (ex: "https://www.youtube.com/embed/XXXXXXXXXXX")
+const HERO_VIDEO_URL = "https://www.youtube.com/embed/juayMevy2fQ";
+
 /* ── Terminal animé : simulation d'une session de Vibe Coding ── */
 type Step = { type: "log" | "code" | "success" | "link"; text: string };
 
@@ -135,6 +140,36 @@ function TerminalSimulator() {
           return <div key={i} className="text-gray-300 break-words">{line.text}</div>;
         })}
       </div>
+    </div>
+  );
+}
+
+/* ── Vidéo de présentation (Hero) ── */
+function HeroVideo() {
+  const isEmbed = /youtube\.com\/embed|player\.vimeo\.com/.test(HERO_VIDEO_URL);
+  const isFile = HERO_VIDEO_URL && !isEmbed;
+
+  return (
+    <div className="glass-panel rounded-2xl border-white/10 overflow-hidden shadow-2xl aspect-video">
+      {isEmbed ? (
+        <iframe
+          src={HERO_VIDEO_URL}
+          title="Vidéo de présentation — Vibe Coding Mastery"
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      ) : isFile ? (
+        <video controls className="w-full h-full object-cover" src={HERO_VIDEO_URL} />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-gray-500 bg-gradient-to-br from-emerald-900/20 to-orange-900/10">
+          <PlayCircle className="w-14 h-14 opacity-60" />
+          <p className="text-sm font-medium">Emplacement pour votre vidéo de présentation</p>
+          <p className="text-xs text-gray-600 max-w-xs text-center px-4">
+            Ajoutez le lien ou le fichier dans <code className="text-gray-400">HERO_VIDEO_URL</code>
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -428,6 +463,10 @@ export default function VibeCodingMasteryPage() {
         </div>
 
         <div className="mt-14 max-w-3xl mx-auto">
+          <HeroVideo />
+        </div>
+
+        <div className="mt-10 max-w-3xl mx-auto">
           <TerminalSimulator />
           <p className="text-center text-xs text-gray-500 mt-3">↑ Voilà à quoi ressemble « vibe coder » : vous décrivez, l'IA construit, votre SaaS se met en ligne.</p>
         </div>
