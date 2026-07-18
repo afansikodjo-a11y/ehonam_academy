@@ -29,7 +29,8 @@ const FOUNDER_PHOTO = "/ehonam.jpg";
 // - Fichier local : déposez le .mp4 dans /public puis mettez "/nom-du-fichier.mp4"
 // - YouTube : collez n'importe quel lien (youtu.be/..., .../watch?v=..., .../embed/...), l'ID est extrait automatiquement
 // - Vimeo : collez le lien "embed" (ex: "https://player.vimeo.com/video/XXXXXXXXX")
-const HERO_VIDEO_URL = "https://youtu.be/juayMevy2fQ";
+const HERO_VIDEO_URL =
+  "https://player.vimeo.com/video/1211012513?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1";
 
 function extractYouTubeId(url: string): string | null {
   const m = url.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|watch\?v=))([\w-]{11})/);
