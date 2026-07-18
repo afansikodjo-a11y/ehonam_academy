@@ -6,7 +6,7 @@ import {
   Plus, Minus, CreditCard, Database, GitBranch, Cloud, Wand2, XCircle,
   Hourglass, Wallet, BadgeCheck, Users, Lightbulb, Target, Palette, Lock,
   TrendingUp, Star, Quote, Globe, FileText, GraduationCap, Briefcase,
-  Gift, LineChart, Flame, PlayCircle, Camera,
+  Gift, LineChart, Flame, PlayCircle, Camera, ExternalLink,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getCourse, VIBE_COURSE_ID } from "@/lib/courses";
@@ -317,9 +317,9 @@ const WHY = [
 ];
 
 const PRODUCTS = [
-  { name: "GeScole", tag: "EdTech · Gestion scolaire", Icon: GraduationCap, image: "/gescole.png", desc: "Plateforme 100 % cloud qui digitalise la gestion des établissements : élèves, notes, présences, finances et communication.", accent: "text-emerald-400" },
-  { name: "Edossime", tag: "Marketplace · Talents africains", Icon: Users, image: "/edossime.png", desc: "La marketplace de l'élite du freelancing africain, où expertise humaine et IA se combinent pour livrer plus vite.", accent: "text-orange-400" },
-  { name: "ChapFacture", tag: "FinTech · Gestion commerciale", Icon: FileText, image: "/chapfacture.png", desc: "Devis, factures, proformas, bons de commande et de livraison — avec suivi des paiements, en quelques secondes.", accent: "text-emerald-400" },
+  { name: "GeScole", tag: "EdTech · Gestion scolaire", Icon: GraduationCap, image: "/gescole.png", desc: "Plateforme 100 % cloud qui digitalise la gestion des établissements : élèves, notes, présences, finances et communication.", accent: "text-emerald-400", url: "https://www.gescole.com" },
+  { name: "Edossime", tag: "Marketplace · Talents africains", Icon: Users, image: "/edossime.png", desc: "La marketplace de l'élite du freelancing africain, où expertise humaine et IA se combinent pour livrer plus vite.", accent: "text-orange-400", url: "https://www.edossime.com" },
+  { name: "ChapFacture", tag: "FinTech · Gestion commerciale", Icon: FileText, image: "/chapfacture.png", desc: "Devis, factures, proformas, bons de commande et de livraison — avec suivi des paiements, en quelques secondes.", accent: "text-emerald-400", url: "https://www.chapfacture.com" },
 ];
 
 const JOURNEY = [
@@ -409,13 +409,18 @@ function Eyebrow({ children, color = "emerald" }: { children: React.ReactNode; c
 }
 
 function BrowserFrame({
-  image, name, tag, desc, Icon, accent,
+  image, name, tag, desc, Icon, accent, url,
 }: {
   image: string; name: string; tag: string; desc: string;
-  Icon: React.ComponentType<{ className?: string }>; accent: string;
+  Icon: React.ComponentType<{ className?: string }>; accent: string; url: string;
 }) {
   return (
-    <div className="glass-panel rounded-2xl border-white/10 overflow-hidden shadow-xl glass-panel-hover group">
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="glass-panel rounded-2xl border-white/10 overflow-hidden shadow-xl glass-panel-hover group block cursor-pointer"
+    >
       <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 bg-black/40">
         <span className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
         <span className="w-2.5 h-2.5 rounded-full bg-amber-400/70" />
@@ -432,14 +437,17 @@ function BrowserFrame({
         />
       </div>
       <div className="px-5 py-4">
-        <div className="flex items-center gap-2">
-          <Icon className={`w-5 h-5 ${accent}`} />
-          <h4 className="text-white font-bold">{name}</h4>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Icon className={`w-5 h-5 ${accent}`} />
+            <h4 className="text-white font-bold">{name}</h4>
+          </div>
+          <ExternalLink className="w-3.5 h-3.5 text-gray-500 group-hover:text-white transition-colors shrink-0" />
         </div>
         <p className="text-[11px] uppercase tracking-wide text-gray-500 mt-0.5">{tag}</p>
         <p className="text-gray-400 text-xs mt-2 leading-relaxed">{desc}</p>
       </div>
-    </div>
+    </a>
   );
 }
 
