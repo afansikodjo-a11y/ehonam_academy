@@ -28,8 +28,14 @@ const FOUNDER_PHOTO = "/ehonam.jpg";
 
 // Vidéo de présentation du Hero (VSL). Laissez vide pour afficher l'emplacement à compléter.
 // - Fichier local : déposez le .mp4 dans /public puis mettez "/nom-du-fichier.mp4"
-// - YouTube / Vimeo : collez le lien "embed" (ex: "https://www.youtube.com/embed/XXXXXXXXXXX")
-const HERO_VIDEO_URL = "https://www.youtube.com/embed/juayMevy2fQ";
+// - YouTube : collez n'importe quel lien (youtu.be/..., .../watch?v=..., .../embed/...), l'ID est extrait automatiquement
+// - Vimeo : collez le lien "embed" (ex: "https://player.vimeo.com/video/XXXXXXXXX")
+const HERO_VIDEO_URL = "https://youtu.be/juayMevy2fQ";
+
+function extractYouTubeId(url: string): string | null {
+  const m = url.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|watch\?v=))([\w-]{11})/);
+  return m ? m[1] : null;
+}
 
 /* ── Terminal animé : simulation d'une session de Vibe Coding ── */
 type Step = { type: "log" | "code" | "success" | "link"; text: string };
@@ -144,14 +150,56 @@ function TerminalSimulator() {
   );
 }
 
-/* ── Vidéo de présentation (Hero) ── */
+/* ── Vidéo de présentation (Hero) ──
+   Vidéo YouTube : on affiche d'abord une simple image miniature (quelques Ko), et on
+   ne charge l'iframe YouTube (~1 Mo de scripts) qu'au clic. Ça évite de plomber le
+   chargement de la page sur une connexion faible, et ça masque toutes les distractions
+   YouTube (vidéos suggérées, branding, etc.) tant que la vidéo n'est pas lancée. */
 function HeroVideo() {
-  const isEmbed = /youtube\.com\/embed|player\.vimeo\.com/.test(HERO_VIDEO_URL);
-  const isFile = HERO_VIDEO_URL && !isEmbed;
+  const [play, setPlay] = useState(false);
+  const youtubeId = extractYouTubeId(HERO_VIDEO_URL);
+  const isOtherEmbed = !youtubeId && /player\.vimeo\.com/.test(HERO_VIDEO_URL);
+  const isFile = !youtubeId && !isOtherEmbed && HERO_VIDEO_URL;
+
+  if (youtubeId) {
+    return (
+      <div className="glass-panel rounded-2xl border-white/10 overflow-hidden shadow-2xl aspect-video relative">
+        {play ? (
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&cc_load_policy=0&playsinline=1`}
+            title="Vidéo de présentation — Vibe Coding Mastery"
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setPlay(true)}
+            aria-label="Lancer la vidéo de présentation"
+            className="group w-full h-full block cursor-pointer relative"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`}
+              alt="Vidéo de présentation"
+              loading="lazy"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/35 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+              <span className="w-16 h-16 sm:w-20 sm:h-20 rounded-full gradient-btn flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform">
+                <PlayCircle className="w-9 h-9 sm:w-11 sm:h-11 text-white" />
+              </span>
+            </div>
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="glass-panel rounded-2xl border-white/10 overflow-hidden shadow-2xl aspect-video">
-      {isEmbed ? (
+      {isOtherEmbed ? (
         <iframe
           src={HERO_VIDEO_URL}
           title="Vidéo de présentation — Vibe Coding Mastery"
@@ -160,7 +208,7 @@ function HeroVideo() {
           allowFullScreen
         />
       ) : isFile ? (
-        <video controls className="w-full h-full object-cover" src={HERO_VIDEO_URL} />
+        <video controls preload="none" className="w-full h-full object-cover" src={HERO_VIDEO_URL} />
       ) : (
         <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-gray-500 bg-gradient-to-br from-emerald-900/20 to-orange-900/10">
           <PlayCircle className="w-14 h-14 opacity-60" />
