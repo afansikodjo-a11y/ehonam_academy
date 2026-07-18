@@ -97,16 +97,27 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
 
     if (authMode === "signup") {
       const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
-      setAuthLoading(false);
       if (signUpError) {
+        setAuthLoading(false);
         setError(signUpError.message || "Inscription impossible.");
         return;
       }
-      if (!data.session) {
-        setPhase("confirm-email");
+      if (data.session) {
+        setAuthLoading(false);
+        await initiateCheckout(data.session.access_token);
         return;
       }
-      await initiateCheckout(data.session.access_token);
+      // Pas de session ni d'erreur : soit un nouveau compte en attente de
+      // confirmation par email, soit un email déjà enregistré (Supabase ne fait
+      // pas la différence pour éviter l'énumération de comptes). On tente une
+      // connexion silencieuse avec les mêmes identifiants pour couvrir ce cas.
+      const { data: signInData } = await supabase.auth.signInWithPassword({ email, password });
+      setAuthLoading(false);
+      if (signInData.session) {
+        await initiateCheckout(signInData.session.access_token);
+        return;
+      }
+      setPhase("confirm-email");
       return;
     }
 
@@ -190,14 +201,28 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
               <Mail className="w-7 h-7 text-emerald-400" />
             </div>
             <p className="text-sm text-gray-300">
-              Compte créé ! Vérifiez votre email pour confirmer votre inscription, puis revenez ici pour finaliser votre paiement.
+              Si c'est un nouveau compte : vérifiez votre email pour le confirmer, puis revenez ici pour payer.
+              <br className="hidden sm:block" />
+              Si vous avez déjà un compte : le mot de passe saisi ne correspond pas.
             </p>
-            <button
-              onClick={onClose}
-              className="px-6 py-3 rounded-xl font-bold text-white gradient-btn shadow-md text-sm"
-            >
-              Compris
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => {
+                  setAuthMode("login");
+                  setError("");
+                  setPhase("auth");
+                }}
+                className="px-6 py-3 rounded-xl font-bold text-white gradient-btn shadow-md text-sm"
+              >
+                J'ai déjà un compte
+              </button>
+              <button
+                onClick={onClose}
+                className="px-6 py-3 rounded-xl font-bold text-gray-300 bg-white/5 border border-white/10 text-sm"
+              >
+                Fermer
+              </button>
+            </div>
           </div>
         )}
 
