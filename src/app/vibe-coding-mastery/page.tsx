@@ -359,10 +359,10 @@ const MODULES = [
 ];
 
 const BONUSES = [
-  { badge: "BONUS #1", title: "La bibliothèque de prompts SaaS", value: "97 000 FCFA", text: "Des structures de prompts éprouvées à copier-coller pour générer instantanément des bases de SaaS, des paiements et des dashboards." },
-  { badge: "BONUS #2", title: "Le Discord privé des SaaS Builders", value: "197 000 FCFA / an", text: "Ne restez jamais bloqué. Une communauté active pour partager vos projets, obtenir du feedback et de l'aide en direct." },
-  { badge: "BONUS #3", title: "Coaching live mensuel (Q&R)", value: "297 000 FCFA", text: "Chaque mois, une session en direct pour analyser votre SaaS, débloquer vos difficultés et avancer plus vite." },
-  { badge: "BONUS #4", title: "Les modèles de déploiement & sécurité", value: "67 000 FCFA", text: "Nos configurations prêtes à l'emploi pour déployer et sécuriser votre application sans stress." },
+  { badge: "BONUS #1", title: "La bibliothèque de prompts SaaS", value: "45 000 FCFA", text: "Des structures de prompts éprouvées à copier-coller pour générer instantanément des bases de SaaS, des paiements et des dashboards." },
+  { badge: "BONUS #2", title: "Le Discord privé des SaaS Builders", value: "69 000 FCFA / an", text: "Ne restez jamais bloqué. Une communauté active pour partager vos projets, obtenir du feedback et de l'aide en direct." },
+  { badge: "BONUS #3", title: "Coaching live mensuel (Q&R)", value: "50 000 FCFA", text: "Chaque mois, une session en direct pour analyser votre SaaS, débloquer vos difficultés et avancer plus vite." },
+  { badge: "BONUS #4", title: "Les modèles de déploiement & sécurité", value: "47 000 FCFA", text: "Nos configurations prêtes à l'emploi pour déployer et sécuriser votre application sans stress." },
 ];
 
 const OUTCOMES = [
@@ -903,10 +903,10 @@ export default function VibeCodingMasteryPage() {
             {[
               ["Programme complet Vibe Coding Mastery", "Inclus"],
               ["Le Défi 30 jours (idée → SaaS en ligne)", "Inclus"],
-              ["Bibliothèque de prompts SaaS", "97 000 FCFA"],
-              ["Discord privé des SaaS Builders", "197 000 FCFA"],
-              ["Coaching live mensuel", "297 000 FCFA"],
-              ["Modèles de déploiement & sécurité", "67 000 FCFA"],
+              ["Bibliothèque de prompts SaaS", "45 000 FCFA"],
+              ["Discord privé des SaaS Builders", "69 000 FCFA"],
+              ["Coaching live mensuel", "50 000 FCFA"],
+              ["Modèles de déploiement & sécurité", "47 000 FCFA"],
             ].map(([label, val]) => (
               <div key={label} className="flex items-center justify-between gap-4 text-sm border-b border-white/5 pb-2.5">
                 <span className="flex items-center gap-2 text-gray-300"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> {label}</span>
