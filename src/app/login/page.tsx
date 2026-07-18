@@ -22,6 +22,10 @@ export default function LoginPage() {
   const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  // Le temps de savoir si une session est déjà active (ex: retour de Google),
+  // on n'affiche pas le formulaire — pour éviter le flash "page de connexion"
+  // juste avant la redirection vers le dashboard / mon espace.
+  const [checkingSession, setCheckingSession] = useState(true);
 
   // Route by role after a successful auth: admin → dashboard, student → space.
   const completeLogin = async () => {
@@ -29,7 +33,10 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    if (!isSupabaseConfigured) {
+      setCheckingSession(false);
+      return;
+    }
     // Surface OAuth/redirect errors returned in the URL.
     const hash = window.location.hash.replace(/^#/, "");
     const search = window.location.search.replace(/^\?/, "");
@@ -40,8 +47,13 @@ export default function LoginPage() {
     }
 
     let active = true;
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (active && event === "SIGNED_IN" && session) completeLogin();
+    // Le premier appel arrive immédiatement avec l'état résolu (session
+    // existante ou fraîchement établie par le retour Google) : s'il y a une
+    // session, on redirige sans jamais montrer le formulaire.
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!active) return;
+      if (session) completeLogin();
+      else setCheckingSession(false);
     });
     return () => {
       active = false;
@@ -98,6 +110,14 @@ export default function LoginPage() {
   };
 
   const isSignup = mode === "signup";
+
+  if (checkingSession) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-12 sm:py-20 text-center text-gray-400">
+        <Loader2 className="w-6 h-6 animate-spin mx-auto" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto px-4 py-12 sm:py-20">
