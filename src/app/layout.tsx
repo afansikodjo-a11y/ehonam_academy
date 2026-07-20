@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import CheckoutResume from "@/components/CheckoutResume";
 import AuthLandingResume from "@/components/AuthLandingResume";
+import FacebookPixel from "@/components/FacebookPixel";
 
 export const metadata: Metadata = {
   title: "Ehonam Academy - Plateforme de Formations en Ligne Premium",
@@ -21,6 +22,7 @@ export default function RootLayout({
         <ThemeProvider>
           <CheckoutResume />
           <AuthLandingResume />
+          <FacebookPixel />
 
           {/* Glow Effects Background */}
           <div className="glow-blob w-[500px] h-[500px] bg-orange-600 top-[-10%] left-[-10%] animated-glow-1"></div>

@@ -9,8 +9,14 @@ import { isSupabaseConfigured, fetchCourseById } from "@/lib/courses-db";
 import { fetchMyPurchases, type Purchase } from "@/lib/purchases-db";
 import { fetchCourseProgress } from "@/lib/progress-db";
 import { lessonCount } from "@/lib/courses";
+import { trackFbEvent } from "@/lib/fb-pixel";
 
 type CourseProgress = { done: number; total: number; pct: number };
+
+function parsePrice(price: string): number {
+  const digits = (price || "").replace(/[^\d]/g, "");
+  return digits ? parseInt(digits, 10) : 0;
+}
 
 function formatDate(iso: string): string {
   try {
@@ -104,6 +110,27 @@ export default function MonEspacePage() {
       setPurchases(list);
       setLoading(false);
       loadProgress(list);
+
+      if (isReturn) {
+        // list est trié du plus récent au plus ancien : l'achat en tête est
+        // celui qu'on vient de confirmer. Sert à envoyer un évènement de
+        // conversion précis (montant réel) au Pixel Facebook.
+        const latest = list[0];
+        if (latest) {
+          trackFbEvent("Purchase", {
+            value: parsePrice(latest.price),
+            currency: "XOF",
+            content_name: latest.title || latest.itemId,
+            content_ids: [latest.itemId],
+            content_type: "product",
+          });
+        }
+        // Retire "paiement=succes" de l'URL : un rechargement de page ne doit
+        // pas re-confirmer le paiement ni renvoyer un évènement Purchase en double.
+        const url = new URL(window.location.href);
+        url.searchParams.delete("paiement");
+        window.history.replaceState({}, "", url.pathname + url.search);
+      }
 
       // Filet de sécurité : le webhook peut aussi arriver un peu après.
       if (isReturn) {
