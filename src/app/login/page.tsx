@@ -9,6 +9,7 @@ import { isSupabaseConfigured } from "@/lib/courses-db";
 import { isCurrentUserAdmin } from "@/lib/auth";
 import GoogleIcon from "@/components/GoogleIcon";
 import { markAwaitingLoginRedirect } from "@/lib/pending-login-redirect";
+import { trackFbEvent } from "@/lib/fb-pixel";
 
 const inputClass =
   "w-full rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-emerald-500 dark:focus:border-emerald-500/60 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-colors";
@@ -82,6 +83,7 @@ export default function LoginPage() {
         setMode("login");
         return;
       }
+      trackFbEvent("CompleteRegistration", { content_name: "Inscription" });
       await completeLogin();
       return;
     }

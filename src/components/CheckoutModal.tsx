@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { type ItemType } from "@/lib/purchases-db";
 import GoogleIcon from "@/components/GoogleIcon";
 import { setPendingCheckout } from "@/lib/pending-checkout";
+import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
 
 interface CheckoutModalProps {
   open: boolean;
@@ -60,6 +61,13 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
           localStorage.setItem("ea_pending_payment", String(data.paymentId));
         } catch {}
       }
+      trackFbEvent("AddPaymentInfo", {
+        value: parsePriceFCFA(price),
+        currency: "XOF",
+        content_ids: [itemId],
+        content_type: "product",
+        content_name: itemTitle,
+      });
       window.location.href = data.checkoutUrl; // → page de paiement Moneroo
     } catch (e: any) {
       setError(e.message || "Le paiement n'a pas pu être initié.");
@@ -75,6 +83,14 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
     setAuthMode("signup");
     setPhase("checking");
     let active = true;
+
+    trackFbEvent("InitiateCheckout", {
+      value: parsePriceFCFA(price),
+      currency: "XOF",
+      content_ids: [itemId],
+      content_type: "product",
+      content_name: itemTitle,
+    });
 
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
@@ -105,6 +121,7 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
       }
       if (data.session) {
         setAuthLoading(false);
+        trackFbEvent("CompleteRegistration", { content_name: "Achat — création de compte" });
         await initiateCheckout(data.session.access_token);
         return;
       }

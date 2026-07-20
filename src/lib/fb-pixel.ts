@@ -5,3 +5,9 @@ export function trackFbEvent(event: string, params?: Record<string, unknown>) {
   const fbq = (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq;
   if (typeof fbq === "function") fbq("track", event, params);
 }
+
+/** "35 000 FCFA" → 35000. Utilisé pour renseigner "value" dans les évènements. */
+export function parsePriceFCFA(price: string): number {
+  const digits = (price || "").replace(/[^\d]/g, "");
+  return digits ? parseInt(digits, 10) : 0;
+}

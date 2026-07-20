@@ -9,14 +9,9 @@ import { isSupabaseConfigured, fetchCourseById } from "@/lib/courses-db";
 import { fetchMyPurchases, type Purchase } from "@/lib/purchases-db";
 import { fetchCourseProgress } from "@/lib/progress-db";
 import { lessonCount } from "@/lib/courses";
-import { trackFbEvent } from "@/lib/fb-pixel";
+import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
 
 type CourseProgress = { done: number; total: number; pct: number };
-
-function parsePrice(price: string): number {
-  const digits = (price || "").replace(/[^\d]/g, "");
-  return digits ? parseInt(digits, 10) : 0;
-}
 
 function formatDate(iso: string): string {
   try {
@@ -118,7 +113,7 @@ export default function MonEspacePage() {
         const latest = list[0];
         if (latest) {
           trackFbEvent("Purchase", {
-            value: parsePrice(latest.price),
+            value: parsePriceFCFA(latest.price),
             currency: "XOF",
             content_name: latest.title || latest.itemId,
             content_ids: [latest.itemId],

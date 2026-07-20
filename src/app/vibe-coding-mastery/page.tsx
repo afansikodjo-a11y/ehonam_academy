@@ -13,6 +13,7 @@ import { getCourse, VIBE_COURSE_ID } from "@/lib/courses";
 import { fetchCourseById } from "@/lib/courses-db";
 import CheckoutModal from "@/components/CheckoutModal";
 import ThemeToggle from "@/components/ThemeToggle";
+import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
 
 // Valeurs de repli le temps que la base réponde (la base = source de vérité).
 const staticCourse = getCourse(VIBE_COURSE_ID);
@@ -461,6 +462,16 @@ export default function VibeCodingMasteryPage() {
     const onScroll = () => setShowSticky(window.scrollY > 720);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    trackFbEvent("ViewContent", {
+      value: parsePriceFCFA(FALLBACK.price),
+      currency: "XOF",
+      content_ids: [VIBE_COURSE_ID],
+      content_type: "product",
+      content_name: FALLBACK.title,
+    });
   }, []);
 
   // Prix / titre lus depuis la base (modifiables dans /admin).

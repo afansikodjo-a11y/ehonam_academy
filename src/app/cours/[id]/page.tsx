@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, CreditCard, Award, BookOpen, Layers, Check, Clock, PlayCircle, Loader2 } from "lucide-react";
 import { getCourse, getAllLessons, courseImageSrc, type Course } from "@/lib/courses";
 import { fetchCourseById } from "@/lib/courses-db";
 import { supabase } from "@/lib/supabase";
 import CheckoutModal from "@/components/CheckoutModal";
+import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -16,6 +17,7 @@ export default function CourseDetailPage() {
   const [course, setCourse] = useState<Course | null>(() => getCourse(id) ?? null);
   const [loading, setLoading] = useState(true);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const viewTracked = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -29,6 +31,18 @@ export default function CourseDetailPage() {
       active = false;
     };
   }, [id]);
+
+  useEffect(() => {
+    if (!course || viewTracked.current) return;
+    viewTracked.current = true;
+    trackFbEvent("ViewContent", {
+      value: parsePriceFCFA(course.price),
+      currency: "XOF",
+      content_ids: [course.id],
+      content_type: "product",
+      content_name: course.title,
+    });
+  }, [course]);
 
   if (!course) {
     return (
