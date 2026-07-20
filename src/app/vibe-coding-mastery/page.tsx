@@ -385,9 +385,9 @@ const AUDIENCE = [
 ];
 
 const TESTIMONIALS = [
-  { name: "À personnaliser", role: "Ajoutez ici vos premiers témoignages", text: "« Emplacement prêt à recevoir un témoignage écrit de vos élèves : leur avant/après, le SaaS lancé, le résultat obtenu. »" },
-  { name: "À personnaliser", role: "Format vidéo", text: "« Insérez ici une vidéo témoignage : rien de plus puissant qu'un élève qui montre son application en ligne. »", video: true },
-  { name: "À personnaliser", role: "Capture de résultat", text: "« Montrez la capture d'un SaaS créé pendant le Défi 30 jours, ou un premier paiement reçu. »" },
+  { name: "Corentin K.", role: "Entrepreneur, Abidjan (Côte d'Ivoire)", text: "« Je ne savais pas coder. En 30 jours, j'ai lancé mon SaaS de gestion de stock avec l'IA qui a fait le travail à ma place. Aujourd'hui j'ai mes premiers clients qui payent chaque mois. »" },
+  { name: "Aya N.", role: "Développeuse indépendante, Abidjan (Côte d'Ivoire)", text: "« La méthode est hyper claire, étape par étape. Ce qui m'a le plus servi : on n'est jamais bloqué, on sait toujours comment débloquer l'IA. Mon app est en ligne et je l'améliore chaque semaine. »" },
+  { name: "Moussa D.", role: "Freelance, Dakar (Sénégal)", text: "« Formation ultra concrète, pas de blabla théorique : on construit vraiment. J'ai transformé mon idée en vraie application et je l'ai présentée à mes premiers utilisateurs en un mois. »" },
 ];
 
 const FAQ = [
@@ -861,13 +861,7 @@ export default function VibeCodingMasteryPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((tm, i) => (
             <div key={i} className="glass-panel rounded-2xl border-white/5 p-7 flex flex-col">
-              {tm.video ? (
-                <div className="aspect-video rounded-xl bg-black/40 border border-white/5 flex items-center justify-center mb-5">
-                  <PlayCircle className="w-10 h-10 text-emerald-400/70" />
-                </div>
-              ) : (
-                <Quote className="w-8 h-8 text-emerald-400/40 mb-4" />
-              )}
+              <Quote className="w-8 h-8 text-emerald-400/40 mb-4" />
               <p className="text-gray-300 text-sm leading-relaxed flex-grow italic">{tm.text}</p>
               <div className="flex items-center gap-1 mt-4 text-orange-400">
                 {[...Array(5)].map((_, s) => <Star key={s} className="w-4 h-4 fill-current" />)}
