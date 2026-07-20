@@ -855,7 +855,7 @@ export default function VibeCodingMasteryPage() {
         <div className="text-center max-w-2xl mx-auto mb-14">
           <Eyebrow color="orange">Ils sont passés à l'action</Eyebrow>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
-            Vos futurs élèves, ici
+            Ce qu'ils pensent de VIBE CODING MASTERY
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
