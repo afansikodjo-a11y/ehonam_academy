@@ -576,8 +576,8 @@ export default function VibeCodingMasteryPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {NEW_REALITY.map(({ Icon, title, text }) => (
-            <div key={title} className="glass-panel rounded-2xl border-white/5 p-8 glass-panel-hover">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6">
+            <div key={title} className="glass-panel rounded-2xl border-white/5 p-8 glass-panel-hover text-center">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6 mx-auto">
                 <Icon className="w-6 h-6 text-emerald-400" />
               </div>
               <h3 className="text-xl font-bold text-white mb-3">{title}</h3>
@@ -738,9 +738,9 @@ export default function VibeCodingMasteryPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {JOURNEY.map(({ Icon, title, text }, i) => (
-            <div key={title} className="glass-panel rounded-2xl border-white/5 p-5 relative">
+            <div key={title} className="glass-panel rounded-2xl border-white/5 p-5 relative text-center">
               <span className="absolute top-4 right-4 text-3xl font-black text-white/5">{String(i + 1).padStart(2, "0")}</span>
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4 mx-auto">
                 <Icon className="w-5 h-5 text-emerald-400" />
               </div>
               <h3 className="text-white font-bold mb-1">{title}</h3>
