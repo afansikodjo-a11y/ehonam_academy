@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Shield, Loader2, AlertCircle, CreditCard, Mail, Lock } from "lucide-react";
+import { Shield, Loader2, AlertCircle, CreditCard, Mail, Lock, MessageCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { type ItemType } from "@/lib/purchases-db";
 import GoogleIcon from "@/components/GoogleIcon";
 import { setPendingCheckout } from "@/lib/pending-checkout";
 import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
+import { buildWhatsappUrl } from "@/lib/whatsapp";
 
 interface CheckoutModalProps {
   open: boolean;
@@ -214,6 +215,19 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
                 Vous allez être redirigé vers la page sécurisée Moneroo (Carte / Mobile Money).
               </p>
             </div>
+            <p className="text-xs text-gray-500 pt-2 border-t border-white/5">
+              Ça prend plus de temps que prévu ?{" "}
+              <a
+                href={buildWhatsappUrl(
+                  `Bonjour, mon paiement pour « ${itemTitle} » (${price}) semble bloqué sur Ehonam Academy. Pouvez-vous m'aider ?`
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-400 hover:text-emerald-300 font-semibold underline underline-offset-2"
+              >
+                Contactez-nous sur WhatsApp
+              </a>
+            </p>
           </div>
         )}
 
@@ -254,12 +268,28 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
               <AlertCircle className="w-7 h-7 text-rose-400" />
             </div>
             <p className="text-sm text-gray-300">{error}</p>
-            <button
-              onClick={onClose}
-              className="px-6 py-3 rounded-xl font-bold text-white gradient-btn shadow-md text-sm"
-            >
-              Réessayer plus tard
-            </button>
+            <p className="text-xs text-gray-500">
+              Un souci avec votre paiement ? Contactez-nous directement, on s'en occupe rapidement.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <a
+                href={buildWhatsappUrl(
+                  `Bonjour, mon paiement pour « ${itemTitle} » (${price}) a échoué sur Ehonam Academy. Pouvez-vous m'aider ?`
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-3 rounded-xl font-bold text-white bg-[#25D366] hover:bg-[#20bd5a] shadow-md text-sm inline-flex items-center justify-center gap-2 transition-colors"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Contactez-nous sur WhatsApp
+              </a>
+              <button
+                onClick={onClose}
+                className="px-6 py-3 rounded-xl font-bold text-gray-300 bg-white/5 border border-white/10 text-sm"
+              >
+                Fermer
+              </button>
+            </div>
           </div>
         )}
 

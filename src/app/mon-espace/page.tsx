@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Sparkles, Loader2, GraduationCap, ArrowRight, Calendar, Award, PlayCircle, UserCog } from "lucide-react";
+import { BookOpen, Sparkles, Loader2, GraduationCap, ArrowRight, Calendar, Award, PlayCircle, UserCog, MessageCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured, fetchCourseById } from "@/lib/courses-db";
 import { fetchMyPurchases, type Purchase } from "@/lib/purchases-db";
 import { fetchCourseProgress } from "@/lib/progress-db";
 import { lessonCount } from "@/lib/courses";
 import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
+import { buildWhatsappUrl } from "@/lib/whatsapp";
 
 type CourseProgress = { done: number; total: number; pct: number };
 
@@ -179,11 +180,41 @@ export default function MonEspacePage() {
       </div>
 
       {paymentSuccess && (
-        <div className="mb-8 flex items-start gap-2 text-sm text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-4 py-3">
-          <span className="mt-0.5">✅</span>
+        <div className="mb-8 flex flex-col gap-2 text-sm text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-4 py-3">
+          <span className="flex items-start gap-2">
+            <span className="mt-0.5">✅</span>
+            <span>
+              Merci pour votre paiement ! Votre accès est en cours de validation et apparaîtra ici dans un instant
+              (actualisez la page si besoin).
+            </span>
+          </span>
+          <span className="pl-6 text-xs text-emerald-300/80">
+            Toujours rien après quelques minutes ?{" "}
+            <a
+              href={buildWhatsappUrl("Bonjour, j'ai payé sur Ehonam Academy mais mon accès n'apparaît toujours pas dans « Mon espace ». Pouvez-vous m'aider ?")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold underline underline-offset-2 hover:text-emerald-200"
+            >
+              Contactez-nous sur WhatsApp
+            </a>
+          </span>
+        </div>
+      )}
+
+      {!paymentSuccess && (
+        <div className="mb-8 flex items-center gap-2 text-xs text-gray-500">
+          <MessageCircle className="w-3.5 h-3.5 shrink-0" />
           <span>
-            Merci pour votre paiement ! Votre accès est en cours de validation et apparaîtra ici dans un instant
-            (actualisez la page si besoin).
+            Un souci avec un paiement ou un accès manquant ?{" "}
+            <a
+              href={buildWhatsappUrl("Bonjour, j'ai un souci avec mon compte/paiement sur Ehonam Academy.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
+            >
+              Contactez-nous sur WhatsApp
+            </a>
           </span>
         </div>
       )}

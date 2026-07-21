@@ -3,10 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, MessageCircle, Check, ArrowLeft, Clock, ShieldCheck } from "lucide-react";
-
-// Owner WhatsApp number in international format (no "+"): +228 91 28 25 90
-const WHATSAPP_NUMBER = "22891282590";
-const WHATSAPP_DISPLAY = "+228 91 28 25 90";
+import { WHATSAPP_DISPLAY, buildWhatsappUrl } from "@/lib/whatsapp";
 
 const SUBJECTS = [
   "Question sur une formation",
@@ -17,10 +14,6 @@ const SUBJECTS = [
 
 const inputClass =
   "w-full rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-emerald-500 dark:focus:border-emerald-500/60 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-colors";
-
-function buildWhatsappUrl(text: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-}
 
 export default function ContactPage() {
   const router = useRouter();
