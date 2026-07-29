@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Shield, LogOut, Megaphone, Loader2, Save, Check, TrendingDown,
+  Shield, LogOut, Megaphone, Loader2, Save, Check, TrendingDown, Trash2,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
@@ -46,6 +46,7 @@ export default function AdminCampagnesPage() {
   const [pixelIdInput, setPixelIdInput] = useState("");
   const [savingPixel, setSavingPixel] = useState(false);
   const [savedPixel, setSavedPixel] = useState(false);
+  const [removingPixel, setRemovingPixel] = useState(false);
 
   const [days, setDays] = useState(30);
   const [events, setEvents] = useState<PixelEventRow[]>([]);
@@ -91,6 +92,19 @@ export default function AdminCampagnesPage() {
       setPixelId(pixelIdInput.trim());
       setSavedPixel(true);
       setTimeout(() => setSavedPixel(false), 2500);
+    }
+  };
+
+  const removePixelId = async () => {
+    if (!window.confirm("Supprimer le pixel Meta ? Le suivi des conversions sera arrêté sur tout le site jusqu'à ce qu'un nouvel ID soit enregistré.")) {
+      return;
+    }
+    setRemovingPixel(true);
+    const err = await updatePixelId("");
+    setRemovingPixel(false);
+    if (!err) {
+      setPixelId("");
+      setPixelIdInput("");
     }
   };
 
@@ -193,14 +207,25 @@ export default function AdminCampagnesPage() {
               <p className="text-xs text-gray-500 mt-2">Aucun pixel actif — le suivi Meta est inactif sur le site.</p>
             )}
           </div>
-          <button
-            onClick={savePixelId}
-            disabled={savingPixel || pixelIdInput.trim() === pixelId}
-            className="gradient-btn shrink-0 px-6 py-2.5 rounded-xl text-white font-black text-sm flex items-center gap-2 disabled:opacity-50"
-          >
-            {savingPixel ? <Loader2 className="w-4 h-4 animate-spin" /> : savedPixel ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-            {savedPixel ? "Enregistré" : "Enregistrer"}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={removePixelId}
+              disabled={removingPixel || (!pixelId && !pixelIdInput)}
+              title="Supprimer le pixel"
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold text-red-300 hover:text-red-200 border border-red-500/20 hover:bg-red-500/10 flex items-center gap-2 transition-all disabled:opacity-40"
+            >
+              {removingPixel ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              Supprimer
+            </button>
+            <button
+              onClick={savePixelId}
+              disabled={savingPixel || pixelIdInput.trim() === pixelId}
+              className="gradient-btn px-6 py-2.5 rounded-xl text-white font-black text-sm flex items-center gap-2 disabled:opacity-50"
+            >
+              {savingPixel ? <Loader2 className="w-4 h-4 animate-spin" /> : savedPixel ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+              {savedPixel ? "Enregistré" : "Enregistrer"}
+            </button>
+          </div>
         </div>
       </div>
 
