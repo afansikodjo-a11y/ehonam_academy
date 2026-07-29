@@ -8,20 +8,11 @@ import {
   TrendingUp, Star, Quote, Globe, FileText, GraduationCap, Briefcase,
   Gift, LineChart, Flame, PlayCircle, Camera, ExternalLink,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-import { getCourse, VIBE_COURSE_ID } from "@/lib/courses";
-import { fetchCourseById } from "@/lib/courses-db";
+import { VIBE_COURSE_ID } from "@/lib/courses";
 import CheckoutModal from "@/components/CheckoutModal";
 import ThemeToggle from "@/components/ThemeToggle";
-import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
-
-// Valeurs de repli le temps que la base réponde (la base = source de vérité).
-const staticCourse = getCourse(VIBE_COURSE_ID);
-const FALLBACK = {
-  price: staticCourse?.price ?? "19 000 FCFA",
-  originalPrice: staticCourse?.originalPrice ?? "85 000 FCFA",
-  title: staticCourse?.title ?? "Vibe Coding Mastery",
-};
+import { useSalesPageCheckout } from "@/lib/useSalesPageCheckout";
+import Eyebrow from "@/components/Eyebrow";
 
 // Photo d'Ehonam (fichier dans /public).
 const FOUNDER_PHOTO = "/ehonam.jpg";
@@ -401,14 +392,6 @@ const FAQ = [
 ];
 
 /* ── UI helpers ── */
-function Eyebrow({ children, color = "emerald" }: { children: React.ReactNode; color?: "emerald" | "orange" }) {
-  return (
-    <span className={`text-xs font-black uppercase tracking-widest ${color === "orange" ? "text-orange-400" : "text-emerald-400"}`}>
-      {children}
-    </span>
-  );
-}
-
 function BrowserFrame({
   image, name, tag, desc, Icon, accent, url,
 }: {
@@ -453,51 +436,8 @@ function BrowserFrame({
 }
 
 export default function VibeCodingMasteryPage() {
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const { info, checkoutOpen, setCheckoutOpen, showSticky, handleBuy } = useSalesPageCheckout(VIBE_COURSE_ID);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [showSticky, setShowSticky] = useState(false);
-  const [info, setInfo] = useState(FALLBACK);
-
-  useEffect(() => {
-    const onScroll = () => setShowSticky(window.scrollY > 720);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    trackFbEvent("ViewContent", {
-      value: parsePriceFCFA(FALLBACK.price),
-      currency: "XOF",
-      content_ids: [VIBE_COURSE_ID],
-      content_type: "product",
-      content_name: FALLBACK.title,
-    });
-  }, []);
-
-  // Prix / titre lus depuis la base (modifiables dans /admin).
-  useEffect(() => {
-    fetchCourseById(VIBE_COURSE_ID).then((c) => {
-      if (c) setInfo({ price: c.price, originalPrice: c.originalPrice, title: c.title });
-    });
-  }, []);
-
-  // Retour d'une connexion Google (voir CheckoutModal) : on rouvre directement le
-  // paiement, sans repasser par une étape de connexion séparée.
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("checkout") !== "1") return;
-    params.delete("checkout");
-    const qs = params.toString();
-    window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : ""));
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setCheckoutOpen(true);
-    });
-  }, []);
-
-  // Le paiement dirige directement vers la modale : si l'utilisateur n'est pas
-  // encore connecté, elle crée son compte (ou le connecte) sur place avant de
-  // lancer le paiement — plus d'étape de connexion séparée avant d'acheter.
-  const handleBuy = () => setCheckoutOpen(true);
 
   const PrimaryCTA = ({ label, className = "" }: { label: string; className?: string }) => (
     <button

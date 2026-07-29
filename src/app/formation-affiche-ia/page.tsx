@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Sparkles, Check, CheckCircle2, ArrowRight,
   Plus, Minus,
@@ -12,17 +12,11 @@ import {
   Smartphone, MonitorPlay, Clock, BadgeCheck,
   PlayCircle,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-import { fetchCourseById } from "@/lib/courses-db";
 import { AFFICHE_COURSE_ID } from "@/lib/courses";
 import CheckoutModal from "@/components/CheckoutModal";
-import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
-
-const FALLBACK = {
-  price: "15 000 FCFA",
-  originalPrice: "45 000 FCFA",
-  title: "Créer des Affiches Professionnelles avec l'IA",
-};
+import { useSalesPageCheckout } from "@/lib/useSalesPageCheckout";
+import { useScrollReveal } from "@/lib/useScrollReveal";
+import Eyebrow from "@/components/Eyebrow";
 
 const TRUST_PILLS = [
   "Accessible aux débutants",
@@ -144,14 +138,6 @@ const OUTCOMES = [
   "Créer des contenus visuels pour les réseaux sociaux",
   "Utiliser cette compétence pour vos propres projets ou vos clients",
 ];
-
-function Eyebrow({ children, color = "emerald" }: { children: React.ReactNode; color?: "emerald" | "orange" }) {
-  return (
-    <span className={`text-xs font-black uppercase tracking-widest ${color === "orange" ? "text-orange-400" : "text-emerald-400"}`}>
-      {children}
-    </span>
-  );
-}
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -284,63 +270,9 @@ function PosterMockup({ type }: { type: number }) {
 }
 
 export default function FormationAfficheIAPage() {
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const { info, checkoutOpen, setCheckoutOpen, showSticky, handleBuy } = useSalesPageCheckout(AFFICHE_COURSE_ID);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [showSticky, setShowSticky] = useState(false);
-  const [info, setInfo] = useState(FALLBACK);
-
-  useEffect(() => {
-    const onScroll = () => setShowSticky(window.scrollY > 720);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Activer dynamiquement le scroll reveal pour les sections en-dessous du Hero
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("reveal-visible");
-          }
-        });
-      },
-      { threshold: 0.05, rootMargin: "50px" }
-    );
-
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    trackFbEvent("ViewContent", {
-      value: parsePriceFCFA(FALLBACK.price),
-      currency: "XOF",
-      content_ids: [AFFICHE_COURSE_ID],
-      content_type: "product",
-      content_name: FALLBACK.title,
-    });
-  }, []);
-
-  useEffect(() => {
-    fetchCourseById(AFFICHE_COURSE_ID).then((c) => {
-      if (c) setInfo({ price: c.price, originalPrice: c.originalPrice, title: c.title });
-    });
-  }, []);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("checkout") !== "1") return;
-    params.delete("checkout");
-    const qs = params.toString();
-    window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : ""));
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setCheckoutOpen(true);
-    });
-  }, []);
-
-  const handleBuy = () => setCheckoutOpen(true);
+  useScrollReveal();
 
   return (
     <>
