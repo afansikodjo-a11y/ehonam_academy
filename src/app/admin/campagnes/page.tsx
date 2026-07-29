@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
 import { isCurrentUserAdmin } from "@/lib/auth";
 import { fetchPixelId, updatePixelId } from "@/lib/settings-db";
-import { fetchPixelEvents, type PixelEventRow } from "@/lib/pixel-events-db";
+import { fetchPixelEvents, resetPixelEvents, type PixelEventRow } from "@/lib/pixel-events-db";
 import AdminTabs from "@/components/AdminTabs";
 
 const inputClass =
@@ -51,6 +51,7 @@ export default function AdminCampagnesPage() {
   const [days, setDays] = useState(30);
   const [events, setEvents] = useState<PixelEventRow[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [resettingEvents, setResettingEvents] = useState(false);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -106,6 +107,16 @@ export default function AdminCampagnesPage() {
       setPixelId("");
       setPixelIdInput("");
     }
+  };
+
+  const resetStats = async () => {
+    if (!window.confirm("Réinitialiser toutes les statistiques ? Tout l'historique des évènements (vues, paiements, achats) sera effacé définitivement.")) {
+      return;
+    }
+    setResettingEvents(true);
+    const err = await resetPixelEvents();
+    setResettingEvents(false);
+    if (!err) setEvents([]);
   };
 
   const logout = async () => {
@@ -230,18 +241,29 @@ export default function AdminCampagnesPage() {
       </div>
 
       {/* Sélecteur de période */}
-      <div className="flex items-center gap-2">
-        {PERIODS.map((p) => (
-          <button
-            key={p.days}
-            onClick={() => setDays(p.days)}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-              days === p.days ? "gradient-btn text-white shadow-md" : "text-gray-300 hover:text-white bg-white/5 hover:bg-white/10"
-            }`}
-          >
-            {p.label}
-          </button>
-        ))}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          {PERIODS.map((p) => (
+            <button
+              key={p.days}
+              onClick={() => setDays(p.days)}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                days === p.days ? "gradient-btn text-white shadow-md" : "text-gray-300 hover:text-white bg-white/5 hover:bg-white/10"
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={resetStats}
+          disabled={resettingEvents || events.length === 0}
+          title="Réinitialiser toutes les statistiques"
+          className="px-4 py-2 rounded-lg text-xs font-bold text-red-300 hover:text-red-200 border border-red-500/20 hover:bg-red-500/10 flex items-center gap-2 transition-all disabled:opacity-40"
+        >
+          {resettingEvents ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+          Réinitialiser les statistiques
+        </button>
       </div>
 
       {/* Entonnoir de conversion */}

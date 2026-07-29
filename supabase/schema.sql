@@ -601,13 +601,16 @@ create table if not exists public.pixel_events (
 
 alter table public.pixel_events enable row level security;
 
--- Aucune policy insert/update/delete pour anon/authenticated : toute
--- écriture passe par /api/pixel-events avec supabaseAdmin (service_role),
--- jamais directement depuis le navigateur.
+-- Aucune policy insert/update pour anon/authenticated : toute écriture
+-- passe par /api/pixel-events avec supabaseAdmin (service_role), jamais
+-- directement depuis le navigateur. Le delete est réservé à l'admin
+-- (réinitialisation des statistiques depuis /admin/campagnes).
 drop policy if exists "Admin read pixel events" on public.pixel_events;
 create policy "Admin read pixel events" on public.pixel_events for select to authenticated using ( public.is_admin() );
+drop policy if exists "Admin delete pixel events" on public.pixel_events;
+create policy "Admin delete pixel events" on public.pixel_events for delete to authenticated using ( public.is_admin() );
 
-grant select on public.pixel_events to authenticated;
+grant select, delete on public.pixel_events to authenticated;
 
 -- service_role (utilisé par /api/pixel-events) contourne la RLS mais reste
 -- soumis aux GRANTs Postgres normaux — explicite ici pour que cette section

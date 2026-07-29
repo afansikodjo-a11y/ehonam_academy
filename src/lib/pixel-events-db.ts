@@ -33,3 +33,9 @@ export async function fetchPixelEvents(sinceDays: number): Promise<PixelEventRow
   if (error || !data) return [];
   return data as PixelEventRow[];
 }
+
+/** Efface tout le journal des évènements pixel (admin uniquement, cf. RLS). */
+export async function resetPixelEvents() {
+  const { error } = await supabase.from("pixel_events").delete().gte("created_at", "1970-01-01T00:00:00Z");
+  return error;
+}
