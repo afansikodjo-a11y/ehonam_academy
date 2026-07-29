@@ -56,7 +56,74 @@ export interface Course {
  */
 export const VIBE_COURSE_ID = "vibe-coding-mastery";
 
+/**
+ * Identifiant de la formation « Créer des Affiches Professionnelles avec l'IA ».
+ * Possède sa propre page de vente dédiée (/formation-affiche-ia).
+ */
+export const AFFICHE_COURSE_ID = "formation-affiche-ia";
+
 export const courses: Course[] = [
+  {
+    id: AFFICHE_COURSE_ID,
+    title: "Créer des Affiches Professionnelles avec l'IA",
+    description:
+      "Apprenez à créer des affiches professionnelles de différents types grâce à l'intelligence artificielle — promotions, événements, restaurants, réseaux sociaux et bien plus.",
+    price: "15 000 FCFA",
+    priceNumeric: 15000,
+    originalPrice: "45 000 FCFA",
+    originalPriceNumeric: 45000,
+    duration: "Accès à vie",
+    students: "0",
+    rating: 5.0,
+    category: "Design",
+    tag: "Nouveau",
+    gradient: "from-orange-600/20 to-emerald-600/20",
+    borderColor: "group-hover:border-orange-500/50",
+    showDuration: false,
+    showLessons: false,
+    chapters: [
+      {
+        title: "L'IA et la création d'affiches",
+        lessons: [
+          { title: "Le potentiel de l'IA pour créer des affiches professionnelles", duration: "—" },
+          { title: "Les meilleurs outils IA pour la création graphique", duration: "—" },
+          { title: "Les principes d'une affiche qui capte l'attention", duration: "—" },
+        ],
+      },
+      {
+        title: "Maîtriser l'art du prompt visuel",
+        lessons: [
+          { title: "La structure d'un prompt efficace pour les visuels", duration: "—" },
+          { title: "Les mots-clés qui font la différence", duration: "—" },
+          { title: "Itérer et affiner vos créations étape par étape", duration: "—" },
+        ],
+      },
+      {
+        title: "Affiches commerciales & promotionnelles",
+        lessons: [
+          { title: "Affiches de promotion pour boutiques et commerces", duration: "—" },
+          { title: "Visuels publicitaires pour Facebook et Instagram", duration: "—" },
+          { title: "Affiches de soldes et offres spéciales", duration: "—" },
+        ],
+      },
+      {
+        title: "Affiches restaurants, événements & entreprises",
+        lessons: [
+          { title: "Menus et affiches de restaurant", duration: "—" },
+          { title: "Affiches d'événements et flyers de formations", duration: "—" },
+          { title: "Affiches institutionnelles pour entreprises", duration: "—" },
+        ],
+      },
+      {
+        title: "Visuels réseaux sociaux & amélioration IA",
+        lessons: [
+          { title: "Visuels Instagram, Facebook, TikTok et LinkedIn", duration: "—" },
+          { title: "Affiches produits et packagings", duration: "—" },
+          { title: "Retoucher et améliorer des photos existantes avec l'IA", duration: "—" },
+        ],
+      },
+    ],
+  },
   {
     id: VIBE_COURSE_ID,
     title: "Vibe Coding Mastery",
