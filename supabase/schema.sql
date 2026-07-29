@@ -609,6 +609,11 @@ create policy "Admin read pixel events" on public.pixel_events for select to aut
 
 grant select on public.pixel_events to authenticated;
 
+-- service_role (utilisé par /api/pixel-events) contourne la RLS mais reste
+-- soumis aux GRANTs Postgres normaux — explicite ici pour que cette section
+-- fonctionne même exécutée seule, sans dépendre du correctif en bas de fichier.
+grant select, insert, update, delete on public.app_settings, public.pixel_events to service_role;
+
 -- ════════════════════════════════════════════════════════════════
 -- CORRECTIF : privilèges manquants pour service_role.
 -- service_role CONTOURNE la RLS mais reste soumis aux GRANTs Postgres
