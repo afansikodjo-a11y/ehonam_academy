@@ -22,10 +22,12 @@ const limiters = redis
       checkout: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, "10 m"), prefix: "rl:checkout", analytics: false }),
       // Confirmation au retour (appelle Moneroo verify).
       confirm: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(20, "10 m"), prefix: "rl:confirm", analytics: false }),
+      // Journal interne des évènements pixel : très fréquent, non authentifié.
+      pixelEvent: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(30, "1 m"), prefix: "rl:pixel", analytics: false }),
     }
   : null;
 
-export type RateLimitKind = "contact" | "checkout" | "confirm";
+export type RateLimitKind = "contact" | "checkout" | "confirm" | "pixelEvent";
 
 /** true = autorisé. No-op (autorise) si Redis non configuré ou en cas d'erreur. */
 export async function checkRateLimit(kind: RateLimitKind, identifier: string): Promise<boolean> {

@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import CheckoutResume from "@/components/CheckoutResume";
 import AuthLandingResume from "@/components/AuthLandingResume";
+import AttributionCapture from "@/components/AttributionCapture";
 import FacebookPixel from "@/components/FacebookPixel";
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({
         <ThemeProvider>
           <CheckoutResume />
           <AuthLandingResume />
+          <AttributionCapture />
           <FacebookPixel />
 
           {/* Glow Effects Background */}

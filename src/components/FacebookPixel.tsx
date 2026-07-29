@@ -1,22 +1,27 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Script from "next/script";
-
-const PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID || "";
+import { fetchPixelId } from "@/lib/settings-db";
 
 /**
  * Pixel Facebook (Meta Ads) — suit les vues de page (y compris la navigation
  * côté client, en SPA) pour l'optimisation des campagnes publicitaires.
- * Inactif si NEXT_PUBLIC_FB_PIXEL_ID n'est pas renseigné.
+ * L'ID est réglable depuis /admin/campagnes (table app_settings), avec
+ * repli sur NEXT_PUBLIC_FB_PIXEL_ID. Inactif si aucun des deux n'est défini.
  */
 export default function FacebookPixel() {
   const pathname = usePathname();
   const firstRender = useRef(true);
+  const [pixelId, setPixelId] = useState("");
 
   useEffect(() => {
-    if (!PIXEL_ID) return;
+    fetchPixelId().then(setPixelId);
+  }, []);
+
+  useEffect(() => {
+    if (!pixelId) return;
     // Le premier PageView est déjà envoyé par le script d'init ci-dessous ;
     // on ne renvoie un PageView qu'aux changements de page suivants (SPA).
     if (firstRender.current) {
@@ -24,9 +29,9 @@ export default function FacebookPixel() {
       return;
     }
     (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq?.("track", "PageView");
-  }, [pathname]);
+  }, [pathname, pixelId]);
 
-  if (!PIXEL_ID) return null;
+  if (!pixelId) return null;
 
   return (
     <>
@@ -40,7 +45,7 @@ export default function FacebookPixel() {
           t.src=v;s=b.getElementsByTagName(e)[0];
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init', '${PIXEL_ID}');
+          fbq('init', '${pixelId}');
           fbq('track', 'PageView');
         `}
       </Script>
@@ -50,7 +55,7 @@ export default function FacebookPixel() {
           height="1"
           width="1"
           style={{ display: "none" }}
-          src={`https://www.facebook.com/tr?id=${PIXEL_ID}&ev=PageView&noscript=1`}
+          src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}
           alt=""
         />
       </noscript>

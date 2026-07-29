@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, BookOpen, Sparkles, Newspaper, Award, Users } from "lucide-react";
+import { LayoutDashboard, BookOpen, Sparkles, Newspaper, Award, Users, Megaphone } from "lucide-react";
 
 const TABS = [
   { href: "/admin/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
@@ -11,6 +11,7 @@ const TABS = [
   { href: "/admin/blog", label: "Blog", icon: Newspaper },
   { href: "/admin/certificats", label: "Certificats", icon: Award },
   { href: "/admin/utilisateurs", label: "Inscrits", icon: Users },
+  { href: "/admin/campagnes", label: "Pixel & campagnes", icon: Megaphone },
 ];
 
 export default function AdminTabs() {

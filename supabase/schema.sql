@@ -559,6 +559,57 @@ create policy "Admin delete course images"
   using ( bucket_id = 'course-images' and public.is_admin() );
 
 -- ════════════════════════════════════════════════════════════════
+-- PIXEL & CAMPAGNES (réglages + journal interne des conversions)
+-- ════════════════════════════════════════════════════════════════
+create table if not exists public.app_settings (
+  key        text primary key,
+  value      text not null default '',
+  updated_at timestamptz not null default now()
+);
+
+alter table public.app_settings enable row level security;
+
+-- Lecture publique volontaire : un ID de pixel est de toute façon visible
+-- dans le trafic réseau du navigateur ; seule l'écriture est verrouillée.
+drop policy if exists "Public read settings" on public.app_settings;
+create policy "Public read settings" on public.app_settings for select using ( true );
+drop policy if exists "Admin write settings" on public.app_settings;
+create policy "Admin write settings" on public.app_settings for insert to authenticated with check ( public.is_admin() );
+drop policy if exists "Admin update settings" on public.app_settings;
+create policy "Admin update settings" on public.app_settings for update to authenticated using ( public.is_admin() ) with check ( public.is_admin() );
+
+grant select on public.app_settings to anon, authenticated;
+grant insert, update on public.app_settings to authenticated;
+
+create table if not exists public.pixel_events (
+  id           uuid primary key default gen_random_uuid(),
+  event_name   text not null,
+  content_id   text,
+  content_name text,
+  value        numeric,
+  currency     text,
+  utm_source   text,
+  utm_medium   text,
+  utm_campaign text,
+  utm_content  text,
+  utm_term     text,
+  fbclid       text,
+  path         text,
+  visitor_id   text,
+  created_at   timestamptz not null default now()
+);
+
+alter table public.pixel_events enable row level security;
+
+-- Aucune policy insert/update/delete pour anon/authenticated : toute
+-- écriture passe par /api/pixel-events avec supabaseAdmin (service_role),
+-- jamais directement depuis le navigateur.
+drop policy if exists "Admin read pixel events" on public.pixel_events;
+create policy "Admin read pixel events" on public.pixel_events for select to authenticated using ( public.is_admin() );
+
+grant select on public.pixel_events to authenticated;
+
+-- ════════════════════════════════════════════════════════════════
 -- CORRECTIF : privilèges manquants pour service_role.
 -- service_role CONTOURNE la RLS mais reste soumis aux GRANTs Postgres
 -- normaux. Sans ceci, le webhook Moneroo (qui utilise supabaseAdmin /
