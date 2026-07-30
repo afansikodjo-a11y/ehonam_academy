@@ -252,6 +252,72 @@ function PortraitMockup({ type }: { type: number }) {
   );
 }
 
+/**
+ * Vos portraits générés avec l'IA. Ajoutez une ligne par photo — autant
+ * que vous voulez, de tous les styles — en déposant le fichier dans
+ * /public/portraits/ (format 3:4 conseillé, ex. 900×1200px) :
+ *   { src: "/portraits/mon-fichier.jpg", tag: "Mon style" },
+ * Tant qu'un fichier n'existe pas encore, un mockup de remplacement
+ * s'affiche à sa place — aucun risque d'image cassée.
+ */
+const PORTRAIT_GALLERY: { src: string; tag: string }[] = [
+  { src: "/portraits/1-corporate.jpg", tag: "Corporate" },
+  { src: "/portraits/2-reseaux-sociaux.jpg", tag: "Réseaux sociaux" },
+  { src: "/portraits/Mac.jpg", tag: "Entrepreneur" },
+  { src: "/portraits/Moi.jpg", tag: "Éditorial" },
+  { src: "/portraits/m10.jpg", tag: "Créatif" },
+  { src: "/portraits/33.jpg", tag: "Mode" },
+  { src: "/portraits/m0.jpg", tag: "Mode" },
+  { src: "/portraits/m2.jpg", tag: "Mode" },
+  { src: "/portraits/NF1.jpg", tag: "Mode" },
+  { src: "/portraits/Stylé.jpg", tag: "Casual chic" },
+  { src: "/portraits/Lifestyle.png", tag: "Lifestyle" },
+  { src: "/portraits/Lifestyle2.png", tag: "Lifestyle" },
+  { src: "/portraits/n4.jpg", tag: "Lifestyle" },
+  { src: "/portraits/NP.jpg", tag: "Tenue traditionnelle" },
+  { src: "/portraits/m5.jpg", tag: "Tenue traditionnelle" },
+  { src: "/portraits/mP.jpg", tag: "Prestige royal" },
+];
+
+function PortraitCard({ src, tag, fallbackType }: { src: string; tag: string; fallbackType: number }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className="w-40 sm:w-52 aspect-[3/4] rounded-xl overflow-hidden shadow-lg shrink-0 relative">
+      {failed ? (
+        <PortraitMockup type={fallbackType} />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
+          alt={tag}
+          loading="lazy"
+          className="w-full h-full object-cover"
+          onError={() => setFailed(true)}
+        />
+      )}
+      {!failed && (
+        <span className="absolute top-2 left-2 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-black/60 text-white backdrop-blur-sm">
+          {tag}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/** Défilement horizontal continu — s'adapte à n'importe quel nombre de photos, se met en pause au survol. */
+function PortraitCarousel() {
+  const items = [...PORTRAIT_GALLERY, ...PORTRAIT_GALLERY];
+  return (
+    <div className="vibe-marquee">
+      <div className="vibe-marquee-track gap-4">
+        {items.map((item, i) => (
+          <PortraitCard key={i} src={item.src} tag={item.tag} fallbackType={i % 6} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function FormationPhotoPortraitIAPage() {
   const { info, checkoutOpen, setCheckoutOpen, showSticky, handleBuy } = useSalesPageCheckout(PORTRAIT_COURSE_ID);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -356,12 +422,8 @@ export default function FormationPhotoPortraitIAPage() {
                   <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
                   <span className="ml-3 text-xs text-gray-500 font-mono hidden sm:block">formation-photo-portrait-ia — résultats créés avec l'IA</span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 p-3 bg-black/40">
-                  {[0, 1, 2, 3, 4, 5].map((idx) => (
-                    <div key={idx} className="aspect-[3/4] rounded-xl overflow-hidden group shadow-lg">
-                      <PortraitMockup type={idx} />
-                    </div>
-                  ))}
+                <div className="p-3 bg-black/40">
+                  <PortraitCarousel />
                 </div>
               </div>
               <div className="absolute -top-4 right-4 glass-panel rounded-2xl px-4 py-3 border-emerald-500/20 shadow-xl hidden sm:block">
@@ -522,12 +584,8 @@ export default function FormationPhotoPortraitIAPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 mb-10 reveal">
-              {[0, 1, 2, 3, 4, 5].map((idx) => (
-                <div key={idx} className="aspect-[3/4] rounded-2xl overflow-hidden glass-panel glass-panel-hover shadow-xl">
-                  <PortraitMockup type={idx} />
-                </div>
-              ))}
+            <div className="mb-10 reveal">
+              <PortraitCarousel />
             </div>
 
             <div className="mt-10 text-center reveal">
