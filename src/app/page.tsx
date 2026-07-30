@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Play, Sparkles, BookOpen, Clock, Users, ArrowRight, Star, Smartphone, ShieldCheck, Zap, CreditCard, Video, Check, Newspaper, Calendar } from "lucide-react";
-import { courses as staticCourses, courseImageSrc, VIBE_COURSE_ID, AFFICHE_COURSE_ID, type Course } from "@/lib/courses";
+import { courses as staticCourses, courseImageSrc, VIBE_COURSE_ID, AFFICHE_COURSE_ID, PORTRAIT_COURSE_ID, type Course } from "@/lib/courses";
 import { fetchPublishedCourses } from "@/lib/courses-db";
 import { coachingOffers as staticOffers, type CoachingOffer } from "@/lib/coaching";
 import { fetchPublishedCoaching } from "@/lib/coaching-db";
@@ -261,6 +261,8 @@ export default function HomePage() {
                         ? "/vibe-coding-mastery"
                         : course.id === AFFICHE_COURSE_ID
                         ? "/formation-affiche-ia"
+                        : course.id === PORTRAIT_COURSE_ID
+                        ? "/formation-photo-portrait-ia"
                         : `/cours/${course.id}`
                     }
                     className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md"

@@ -62,7 +62,74 @@ export const VIBE_COURSE_ID = "vibe-coding-mastery";
  */
 export const AFFICHE_COURSE_ID = "formation-affiche-ia";
 
+/**
+ * Identifiant de la formation « Créer des Portraits Professionnels avec l'IA ».
+ * Possède sa propre page de vente dédiée (/formation-photo-portrait-ia).
+ */
+export const PORTRAIT_COURSE_ID = "formation-photo-portrait-ia";
+
 export const courses: Course[] = [
+  {
+    id: PORTRAIT_COURSE_ID,
+    title: "Créer des Portraits Professionnels avec l'IA",
+    description:
+      "Apprenez à créer des portraits professionnels grâce à l'intelligence artificielle — photo de profil LinkedIn, CV, réseaux sociaux, portraits artistiques et bien plus, sans appareil photo ni studio.",
+    price: "15 000 FCFA",
+    priceNumeric: 15000,
+    originalPrice: "45 000 FCFA",
+    originalPriceNumeric: 45000,
+    duration: "Accès à vie",
+    students: "0",
+    rating: 5.0,
+    category: "Photographie",
+    tag: "Nouveau",
+    gradient: "from-emerald-600/20 to-orange-600/20",
+    borderColor: "group-hover:border-emerald-500/50",
+    showDuration: false,
+    showLessons: false,
+    chapters: [
+      {
+        title: "L'IA et le portrait professionnel",
+        lessons: [
+          { title: "Le potentiel de l'IA pour créer des portraits professionnels", duration: "—" },
+          { title: "Les meilleurs outils IA pour le portrait", duration: "—" },
+          { title: "Les principes d'un portrait qui inspire confiance", duration: "—" },
+        ],
+      },
+      {
+        title: "Maîtriser l'art du prompt portrait",
+        lessons: [
+          { title: "Décrire une pose, une lumière et une expression avec précision", duration: "—" },
+          { title: "Garder un visage cohérent d'une génération à l'autre", duration: "—" },
+          { title: "Itérer et affiner un portrait étape par étape", duration: "—" },
+        ],
+      },
+      {
+        title: "Portraits professionnels & corporate",
+        lessons: [
+          { title: "Photo de profil LinkedIn et CV qui inspire confiance", duration: "—" },
+          { title: "Portraits d'équipe et trombinoscopes d'entreprise", duration: "—" },
+          { title: "Portraits pour entrepreneurs et indépendants", duration: "—" },
+        ],
+      },
+      {
+        title: "Portraits réseaux sociaux & créatifs",
+        lessons: [
+          { title: "Photo de profil Instagram, Facebook et TikTok", duration: "—" },
+          { title: "Portraits artistiques, mode et éditorial", duration: "—" },
+          { title: "Avatars et identités visuelles personnalisées", duration: "—" },
+        ],
+      },
+      {
+        title: "Retouche, restauration & compétence",
+        lessons: [
+          { title: "Améliorer et restaurer d'anciennes photos avec l'IA", duration: "—" },
+          { title: "Corriger les détails et augmenter la qualité d'un portrait", duration: "—" },
+          { title: "Constituer un portfolio et vendre des séances de portraits IA", duration: "—" },
+        ],
+      },
+    ],
+  },
   {
     id: AFFICHE_COURSE_ID,
     title: "Créer des Affiches Professionnelles avec l'IA",
