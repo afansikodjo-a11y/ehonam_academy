@@ -16,6 +16,7 @@ import CheckoutModal from "@/components/CheckoutModal";
 import { useSalesPageCheckout } from "@/lib/useSalesPageCheckout";
 import { useScrollReveal } from "@/lib/useScrollReveal";
 import Eyebrow from "@/components/Eyebrow";
+import { ImageCarousel } from "@/components/ImageCarousel";
 
 const TRUST_PILLS = [
   "Accessible aux débutants",
@@ -279,45 +280,6 @@ const PORTRAIT_GALLERY: { src: string; tag: string }[] = [
   { src: "/portraits/mP.jpg", tag: "Prestige royal" },
 ];
 
-function PortraitCard({ src, tag, fallbackType }: { src: string; tag: string; fallbackType: number }) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <div className="w-40 sm:w-52 aspect-[3/4] rounded-xl overflow-hidden shadow-lg shrink-0 relative">
-      {failed ? (
-        <PortraitMockup type={fallbackType} />
-      ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={src}
-          alt={tag}
-          loading="lazy"
-          className="w-full h-full object-cover"
-          onError={() => setFailed(true)}
-        />
-      )}
-      {!failed && (
-        <span className="absolute top-2 left-2 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-black/60 text-white backdrop-blur-sm">
-          {tag}
-        </span>
-      )}
-    </div>
-  );
-}
-
-/** Défilement horizontal continu — s'adapte à n'importe quel nombre de photos, se met en pause au survol. */
-function PortraitCarousel() {
-  const items = [...PORTRAIT_GALLERY, ...PORTRAIT_GALLERY];
-  return (
-    <div className="vibe-marquee">
-      <div className="vibe-marquee-track gap-4">
-        {items.map((item, i) => (
-          <PortraitCard key={i} src={item.src} tag={item.tag} fallbackType={i % 6} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function FormationPhotoPortraitIAPage() {
   const { info, checkoutOpen, setCheckoutOpen, showSticky, handleBuy } = useSalesPageCheckout(PORTRAIT_COURSE_ID);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -423,7 +385,7 @@ export default function FormationPhotoPortraitIAPage() {
                   <span className="ml-3 text-xs text-gray-500 font-mono hidden sm:block">formation-photo-portrait-ia — résultats créés avec l'IA</span>
                 </div>
                 <div className="p-3 bg-black/40">
-                  <PortraitCarousel />
+                  <ImageCarousel items={PORTRAIT_GALLERY} fallbackCount={6} Fallback={PortraitMockup} />
                 </div>
               </div>
               <div className="absolute -top-4 right-4 glass-panel rounded-2xl px-4 py-3 border-emerald-500/20 shadow-xl hidden sm:block">
@@ -585,7 +547,7 @@ export default function FormationPhotoPortraitIAPage() {
             </div>
 
             <div className="mb-10 reveal">
-              <PortraitCarousel />
+              <ImageCarousel items={PORTRAIT_GALLERY} fallbackCount={6} Fallback={PortraitMockup} />
             </div>
 
             <div className="mt-10 text-center reveal">

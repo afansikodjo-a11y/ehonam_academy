@@ -17,6 +17,7 @@ import CheckoutModal from "@/components/CheckoutModal";
 import { useSalesPageCheckout } from "@/lib/useSalesPageCheckout";
 import { useScrollReveal } from "@/lib/useScrollReveal";
 import Eyebrow from "@/components/Eyebrow";
+import { ImageCarousel } from "@/components/ImageCarousel";
 
 const TRUST_PILLS = [
   "Accessible aux débutants",
@@ -269,6 +270,23 @@ function PosterMockup({ type }: { type: number }) {
   );
 }
 
+/**
+ * Vos affiches générées avec l'IA. Ajoutez une ligne par visuel — autant
+ * que vous voulez, de tous les types — en déposant le fichier dans
+ * /public/affiches/ (format 4:3 conseillé) :
+ *   { src: "/affiches/mon-fichier.jpg", tag: "Mon type" },
+ * Tant qu'un fichier n'existe pas encore, un mockup de remplacement
+ * s'affiche à sa place — aucun risque d'image cassée.
+ */
+const AFFICHE_GALLERY: { src: string; tag: string }[] = [
+  { src: "/affiches/1-restaurant.jpg", tag: "Gastronomie" },
+  { src: "/affiches/2-evenement.jpg", tag: "Événementiel" },
+  { src: "/affiches/3-promo.jpg", tag: "Promo Flash" },
+  { src: "/affiches/4-produit.jpg", tag: "High-Tech" },
+  { src: "/affiches/5-entreprise.jpg", tag: "Business Summit" },
+  { src: "/affiches/6-masterclass.jpg", tag: "Masterclass" },
+];
+
 export default function FormationAfficheIAPage() {
   const { info, checkoutOpen, setCheckoutOpen, showSticky, handleBuy } = useSalesPageCheckout(AFFICHE_COURSE_ID);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -373,12 +391,13 @@ export default function FormationAfficheIAPage() {
                   <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
                   <span className="ml-3 text-xs text-gray-500 font-mono hidden sm:block">formation-affiche-ia — résultats créés avec l'IA</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-3 bg-black/40">
-                  {[0, 1, 2, 3, 4, 5].map((idx) => (
-                    <div key={idx} className="aspect-[4/3] rounded-xl overflow-hidden group shadow-lg">
-                      <PosterMockup type={idx} />
-                    </div>
-                  ))}
+                <div className="p-3 bg-black/40">
+                  <ImageCarousel
+                    items={AFFICHE_GALLERY}
+                    fallbackCount={6}
+                    Fallback={PosterMockup}
+                    cardClassName="w-56 sm:w-64 aspect-[4/3] rounded-xl overflow-hidden shadow-lg shrink-0 relative"
+                  />
                 </div>
               </div>
               <div className="absolute -top-4 right-4 glass-panel rounded-2xl px-4 py-3 border-emerald-500/20 shadow-xl hidden sm:block">
@@ -539,12 +558,13 @@ export default function FormationAfficheIAPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 reveal">
-              {[0, 1, 2, 3, 4, 5].map((idx) => (
-                <div key={idx} className="aspect-[4/3] rounded-2xl overflow-hidden glass-panel glass-panel-hover shadow-xl">
-                  <PosterMockup type={idx} />
-                </div>
-              ))}
+            <div className="mb-10 reveal">
+              <ImageCarousel
+                items={AFFICHE_GALLERY}
+                fallbackCount={6}
+                Fallback={PosterMockup}
+                cardClassName="w-56 sm:w-64 aspect-[4/3] rounded-2xl overflow-hidden shadow-xl shrink-0 relative"
+              />
             </div>
 
             <div className="mt-10 text-center reveal">
