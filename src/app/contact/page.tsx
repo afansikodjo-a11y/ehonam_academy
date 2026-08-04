@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, MessageCircle, Check, ArrowLeft, Clock, ShieldCheck } from "lucide-react";
 import { WHATSAPP_DISPLAY, buildWhatsappUrl } from "@/lib/whatsapp";
@@ -8,6 +8,7 @@ import { WHATSAPP_DISPLAY, buildWhatsappUrl } from "@/lib/whatsapp";
 const SUBJECTS = [
   "Question sur une formation",
   "Accompagnement privé",
+  "Projet SaaS / application métier",
   "Partenariat",
   "Autre",
 ];
@@ -26,6 +27,16 @@ export default function ContactPage() {
   });
   const [sent, setSent] = useState(false);
   const [lastUrl, setLastUrl] = useState("");
+
+  // Pré-remplit le sujet si la page arrive avec ?sujet=... (ex. lien "Discutons
+  // de votre projet" depuis /saas-builder), en ignorant toute valeur qui ne
+  // correspond à aucune option existante du menu.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("sujet");
+    if (requested && SUBJECTS.includes(requested)) {
+      setForm((f) => ({ ...f, subject: requested }));
+    }
+  }, []);
 
   const update = (field: keyof typeof form, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));

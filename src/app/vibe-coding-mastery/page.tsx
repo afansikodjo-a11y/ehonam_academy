@@ -5,14 +5,16 @@ import {
   Rocket, Zap, Sparkles, Check, CheckCircle2, ShieldCheck, ArrowRight, ArrowDown,
   Plus, Minus, CreditCard, Database, GitBranch, Cloud, Wand2, XCircle,
   Hourglass, Wallet, BadgeCheck, Users, Lightbulb, Target, Palette, Lock,
-  TrendingUp, Star, Quote, Globe, FileText, GraduationCap, Briefcase,
-  Gift, LineChart, Flame, PlayCircle, Camera, ExternalLink,
+  TrendingUp, Star, Quote, Globe, GraduationCap, Briefcase,
+  Gift, LineChart, Flame, PlayCircle, Camera,
 } from "lucide-react";
 import { VIBE_COURSE_ID } from "@/lib/courses";
 import CheckoutModal from "@/components/CheckoutModal";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useSalesPageCheckout } from "@/lib/useSalesPageCheckout";
 import Eyebrow from "@/components/Eyebrow";
+import BrowserFrame from "@/components/BrowserFrame";
+import { SAAS_PORTFOLIO } from "@/lib/portfolio";
 
 // Photo d'Ehonam (fichier dans /public).
 const FOUNDER_PHOTO = "/ehonam.jpg";
@@ -308,12 +310,6 @@ const WHY = [
   { Icon: Rocket, title: "Un objectif : publier", text: "On ne regarde pas des vidéos pour le plaisir. On met votre application en ligne." },
 ];
 
-const PRODUCTS = [
-  { name: "GeScole", tag: "EdTech · Gestion scolaire", Icon: GraduationCap, image: "/gescole.png", desc: "Plateforme 100 % cloud qui digitalise la gestion des établissements : élèves, notes, présences, finances et communication.", accent: "text-emerald-400", url: "https://www.gescole.com" },
-  { name: "Edossime", tag: "Marketplace · Talents africains", Icon: Users, image: "/edossime.png", desc: "La marketplace de l'élite du freelancing africain, où expertise humaine et IA se combinent pour livrer plus vite.", accent: "text-orange-400", url: "https://www.edossime.com" },
-  { name: "ChapFacture", tag: "FinTech · Gestion commerciale", Icon: FileText, image: "/chapfacture.png", desc: "Devis, factures, proformas, bons de commande et de livraison — avec suivi des paiements, en quelques secondes.", accent: "text-emerald-400", url: "https://www.chapfacture.com" },
-];
-
 const JOURNEY = [
   { Icon: Lightbulb, title: "Idée", text: "Clarifier le problème que votre SaaS résout." },
   { Icon: Target, title: "Validation", text: "Vérifier que l'idée mérite d'être construite." },
@@ -390,50 +386,6 @@ const FAQ = [
   { q: "Comment se déroule le Défi 30 jours ?", a: "Un parcours guidé, semaine après semaine : idée, construction, données & paiements, puis lancement. À la fin, votre application est en ligne, prête pour vos premiers utilisateurs." },
   { q: "Et si je bloque en cours de route ?", a: "Vous n'êtes jamais seul : la méthode vous montre exactement comment débloquer l'IA, et la communauté privée + le coaching live sont là pour vous aider." },
 ];
-
-/* ── UI helpers ── */
-function BrowserFrame({
-  image, name, tag, desc, Icon, accent, url,
-}: {
-  image: string; name: string; tag: string; desc: string;
-  Icon: React.ComponentType<{ className?: string }>; accent: string; url: string;
-}) {
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="glass-panel rounded-2xl border-white/10 overflow-hidden shadow-xl glass-panel-hover group block cursor-pointer"
-    >
-      <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 bg-black/40">
-        <span className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
-        <span className="w-2.5 h-2.5 rounded-full bg-amber-400/70" />
-        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
-        <div className="ml-3 flex-1 h-5 rounded-md bg-white/5 border border-white/5" />
-      </div>
-      <div className="aspect-[16/10] overflow-hidden bg-black/20 border-b border-white/5">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={image}
-          alt={name}
-          loading="lazy"
-          className="w-full h-full object-cover object-top group-hover:scale-[1.04] transition-transform duration-700"
-        />
-      </div>
-      <div className="px-5 py-4">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Icon className={`w-5 h-5 ${accent}`} />
-            <h4 className="text-white font-bold">{name}</h4>
-          </div>
-          <ExternalLink className="w-3.5 h-3.5 text-gray-500 group-hover:text-white transition-colors shrink-0" />
-        </div>
-        <p className="text-[11px] uppercase tracking-wide text-gray-500 mt-0.5">{tag}</p>
-        <p className="text-gray-400 text-xs mt-2 leading-relaxed">{desc}</p>
-      </div>
-    </a>
-  );
-}
 
 export default function VibeCodingMasteryPage() {
   const { info, checkoutOpen, setCheckoutOpen, showSticky, handleBuy } = useSalesPageCheckout(VIBE_COURSE_ID);
@@ -671,7 +623,7 @@ export default function VibeCodingMasteryPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {PRODUCTS.map((p) => (
+            {SAAS_PORTFOLIO.map((p) => (
               <BrowserFrame key={p.name} {...p} />
             ))}
           </div>
