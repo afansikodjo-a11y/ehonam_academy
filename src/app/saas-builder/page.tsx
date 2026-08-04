@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
   Flame, Sparkles, CheckCircle2, ArrowRight, XCircle,
   Zap, Building2, Wand2, RefreshCw, Lock, Clock,
-  ShieldCheck, Target, Briefcase, GraduationCap, Rocket, Users,
+  ShieldCheck, Briefcase, GraduationCap, Rocket, Users,
   Plus, Minus, MessageCircle,
 } from "lucide-react";
 import Eyebrow from "@/components/Eyebrow";
@@ -17,7 +17,7 @@ const CONTACT_HREF = `/contact?sujet=${encodeURIComponent("Projet SaaS / applica
 
 const TRUST_PILLS = [
   "3 SaaS déjà en production",
-  "Un seul interlocuteur, du cadrage à la livraison",
+  "Une équipe dédiée, délais record",
   "Développement accéléré par l'IA",
   "Maintenance après la mise en ligne",
 ];
@@ -50,8 +50,8 @@ const PROCESS = [
 ];
 
 const WHY = [
-  { Icon: Target, title: "Un seul interlocuteur", text: "Pas de commerciaux ni de sous-traitance : la personne qui code est la même qui vous répond." },
-  { Icon: Zap, title: "Livraison accélérée par l'IA", text: "Le même processus qui a permis de lancer 3 SaaS en production, mis au service de votre projet." },
+  { Icon: Users, title: "Une équipe dédiée à votre projet", text: "Développeurs et pilote de projet mobilisés pour vous, pas un généraliste isolé sur dix dossiers à la fois." },
+  { Icon: Zap, title: "Des délais record", text: "Une équipe rodée à l'IA, avec les méthodes qui ont déjà permis de livrer 3 SaaS en production." },
   { Icon: Briefcase, title: "Expérience de terrain", text: "Des produits réellement utilisés par de vrais clients, pas des démos." },
   { Icon: ShieldCheck, title: "Zéro engagement caché", text: "Un périmètre et un prix validés avant de démarrer, pas de surprise en cours de route." },
 ];
@@ -146,8 +146,8 @@ export default function SaasBuilderPage() {
                 {" "}conçue et livrée par un vrai SaaS Builder.
               </h1>
               <p className="text-xl sm:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed animate-fade-up ad-2 mt-6">
-                Ehonam conçoit et développe des plateformes SaaS et des outils métier sur mesure pour les entreprises —
-                {" "}<strong className="text-white">plus vite qu'une agence classique, grâce à l'IA.</strong>
+                Ehonam et son équipe conçoivent et développent des plateformes SaaS et des outils métier sur mesure pour les entreprises —
+                {" "}<strong className="text-white">en temps record, grâce à une équipe outillée à l'IA.</strong>
               </p>
             </div>
 
@@ -211,7 +211,7 @@ export default function SaasBuilderPage() {
             <div className="mt-12 text-center reveal">
               <div className="inline-block glass-panel rounded-2xl px-8 py-6 border-orange-500/15">
                 <p className="text-xl sm:text-2xl font-black text-white">Si l'une de ces situations vous parle…</p>
-                <p className="text-orange-400 font-bold mt-2">c'est exactement ce que je résous.</p>
+                <p className="text-orange-400 font-bold mt-2">c'est exactement ce que mon équipe et moi résolvons.</p>
               </div>
             </div>
           </div>
@@ -276,8 +276,8 @@ export default function SaasBuilderPage() {
               <div className="text-center mb-10">
                 <Eyebrow>Pourquoi travailler avec Ehonam</Eyebrow>
                 <h2 className="text-3xl sm:text-4xl font-black text-white mt-3 leading-tight">
-                  Pas une agence.{" "}
-                  <span className="gradient-text">Un SaaS Builder qui code vraiment.</span>
+                  Une équipe qui construit.{" "}
+                  <span className="gradient-text">Des délais qui tiennent.</span>
                 </h2>
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
