@@ -70,7 +70,6 @@ const FAQ = [
   { q: "Quel budget prévoir ?", a: "Chaque projet est chiffré sur mesure selon son périmètre réel — il n'y a pas de tarif unique. Le premier échange sert justement à cadrer le besoin et à vous donner un prix clair avant tout engagement." },
   { q: "Est-ce que je reste propriétaire de mon application ?", a: "Oui. Le code et le produit livré vous appartiennent." },
   { q: "Que se passe-t-il après la mise en ligne ?", a: "Un suivi de maintenance et d'évolution est proposé après la livraison, pour que votre outil continue de vivre avec votre activité." },
-  { q: "Travaillez-vous avec des entreprises hors de Côte d'Ivoire ?", a: "Oui, le travail se fait à distance — la localisation n'est pas un frein." },
   { q: "Puis-je juste avoir un avis technique sans développement complet ?", a: "Oui, un premier échange de cadrage ne vous engage à rien : il sert à clarifier votre besoin, que vous décidiez de continuer ou non." },
 ];
 
