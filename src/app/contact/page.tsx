@@ -13,6 +13,17 @@ const SUBJECTS = [
   "Autre",
 ];
 
+const SAAS_SUBJECT = "Projet SaaS / application métier";
+
+const BUDGET_RANGES = [
+  "Moins de 200 000 FCFA",
+  "200 000 - 500 000 FCFA",
+  "500 000 - 1 000 000 FCFA",
+  "1 000 000 - 3 000 000 FCFA",
+  "Plus de 3 000 000 FCFA",
+  "Je ne sais pas encore",
+];
+
 const inputClass =
   "w-full rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-emerald-500 dark:focus:border-emerald-500/60 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-colors";
 
@@ -24,6 +35,8 @@ export default function ContactPage() {
     phone: "",
     subject: SUBJECTS[0],
     message: "",
+    budget: "",
+    specLink: "",
   });
   const [sent, setSent] = useState(false);
   const [lastUrl, setLastUrl] = useState("");
@@ -44,6 +57,8 @@ export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const isSaasProject = form.subject === SAAS_SUBJECT;
+
     const lines = [
       "Nouveau message depuis Ehonam Academy",
       "",
@@ -51,6 +66,8 @@ export default function ContactPage() {
       `Email : ${form.email}`,
       form.phone ? `Téléphone : ${form.phone}` : "",
       `Sujet : ${form.subject}`,
+      isSaasProject && form.budget ? `Budget prévisionnel : ${form.budget}` : "",
+      isSaasProject && form.specLink ? `Cahier des charges : ${form.specLink}` : "",
       "",
       "Message :",
       form.message,
@@ -203,6 +220,37 @@ export default function ContactPage() {
                     </select>
                   </div>
                 </div>
+
+                {form.subject === SAAS_SUBJECT && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/15">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Budget prévisionnel</label>
+                      <select
+                        value={form.budget}
+                        onChange={(e) => update("budget", e.target.value)}
+                        className={inputClass}
+                      >
+                        <option value="">Sélectionnez une fourchette (optionnel)</option>
+                        {BUDGET_RANGES.map((b) => (
+                          <option key={b} value={b}>{b}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Cahier des charges</label>
+                      <input
+                        type="text"
+                        value={form.specLink}
+                        onChange={(e) => update("specLink", e.target.value)}
+                        placeholder="Lien Drive/Notion si vous en avez un (optionnel)"
+                        className={inputClass}
+                      />
+                    </div>
+                    <p className="sm:col-span-2 text-xs text-gray-500">
+                      Ces informations aident à préparer notre échange — rien n'est obligatoire, vous pouvez aussi envoyer votre cahier des charges directement sur WhatsApp.
+                    </p>
+                  </div>
+                )}
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Message *</label>
