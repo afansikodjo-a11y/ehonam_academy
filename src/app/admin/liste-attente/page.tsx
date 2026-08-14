@@ -8,6 +8,7 @@ import { isSupabaseConfigured, fetchAllCourses, upsertCourse, type AdminCourse }
 import { fetchAllCoaching, upsertCoaching, type AdminCoachingOffer } from "@/lib/coaching-db";
 import { fetchWaitlistSignups, type WaitlistSignupRow } from "@/lib/waitlist-db";
 import { isCurrentUserAdmin } from "@/lib/auth";
+import { buildWhatsappUrlTo } from "@/lib/whatsapp";
 import AdminTabs from "@/components/AdminTabs";
 
 type ClosableItem =
@@ -209,15 +210,26 @@ export default function AdminListeAttentePage() {
                   <tr key={s.id}>
                     <td className="px-6 py-4 font-semibold text-white whitespace-nowrap">{s.name}</td>
                     <td className="px-6 py-4 text-gray-300">
-                      <div className="flex items-center gap-1.5">
+                      <a
+                        href={`mailto:${s.email}`}
+                        className="flex items-center gap-1.5 hover:text-emerald-400 transition-colors w-fit"
+                      >
                         <Mail className="w-3.5 h-3.5 text-gray-500 shrink-0" />
                         {s.email}
-                      </div>
+                      </a>
                       {s.phone && (
-                        <div className="flex items-center gap-1.5 mt-1 text-gray-400">
+                        <a
+                          href={buildWhatsappUrlTo(
+                            s.phone,
+                            `Bonjour ${s.name}, vous vous êtes inscrit(e) sur la liste d'attente pour « ${s.item_title || s.item_id} » sur Ehonam Academy — je vous recontacte à ce sujet.`
+                          )}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 mt-1 text-gray-400 hover:text-emerald-400 transition-colors w-fit"
+                        >
                           <Phone className="w-3.5 h-3.5 text-gray-500 shrink-0" />
                           {s.phone}
-                        </div>
+                        </a>
                       )}
                     </td>
                     <td className="px-6 py-4 text-gray-300">{s.item_title || s.item_id}</td>
