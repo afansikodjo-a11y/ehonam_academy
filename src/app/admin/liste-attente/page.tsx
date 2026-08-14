@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Shield, LogOut, Loader2, ListChecks, Clock, BookOpen, Sparkles, Mail, Phone } from "lucide-react";
+import { Shield, LogOut, Loader2, ListChecks, Clock, BookOpen, Sparkles, Mail, Phone, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured, fetchAllCourses, upsertCourse, type AdminCourse } from "@/lib/courses-db";
 import { fetchAllCoaching, upsertCoaching, type AdminCoachingOffer } from "@/lib/coaching-db";
@@ -23,6 +23,7 @@ export default function AdminListeAttentePage() {
   const [offers, setOffers] = useState<AdminCoachingOffer[]>([]);
   const [loadingItems, setLoadingItems] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [toggleError, setToggleError] = useState("");
 
   const [signups, setSignups] = useState<WaitlistSignupRow[]>([]);
   const [loadingSignups, setLoadingSignups] = useState(true);
@@ -66,14 +67,17 @@ export default function AdminListeAttentePage() {
   const toggleClosed = async (item: ClosableItem) => {
     const id = item.data.id;
     setSavingId(id);
+    setToggleError("");
     if (item.kind === "course") {
       const updated = { ...item.data, closed: !item.data.closed };
       const err = await upsertCourse(updated);
-      if (!err) setCourses((prev) => prev.map((c) => (c.id === id ? updated : c)));
+      if (err) setToggleError(err.message || "Échec de l'enregistrement.");
+      else setCourses((prev) => prev.map((c) => (c.id === id ? updated : c)));
     } else {
       const updated = { ...item.data, closed: !item.data.closed };
       const err = await upsertCoaching(updated);
-      if (!err) setOffers((prev) => prev.map((o) => (o.id === id ? updated : o)));
+      if (err) setToggleError(err.message || "Échec de l'enregistrement.");
+      else setOffers((prev) => prev.map((o) => (o.id === id ? updated : o)));
     }
     setSavingId(null);
   };
@@ -129,6 +133,12 @@ export default function AdminListeAttentePage() {
           <Clock className="w-5 h-5 text-orange-400" />
           <h2 className="text-sm font-bold text-white">Clôturer les inscriptions</h2>
         </div>
+        {toggleError && (
+          <div className="mx-6 mt-4 flex items-start gap-2 text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            {toggleError}
+          </div>
+        )}
         <div className="divide-y divide-white/5">
           {loadingItems ? (
             <div className="p-8 text-center text-gray-500">
