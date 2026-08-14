@@ -14,7 +14,7 @@ export interface WaitlistSignupInput {
   itemTitle: string;
   name: string;
   email: string;
-  phone?: string;
+  phone: string;
 }
 
 export interface WaitlistSignupRow {

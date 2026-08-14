@@ -29,9 +29,9 @@ export async function POST(request: Request) {
     if (!ALLOWED_ITEM_TYPES.has(itemType) || !itemId) {
       return NextResponse.json({ error: "Article invalide." }, { status: 400 });
     }
-    if (!name || !email) {
+    if (!name || !email || !phone) {
       return NextResponse.json(
-        { error: "Veuillez renseigner votre nom et votre email." },
+        { error: "Veuillez renseigner votre nom, votre email et votre téléphone." },
         { status: 400 }
       );
     }
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
         item_title: itemTitle,
         name,
         email,
-        phone: phone || null,
+        phone,
       });
 
       if (error) {

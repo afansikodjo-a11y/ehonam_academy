@@ -47,7 +47,7 @@ export default function WaitlistModal({ open, onClose, itemTitle, itemType, item
     e.preventDefault();
     setLoading(true);
     setError("");
-    const err = await submitWaitlistSignup({ itemType, itemId, itemTitle, name, email, phone: phone || undefined });
+    const err = await submitWaitlistSignup({ itemType, itemId, itemTitle, name, email, phone });
     setLoading(false);
     if (err) {
       setError(err);
@@ -131,9 +131,10 @@ export default function WaitlistModal({ open, onClose, itemTitle, itemType, item
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Téléphone / WhatsApp</label>
                 <input
                   type="tel"
+                  required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Optionnel"
+                  placeholder="Votre numéro"
                   className={inputClass}
                 />
               </div>
