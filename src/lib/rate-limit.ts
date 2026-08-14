@@ -24,10 +24,12 @@ const limiters = redis
       confirm: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(20, "10 m"), prefix: "rl:confirm", analytics: false }),
       // Journal interne des évènements pixel : très fréquent, non authentifié.
       pixelEvent: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(30, "1 m"), prefix: "rl:pixel", analytics: false }),
+      // Inscription liste d'attente : non authentifié.
+      waitlist: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, "10 m"), prefix: "rl:waitlist", analytics: false }),
     }
   : null;
 
-export type RateLimitKind = "contact" | "checkout" | "confirm" | "pixelEvent";
+export type RateLimitKind = "contact" | "checkout" | "confirm" | "pixelEvent" | "waitlist";
 
 /** true = autorisé. No-op (autorise) si Redis non configuré ou en cas d'erreur. */
 export async function checkRateLimit(kind: RateLimitKind, identifier: string): Promise<boolean> {

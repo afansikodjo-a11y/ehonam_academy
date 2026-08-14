@@ -21,6 +21,8 @@ export interface CoachingOffer {
   popular?: boolean;
   /** Tailwind gradient classes for the card accent */
   gradient: string;
+  /** Inscriptions fermées : le bouton d'achat devient une liste d'attente (default false) */
+  closed?: boolean;
 }
 
 export const coachingOffers: CoachingOffer[] = [

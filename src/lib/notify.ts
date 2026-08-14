@@ -38,3 +38,34 @@ export async function notifyNewPurchase(p: PurchaseNotice): Promise<void> {
     console.error("[notify] échec notification WhatsApp:", err);
   }
 }
+
+export interface WaitlistNotice {
+  title: string;
+  itemType: string; // "course" | "coaching"
+  name: string;
+  email: string;
+}
+
+/** Envoie l'alerte WhatsApp pour une nouvelle inscription à la liste d'attente. Best-effort. */
+export async function notifyWaitlistSignup(p: WaitlistNotice): Promise<void> {
+  if (!PHONE || !APIKEY) return; // non configuré → on ne fait rien
+
+  try {
+    const type = p.itemType === "coaching" ? "Accompagnement" : "Formation";
+    const when = new Date().toLocaleString("fr-FR", { timeZone: "Africa/Lome" });
+    const text =
+      `🟠 Nouvelle inscription liste d'attente — Ehonam Academy\n\n` +
+      `📚 ${type} : ${p.title || "—"}\n` +
+      `👤 ${p.name || "—"}\n` +
+      `📧 ${p.email || "—"}\n` +
+      `🕒 ${when}`;
+
+    const url =
+      `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(PHONE)}` +
+      `&text=${encodeURIComponent(text)}&apikey=${encodeURIComponent(APIKEY)}`;
+
+    await fetch(url, { method: "GET" });
+  } catch (err) {
+    console.error("[notify] échec notification liste d'attente:", err);
+  }
+}

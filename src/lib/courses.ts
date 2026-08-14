@@ -47,6 +47,8 @@ export interface Course {
   showDuration?: boolean;
   /** Show the "X leçons" count mention (default true) */
   showLessons?: boolean;
+  /** Inscriptions fermées : le bouton d'achat devient une liste d'attente (default false) */
+  closed?: boolean;
 }
 
 /**

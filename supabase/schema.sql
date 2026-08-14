@@ -618,6 +618,41 @@ grant select, delete on public.pixel_events to authenticated;
 grant select, insert, update, delete on public.app_settings, public.pixel_events to service_role;
 
 -- ════════════════════════════════════════════════════════════════
+-- CLÔTURE DES INSCRIPTIONS + LISTE D'ATTENTE
+-- Un cours/accompagnement "clôturé" reste visible mais son bouton d'achat
+-- est remplacé par un formulaire de liste d'attente (voir /admin/liste-attente).
+-- ════════════════════════════════════════════════════════════════
+alter table public.courses add column if not exists closed boolean not null default false;
+alter table public.coaching_offers add column if not exists closed boolean not null default false;
+
+create table if not exists public.waitlist_signups (
+  id         uuid primary key default gen_random_uuid(),
+  item_type  text not null check (item_type in ('course','coaching')),
+  item_id    text not null,
+  item_title text not null default '',
+  name       text not null,
+  email      text not null,
+  phone      text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.waitlist_signups enable row level security;
+
+-- Insert ouvert (visiteur non authentifié qui rejoint la liste d'attente),
+-- lecture réservée à l'admin — même schéma que la table "contacts".
+drop policy if exists "Anyone can join waitlist" on public.waitlist_signups;
+create policy "Anyone can join waitlist" on public.waitlist_signups for insert with check ( true );
+drop policy if exists "Admin read waitlist" on public.waitlist_signups;
+create policy "Admin read waitlist" on public.waitlist_signups for select to authenticated using ( public.is_admin() );
+
+grant insert on public.waitlist_signups to anon;
+grant select on public.waitlist_signups to authenticated;
+
+-- service_role (utilisé par /api/waitlist) — explicite pour que cette section
+-- fonctionne même exécutée seule, sans dépendre du correctif en bas de fichier.
+grant select, insert, update, delete on public.waitlist_signups to service_role;
+
+-- ════════════════════════════════════════════════════════════════
 -- CORRECTIF : privilèges manquants pour service_role.
 -- service_role CONTOURNE la RLS mais reste soumis aux GRANTs Postgres
 -- normaux. Sans ceci, le webhook Moneroo (qui utilise supabaseAdmin /

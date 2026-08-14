@@ -7,6 +7,7 @@ import { getCourse, getAllLessons, courseImageSrc, type Course } from "@/lib/cou
 import { fetchCourseById } from "@/lib/courses-db";
 import { supabase } from "@/lib/supabase";
 import CheckoutModal from "@/components/CheckoutModal";
+import WaitlistModal from "@/components/WaitlistModal";
 import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
 
 export default function CourseDetailPage() {
@@ -17,6 +18,7 @@ export default function CourseDetailPage() {
   const [course, setCourse] = useState<Course | null>(() => getCourse(id) ?? null);
   const [loading, setLoading] = useState(true);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
   const viewTracked = useRef(false);
 
   useEffect(() => {
@@ -68,6 +70,10 @@ export default function CourseDetailPage() {
   const allLessons = getAllLessons(course);
 
   const handleBuy = async () => {
+    if (course.closed) {
+      setWaitlistOpen(true);
+      return;
+    }
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       router.push("/login");
@@ -170,26 +176,35 @@ export default function CourseDetailPage() {
           <div className="glass-panel p-8 rounded-3xl border-white/5 space-y-6 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1.5 gradient-btn"></div>
 
-            <div className="space-y-2">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Tarif Unique</span>
-              <div className="flex items-baseline gap-2.5">
-                <span className="text-3xl font-black text-white">{course.price}</span>
-                {course.originalPrice && (
-                  <span className="text-xs text-gray-500 line-through">{course.originalPrice}</span>
-                )}
+            {course.closed ? (
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">Inscriptions fermées</span>
+                <p className="text-sm text-gray-300">Rejoignez la liste d'attente pour être averti(e) de la prochaine session.</p>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Tarif Unique</span>
+                <div className="flex items-baseline gap-2.5">
+                  <span className="text-3xl font-black text-white">{course.price}</span>
+                  {course.originalPrice && (
+                    <span className="text-xs text-gray-500 line-through">{course.originalPrice}</span>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4">
               <button
                 onClick={handleBuy}
                 className="w-full py-4 rounded-2xl font-bold text-white gradient-btn flex items-center justify-center gap-2 shadow-lg cursor-pointer"
               >
-                <CreditCard className="w-5 h-5" />
-                Acheter la formation
+                {course.closed ? <Clock className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
+                {course.closed ? "Rejoindre la liste d'attente" : "Acheter la formation"}
               </button>
               <p className="text-center text-xs text-gray-500 leading-relaxed">
-                Paiement sécurisé via <span className="text-white font-semibold">Moneroo</span>. Vous devez être connecté ; l'accès apparaît dans <span className="text-white font-semibold">Mon espace</span>.
+                {course.closed
+                  ? "Vous serez averti(e) dès l'ouverture de la prochaine session."
+                  : <>Paiement sécurisé via <span className="text-white font-semibold">Moneroo</span>. Vous devez être connecté ; l'accès apparaît dans <span className="text-white font-semibold">Mon espace</span>.</>}
               </p>
             </div>
 
@@ -223,6 +238,13 @@ export default function CourseDetailPage() {
         itemType="course"
         itemId={course.id}
         successMessage="Paiement validé ! Votre formation est désormais disponible dans « Mon espace »."
+      />
+      <WaitlistModal
+        open={waitlistOpen}
+        onClose={() => setWaitlistOpen(false)}
+        itemTitle={course.title}
+        itemType="course"
+        itemId={course.id}
       />
     </div>
   );

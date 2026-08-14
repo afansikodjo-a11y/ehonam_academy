@@ -24,6 +24,7 @@ interface OfferRow {
   popular: boolean;
   gradient: string;
   published: boolean;
+  closed?: boolean;
   created_at?: string;
 }
 
@@ -40,6 +41,7 @@ function rowToOffer(r: OfferRow): AdminCoachingOffer {
     popular: r.popular,
     gradient: r.gradient,
     published: r.published,
+    closed: r.closed === true,
   };
 }
 
@@ -56,6 +58,7 @@ function offerToRow(o: AdminCoachingOffer) {
     popular: o.popular,
     gradient: o.gradient,
     published: o.published,
+    closed: o.closed === true,
   };
 }
 

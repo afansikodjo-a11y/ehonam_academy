@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { PORTRAIT_COURSE_ID } from "@/lib/courses";
 import CheckoutModal from "@/components/CheckoutModal";
+import WaitlistModal from "@/components/WaitlistModal";
 import { useSalesPageCheckout } from "@/lib/useSalesPageCheckout";
 import { useScrollReveal } from "@/lib/useScrollReveal";
 import Eyebrow from "@/components/Eyebrow";
@@ -281,7 +282,7 @@ const PORTRAIT_GALLERY: { src: string; tag: string }[] = [
 ];
 
 export default function FormationPhotoPortraitIAPage() {
-  const { info, checkoutOpen, setCheckoutOpen, showSticky, handleBuy } = useSalesPageCheckout(PORTRAIT_COURSE_ID);
+  const { info, checkoutOpen, setCheckoutOpen, waitlistOpen, setWaitlistOpen, showSticky, handleBuy } = useSalesPageCheckout(PORTRAIT_COURSE_ID);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   useScrollReveal();
 
@@ -294,6 +295,15 @@ export default function FormationPhotoPortraitIAPage() {
           itemId={PORTRAIT_COURSE_ID}
           itemTitle={info.title}
           price={info.price}
+          itemType={"course"}
+        />
+      )}
+      {waitlistOpen && (
+        <WaitlistModal
+          open={waitlistOpen}
+          onClose={() => setWaitlistOpen(false)}
+          itemId={PORTRAIT_COURSE_ID}
+          itemTitle={info.title}
           itemType={"course"}
         />
       )}
@@ -310,7 +320,7 @@ export default function FormationPhotoPortraitIAPage() {
               </div>
             </div>
             <button id="sticky-cta" onClick={handleBuy} className="gradient-btn flex-1 sm:flex-none px-6 py-3 rounded-xl text-white font-black text-sm tracking-wide">
-              ACCÉDER À LA FORMATION →
+              {info.closed ? "REJOINDRE LA LISTE D'ATTENTE →" : "ACCÉDER À LA FORMATION →"}
             </button>
           </div>
         </div>
@@ -358,8 +368,8 @@ export default function FormationPhotoPortraitIAPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 animate-fade-up ad-3">
               <button id="hero-cta-primary" onClick={handleBuy} className="gradient-btn w-full sm:w-auto px-8 py-4 rounded-xl text-white font-black text-base sm:text-lg tracking-wide flex items-center justify-center gap-2 shadow-2xl">
-                <Aperture className="w-5 h-5" />
-                JE VEUX CRÉER MES PORTRAITS AVEC L'IA
+                {info.closed ? <Clock className="w-5 h-5" /> : <Aperture className="w-5 h-5" />}
+                {info.closed ? "REJOINDRE LA LISTE D'ATTENTE" : "JE VEUX CRÉER MES PORTRAITS AVEC L'IA"}
               </button>
             </div>
 
@@ -552,8 +562,8 @@ export default function FormationPhotoPortraitIAPage() {
 
             <div className="mt-10 text-center reveal">
               <button id="gallery-cta" onClick={handleBuy} className="gradient-btn inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-black text-base">
-                <Wand2 className="w-5 h-5" />
-                JE COMMENCE À CRÉER MES PORTRAITS
+                {info.closed ? <Clock className="w-5 h-5" /> : <Wand2 className="w-5 h-5" />}
+                {info.closed ? "REJOINDRE LA LISTE D'ATTENTE" : "JE COMMENCE À CRÉER MES PORTRAITS"}
               </button>
             </div>
           </div>
@@ -649,11 +659,18 @@ export default function FormationPhotoPortraitIAPage() {
                   </div>
                 ))}
               </div>
+              {info.closed && (
+                <p className="text-center text-sm text-orange-300 bg-orange-500/10 border border-orange-500/20 rounded-xl px-4 py-3 mb-4">
+                  Les inscriptions pour cette session sont fermées. Rejoignez la liste d'attente pour être averti(e) de la prochaine session.
+                </p>
+              )}
               <button id="pricing-cta" onClick={handleBuy} className="gradient-btn w-full py-4 rounded-xl text-white font-black text-base tracking-wide flex items-center justify-center gap-2 shadow-xl">
-                <ArrowRight className="w-5 h-5" />
-                ACCÉDER À LA FORMATION — {info.price}
+                {info.closed ? <Clock className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
+                {info.closed ? "REJOINDRE LA LISTE D'ATTENTE" : `ACCÉDER À LA FORMATION — ${info.price}`}
               </button>
-              <p className="text-center text-xs text-gray-500 mt-4">Accès immédiat après paiement · Paiement sécurisé</p>
+              <p className="text-center text-xs text-gray-500 mt-4">
+                {info.closed ? "Vous serez averti(e) dès l'ouverture de la prochaine session" : "Accès immédiat après paiement · Paiement sécurisé"}
+              </p>
             </div>
           </div>
         </section>
@@ -709,18 +726,24 @@ export default function FormationPhotoPortraitIAPage() {
 
             <div className="glass-panel rounded-3xl p-8 sm:p-12 border-emerald-500/20 mb-10 max-w-2xl mx-auto">
               <div className="flex items-center justify-center gap-2 mb-6">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-emerald-400 text-sm font-bold">Accès immédiat après paiement</span>
+                <div className={`w-2 h-2 rounded-full animate-pulse ${info.closed ? "bg-orange-400" : "bg-emerald-400"}`} />
+                <span className={`text-sm font-bold ${info.closed ? "text-orange-400" : "text-emerald-400"}`}>
+                  {info.closed ? "Inscriptions fermées — liste d'attente ouverte" : "Accès immédiat après paiement"}
+                </span>
               </div>
-              <div className="flex items-end justify-center gap-3 mb-2">
-                <span className="text-5xl font-black text-white">{info.price}</span>
-              </div>
-              {info.originalPrice && (
-                <p className="text-gray-500 line-through text-sm mb-8">au lieu de {info.originalPrice}</p>
+              {!info.closed && (
+                <>
+                  <div className="flex items-end justify-center gap-3 mb-2">
+                    <span className="text-5xl font-black text-white">{info.price}</span>
+                  </div>
+                  {info.originalPrice && (
+                    <p className="text-gray-500 line-through text-sm mb-8">au lieu de {info.originalPrice}</p>
+                  )}
+                </>
               )}
               <button id="final-cta" onClick={handleBuy} className="gradient-btn w-full py-5 rounded-xl text-white font-black text-lg tracking-wide flex items-center justify-center gap-3 shadow-2xl mb-4">
-                <Aperture className="w-6 h-6" />
-                JE COMMENCE MA FORMATION MAINTENANT
+                {info.closed ? <Clock className="w-6 h-6" /> : <Aperture className="w-6 h-6" />}
+                {info.closed ? "REJOINDRE LA LISTE D'ATTENTE" : "JE COMMENCE MA FORMATION MAINTENANT"}
               </button>
               <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
                 {["Accès immédiat", "Paiement sécurisé", "Mobile & PC"].map((badge) => (

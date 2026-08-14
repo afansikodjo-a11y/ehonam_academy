@@ -3,7 +3,8 @@
 // Plomberie commune aux pages de vente sur mesure (/vibe-coding-mastery,
 // /formation-affiche-ia) : état de la modale de paiement, CTA sticky au
 // scroll, tracking ViewContent, synchronisation prix/titre depuis Supabase,
-// et reprise du paiement après un retour de connexion Google (?checkout=1).
+// reprise du paiement après un retour de connexion Google (?checkout=1),
+// et bascule liste d'attente si la formation est clôturée.
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { fetchCourseById } from "@/lib/courses-db";
@@ -14,6 +15,7 @@ export interface SalesPageInfo {
   price: string;
   originalPrice: string;
   title: string;
+  closed: boolean;
 }
 
 export function useSalesPageCheckout(courseId: string) {
@@ -22,10 +24,12 @@ export function useSalesPageCheckout(courseId: string) {
     price: staticCourse?.price ?? "",
     originalPrice: staticCourse?.originalPrice ?? "",
     title: staticCourse?.title ?? "",
+    closed: staticCourse?.closed === true,
   };
 
   const [info, setInfo] = useState<SalesPageInfo>(fallback);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [showSticky, setShowSticky] = useState(false);
 
   useEffect(() => {
@@ -47,7 +51,7 @@ export function useSalesPageCheckout(courseId: string) {
 
   useEffect(() => {
     fetchCourseById(courseId).then((c) => {
-      if (c) setInfo({ price: c.price, originalPrice: c.originalPrice, title: c.title });
+      if (c) setInfo({ price: c.price, originalPrice: c.originalPrice, title: c.title, closed: c.closed === true });
     });
   }, [courseId]);
 
@@ -60,11 +64,21 @@ export function useSalesPageCheckout(courseId: string) {
     const qs = params.toString();
     window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : ""));
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setCheckoutOpen(true);
+      if (data.session && !info.closed) setCheckoutOpen(true);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleBuy = () => setCheckoutOpen(true);
+  // Clôturée : aucun bouton "Acheter" existant ne peut plus déclencher un
+  // paiement, même ceux qu'on oublierait de retoucher visuellement — on
+  // ouvre la liste d'attente à la place.
+  const handleBuy = () => {
+    if (info.closed) {
+      setWaitlistOpen(true);
+      return;
+    }
+    setCheckoutOpen(true);
+  };
 
-  return { info, checkoutOpen, setCheckoutOpen, showSticky, handleBuy };
+  return { info, checkoutOpen, setCheckoutOpen, waitlistOpen, setWaitlistOpen, showSticky, handleBuy };
 }

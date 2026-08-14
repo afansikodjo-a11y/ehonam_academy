@@ -34,6 +34,7 @@ interface CourseRow {
   published: boolean;
   show_duration?: boolean;
   show_lessons?: boolean;
+  closed?: boolean;
   created_at?: string;
 }
 
@@ -58,6 +59,7 @@ function rowToCourse(r: CourseRow): AdminCourse {
     published: r.published,
     showDuration: r.show_duration !== false,
     showLessons: r.show_lessons !== false,
+    closed: r.closed === true,
   };
 }
 
@@ -82,6 +84,7 @@ function courseToRow(c: AdminCourse) {
     published: c.published,
     show_duration: c.showDuration !== false,
     show_lessons: c.showLessons !== false,
+    closed: c.closed === true,
   };
 }
 

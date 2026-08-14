@@ -12,11 +12,13 @@ import { fetchPublishedCoaching } from "@/lib/coaching-db";
 import { staticPosts as staticBlogPosts, formatPostDate, type BlogPost } from "@/lib/blog";
 import { fetchLivePosts } from "@/lib/blog-db";
 import CheckoutModal from "@/components/CheckoutModal";
+import WaitlistModal from "@/components/WaitlistModal";
 import Reveal from "@/components/Reveal";
 
 export default function HomePage() {
   const router = useRouter();
   const [selectedOffer, setSelectedOffer] = useState<CoachingOffer | null>(null);
+  const [waitlistOffer, setWaitlistOffer] = useState<CoachingOffer | null>(null);
   const [courses, setCourses] = useState<Course[]>(staticCourses);
   const [offers, setOffers] = useState<CoachingOffer[]>(staticOffers);
   const [posts, setPosts] = useState<BlogPost[]>(staticBlogPosts.slice(0, 3));
@@ -28,6 +30,10 @@ export default function HomePage() {
   }, []);
 
   const startCoaching = async (offer: CoachingOffer) => {
+    if (offer.closed) {
+      setWaitlistOffer(offer);
+      return;
+    }
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       router.push("/login");
@@ -158,15 +164,17 @@ export default function HomePage() {
                 {/* Price + CTA */}
                 <div className="mt-auto pt-5 border-t border-white/5 flex items-center justify-between gap-3">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-gray-500 uppercase tracking-widest">À partir de</span>
-                    <span className="text-lg font-black text-white">{offer.price}</span>
+                    <span className="text-[10px] text-gray-500 uppercase tracking-widest">
+                      {offer.closed ? "Inscriptions fermées" : "À partir de"}
+                    </span>
+                    {!offer.closed && <span className="text-lg font-black text-white">{offer.price}</span>}
                   </div>
                   <button
                     onClick={() => startCoaching(offer)}
                     className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md shrink-0"
                   >
-                    <CreditCard className="w-3.5 h-3.5" />
-                    Démarrer
+                    {offer.closed ? <Clock className="w-3.5 h-3.5" /> : <CreditCard className="w-3.5 h-3.5" />}
+                    {offer.closed ? "Liste d'attente" : "Démarrer"}
                   </button>
                 </div>
               </div>
@@ -476,6 +484,13 @@ export default function HomePage() {
         itemType="coaching"
         itemId={selectedOffer?.id ?? ""}
         successMessage="Paiement validé ! Votre accompagnement apparaît dans « Mon espace ». Je vous recontacte sous 24h."
+      />
+      <WaitlistModal
+        open={waitlistOffer !== null}
+        onClose={() => setWaitlistOffer(null)}
+        itemTitle={waitlistOffer?.title ?? ""}
+        itemType="coaching"
+        itemId={waitlistOffer?.id ?? ""}
       />
     </div>
   );

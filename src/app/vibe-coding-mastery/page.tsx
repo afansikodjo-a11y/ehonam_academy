@@ -6,10 +6,11 @@ import {
   Plus, Minus, CreditCard, Database, GitBranch, Cloud, Wand2, XCircle,
   Hourglass, Wallet, BadgeCheck, Users, Lightbulb, Target, Palette, Lock,
   TrendingUp, Star, Quote, Globe, GraduationCap, Briefcase,
-  Gift, LineChart, Flame, PlayCircle, Camera,
+  Gift, LineChart, Flame, PlayCircle, Camera, Clock,
 } from "lucide-react";
 import { VIBE_COURSE_ID } from "@/lib/courses";
 import CheckoutModal from "@/components/CheckoutModal";
+import WaitlistModal from "@/components/WaitlistModal";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useSalesPageCheckout } from "@/lib/useSalesPageCheckout";
 import Eyebrow from "@/components/Eyebrow";
@@ -388,7 +389,7 @@ const FAQ = [
 ];
 
 export default function VibeCodingMasteryPage() {
-  const { info, checkoutOpen, setCheckoutOpen, showSticky, handleBuy } = useSalesPageCheckout(VIBE_COURSE_ID);
+  const { info, checkoutOpen, setCheckoutOpen, waitlistOpen, setWaitlistOpen, showSticky, handleBuy } = useSalesPageCheckout(VIBE_COURSE_ID);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const PrimaryCTA = ({ label, className = "" }: { label: string; className?: string }) => (
@@ -396,15 +397,15 @@ export default function VibeCodingMasteryPage() {
       onClick={handleBuy}
       className={`px-8 py-4 rounded-xl font-bold text-white gradient-btn inline-flex items-center justify-center gap-2 shadow-lg cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform ${className}`}
     >
-      {label}
-      <Rocket className="w-5 h-5" />
+      {info.closed ? "Rejoindre la liste d'attente" : label}
+      {info.closed ? <Clock className="w-5 h-5" /> : <Rocket className="w-5 h-5" />}
     </button>
   );
 
   return (
     <div className="w-full overflow-hidden pb-24 pt-10 sm:pt-11">
       {/* Barre d'urgence : compte à rebours de l'offre de lancement, visible en permanence */}
-      <UrgencyBar />
+      {!info.closed && <UrgencyBar />}
 
       {/* Sélecteur de thème clair/sombre (la navbar est masquée sur cette landing) */}
       <div className="fixed top-14 right-4 z-50">
@@ -812,27 +813,34 @@ export default function VibeCodingMasteryPage() {
             ))}
           </div>
 
-          <div className="flex flex-col items-center mb-8">
-            <span className="text-lg text-gray-500 line-through">{info.originalPrice}</span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-5xl sm:text-6xl font-black text-orange-400">{info.price}</span>
+          {info.closed ? (
+            <p className="max-w-md mx-auto text-sm text-orange-300 bg-orange-500/10 border border-orange-500/20 rounded-xl px-4 py-3 mb-8">
+              Les inscriptions pour cette cohorte sont fermées. Rejoignez la liste d'attente pour être averti(e) de la prochaine session.
+            </p>
+          ) : (
+            <div className="flex flex-col items-center mb-8">
+              <span className="text-lg text-gray-500 line-through">{info.originalPrice}</span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-5xl sm:text-6xl font-black text-orange-400">{info.price}</span>
+              </div>
+              <span className="text-xs text-gray-500 uppercase tracking-widest mt-2">Paiement unique · accès à vie</span>
             </div>
-            <span className="text-xs text-gray-500 uppercase tracking-widest mt-2">Paiement unique · accès à vie</span>
-          </div>
+          )}
 
           <button
             onClick={handleBuy}
             className="w-full sm:w-auto px-10 py-4 rounded-xl font-bold text-white gradient-btn inline-flex items-center justify-center gap-2 shadow-lg cursor-pointer hover:scale-[1.02] transition-transform"
           >
-            <CreditCard className="w-5 h-5" /> Je rejoins le Défi 30 jours
+            {info.closed ? <Clock className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
+            {info.closed ? "Rejoindre la liste d'attente" : "Je rejoins le Défi 30 jours"}
           </button>
 
           <p className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-5">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            Paiement sécurisé Moneroo (Carte / Mobile Money) · accès immédiat dans « Mon espace »
+            {info.closed ? "Vous serez averti(e) dès l'ouverture de la prochaine session" : "Paiement sécurisé Moneroo (Carte / Mobile Money) · accès immédiat dans « Mon espace »"}
           </p>
 
-          <Countdown />
+          {!info.closed && <Countdown />}
         </div>
       </section>
 
@@ -901,13 +909,17 @@ export default function VibeCodingMasteryPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
             <div className="min-w-0">
               <p className="text-white font-bold text-sm truncate">Défi 30 jours — lancez votre SaaS</p>
-              <p className="text-xs text-gray-400">
-                <span className="text-gray-500 line-through mr-2">{info.originalPrice}</span>
-                <span className="text-emerald-400 font-bold">{info.price}</span> · accès à vie
-              </p>
+              {info.closed ? (
+                <p className="text-xs text-orange-400 font-bold">Inscriptions fermées — liste d'attente ouverte</p>
+              ) : (
+                <p className="text-xs text-gray-400">
+                  <span className="text-gray-500 line-through mr-2">{info.originalPrice}</span>
+                  <span className="text-emerald-400 font-bold">{info.price}</span> · accès à vie
+                </p>
+              )}
             </div>
             <button onClick={handleBuy} className="shrink-0 px-5 sm:px-7 py-3 rounded-xl font-bold text-white gradient-btn inline-flex items-center gap-2 shadow-md text-sm">
-              Rejoindre <ArrowRight className="w-4 h-4" />
+              {info.closed ? "Liste d'attente" : "Rejoindre"} {info.closed ? <Clock className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -921,6 +933,13 @@ export default function VibeCodingMasteryPage() {
         itemType="course"
         itemId={VIBE_COURSE_ID}
         successMessage="Bienvenue dans le Défi 30 jours ! Votre accès est disponible dans « Mon espace »."
+      />
+      <WaitlistModal
+        open={waitlistOpen}
+        onClose={() => setWaitlistOpen(false)}
+        itemTitle={info.title}
+        itemType="course"
+        itemId={VIBE_COURSE_ID}
       />
     </div>
   );
