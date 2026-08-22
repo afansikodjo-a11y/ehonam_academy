@@ -70,7 +70,74 @@ export const AFFICHE_COURSE_ID = "formation-affiche-ia";
  */
 export const PORTRAIT_COURSE_ID = "formation-photo-portrait-ia";
 
+/**
+ * Identifiant de la « Masterclass Vibe Coding ».
+ * Possède sa propre page de vente dédiée (/masterclass-vibe-coding).
+ */
+export const MASTERCLASS_COURSE_ID = "masterclass-vibe-coding";
+
 export const courses: Course[] = [
+  {
+    id: MASTERCLASS_COURSE_ID,
+    title: "Masterclass Vibe Coding",
+    description:
+      "Transformez votre idée en véritable application web grâce à l'intelligence artificielle, même si vous ne savez pas coder — la méthode Vibe Coding pour entrepreneurs et porteurs de projets non techniques.",
+    price: "7 500 FCFA",
+    priceNumeric: 7500,
+    originalPrice: "25 000 FCFA",
+    originalPriceNumeric: 25000,
+    duration: "Accès à vie",
+    students: "0",
+    rating: 5.0,
+    category: "Développement",
+    tag: "Nouveau",
+    gradient: "from-emerald-600/20 to-orange-600/20",
+    borderColor: "group-hover:border-emerald-500/50",
+    showDuration: false,
+    showLessons: false,
+    chapters: [
+      {
+        title: "Clarifier et structurer son idée",
+        lessons: [
+          { title: "Clarifier le problème que vous voulez résoudre", duration: "—" },
+          { title: "Définir les fonctionnalités essentielles de votre application", duration: "—" },
+          { title: "Éviter les erreurs de cadrage qui bloquent la plupart des projets", duration: "—" },
+        ],
+      },
+      {
+        title: "Du cahier des charges au prompt",
+        lessons: [
+          { title: "Transformer une idée en cahier des charges exploitable par l'IA", duration: "—" },
+          { title: "La structure d'un prompt qui fonctionne", duration: "—" },
+          { title: "Comment itérer et corriger le tir avec l'IA", duration: "—" },
+        ],
+      },
+      {
+        title: "Construire son application avec le Vibe Coding",
+        lessons: [
+          { title: "Générer les interfaces de votre application avec l'IA", duration: "—" },
+          { title: "Construire étape par étape, sans tout faire d'un coup", duration: "—" },
+          { title: "Garder le contrôle sur ce que l'IA construit pour vous", duration: "—" },
+        ],
+      },
+      {
+        title: "Données et fonctionnalités intelligentes",
+        lessons: [
+          { title: "Connecter votre application à une base de données avec l'IA", duration: "—" },
+          { title: "Ajouter des comptes utilisateurs et des permissions", duration: "—" },
+          { title: "Intégrer des fonctionnalités avancées avec l'aide de l'IA", duration: "—" },
+        ],
+      },
+      {
+        title: "Débogage, mise en ligne et monétisation",
+        lessons: [
+          { title: "Comprendre et transmettre une erreur à l'IA", duration: "—" },
+          { title: "Déployer votre application en ligne", duration: "—" },
+          { title: "Les pistes pour transformer votre application en opportunité business", duration: "—" },
+        ],
+      },
+    ],
+  },
   {
     id: PORTRAIT_COURSE_ID,
     title: "Créer des Portraits Professionnels avec l'IA",

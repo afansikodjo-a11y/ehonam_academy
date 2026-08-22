@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Flame, Sparkles, CheckCircle2, ArrowRight, ArrowDown,
   Plus, Minus, Lightbulb, Wand2, XCircle, X,
@@ -8,22 +8,14 @@ import {
   Database, Bug, Smartphone, Building2,
   Layers, Target, Zap,
   UtensilsCrossed, Calendar, LayoutDashboard, ClipboardList,
-  TrendingUp, PenTool, Code2, Rows3,
+  TrendingUp, PenTool, Code2, Rows3, Clock,
 } from "lucide-react";
 import Eyebrow from "@/components/Eyebrow";
+import { MASTERCLASS_COURSE_ID } from "@/lib/courses";
+import CheckoutModal from "@/components/CheckoutModal";
+import WaitlistModal from "@/components/WaitlistModal";
+import { useSalesPageCheckout } from "@/lib/useSalesPageCheckout";
 import { useScrollReveal } from "@/lib/useScrollReveal";
-import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
-
-// ────────────────────────────────────────────────────────────────
-// Lien de paiement — à remplacer par le vrai lien avant mise en ligne.
-// Tous les CTA de la page utilisent cette seule constante.
-// ────────────────────────────────────────────────────────────────
-const PAYMENT_URL = "A_REMPLACER_PAR_LE_LIEN_DE_PAIEMENT";
-
-const MASTERCLASS_ID = "masterclass-vibe-coding";
-const MASTERCLASS_TITLE = "Masterclass Vibe Coding";
-const PRICE = "7 500 FCFA";
-const ORIGINAL_PRICE = "25 000 FCFA";
 
 const TRUST_PILLS = [
   "Aucune compétence technique requise",
@@ -185,57 +177,50 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 export default function MasterclassVibeCodingClient() {
+  const { info, checkoutOpen, setCheckoutOpen, waitlistOpen, setWaitlistOpen, showSticky, handleBuy } = useSalesPageCheckout(MASTERCLASS_COURSE_ID);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [showSticky, setShowSticky] = useState(false);
   useScrollReveal();
-
-  useEffect(() => {
-    const onScroll = () => setShowSticky(window.scrollY > 720);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    trackFbEvent("ViewContent", {
-      value: parsePriceFCFA(PRICE),
-      currency: "XOF",
-      content_ids: [MASTERCLASS_ID],
-      content_type: "product",
-      content_name: MASTERCLASS_TITLE,
-    });
-  }, []);
-
-  const handleCtaClick = () => {
-    trackFbEvent("InitiateCheckout", {
-      value: parsePriceFCFA(PRICE),
-      currency: "XOF",
-      content_ids: [MASTERCLASS_ID],
-      content_type: "product",
-      content_name: MASTERCLASS_TITLE,
-    });
-  };
 
   return (
     <>
+      {checkoutOpen && (
+        <CheckoutModal
+          open={checkoutOpen}
+          onClose={() => setCheckoutOpen(false)}
+          itemId={MASTERCLASS_COURSE_ID}
+          itemTitle={info.title}
+          price={info.price}
+          itemType={"course"}
+        />
+      )}
+      {waitlistOpen && (
+        <WaitlistModal
+          open={waitlistOpen}
+          onClose={() => setWaitlistOpen(false)}
+          itemId={MASTERCLASS_COURSE_ID}
+          itemTitle={info.title}
+          itemType={"course"}
+        />
+      )}
+
       {/* Sticky CTA */}
       <div className={`fixed bottom-0 left-0 w-full z-50 transition-all duration-500 ${showSticky ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"}`}>
         <div className="glass-panel border-t border-white/10 px-4 py-3 sm:py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <div className="hidden sm:block">
-              <p className="text-sm font-bold text-white">{MASTERCLASS_TITLE}</p>
+              <p className="text-sm font-bold text-white">{info.title}</p>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-lg font-black text-emerald-400">{PRICE}</span>
-                <span className="text-xs text-gray-500 line-through">{ORIGINAL_PRICE}</span>
+                <span className="text-lg font-black text-emerald-400">{info.price}</span>
+                {info.originalPrice && <span className="text-xs text-gray-500 line-through">{info.originalPrice}</span>}
               </div>
             </div>
-            <a
+            <button
               id="sticky-cta"
-              href={PAYMENT_URL}
-              onClick={handleCtaClick}
+              onClick={handleBuy}
               className="gradient-btn flex-1 sm:flex-none px-6 py-3 rounded-xl text-white font-black text-sm tracking-wide text-center"
             >
-              JE VEUX CRÉER MON APPLICATION →
-            </a>
+              {info.closed ? "REJOINDRE LA LISTE D'ATTENTE →" : "JE VEUX CRÉER MON APPLICATION →"}
+            </button>
           </div>
         </div>
       </div>
@@ -279,25 +264,28 @@ export default function MasterclassVibeCodingClient() {
             </div>
 
             <div className="flex flex-col items-center gap-4 mb-4 animate-fade-up ad-3">
-              <a
+              <button
                 id="hero-cta-primary"
-                href={PAYMENT_URL}
-                onClick={handleCtaClick}
+                onClick={handleBuy}
                 className="gradient-btn w-full sm:w-auto px-8 py-4 rounded-xl text-white font-black text-base sm:text-lg tracking-wide flex items-center justify-center gap-2 shadow-2xl"
               >
-                <Rocket className="w-5 h-5" />
-                JE VEUX CRÉER MON APPLICATION
-              </a>
-              <p className="text-xs text-gray-500">Accédez à la masterclass pour seulement {PRICE}</p>
+                {info.closed ? <Clock className="w-5 h-5" /> : <Rocket className="w-5 h-5" />}
+                {info.closed ? "REJOINDRE LA LISTE D'ATTENTE" : "JE VEUX CRÉER MON APPLICATION"}
+              </button>
+              <p className="text-xs text-gray-500">
+                {info.closed ? "Vous serez averti(e) dès l'ouverture de la prochaine session" : `Accédez à la masterclass pour seulement ${info.price}`}
+              </p>
             </div>
 
-            <div className="flex items-center justify-center gap-3 mb-16 animate-fade-up ad-3">
-              <span className="text-gray-500 line-through text-lg">{ORIGINAL_PRICE}</span>
-              <span className="text-3xl font-black text-emerald-400">{PRICE}</span>
-              <span className="text-xs font-black text-orange-400 uppercase tracking-wide px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20">
-                Offre Masterclass
-              </span>
-            </div>
+            {!info.closed && (
+              <div className="flex items-center justify-center gap-3 mb-16 animate-fade-up ad-3">
+                <span className="text-gray-500 line-through text-lg">{info.originalPrice}</span>
+                <span className="text-3xl font-black text-emerald-400">{info.price}</span>
+                <span className="text-xs font-black text-orange-400 uppercase tracking-wide px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20">
+                  Offre Masterclass
+                </span>
+              </div>
+            )}
 
             {/* Visuel hero : idée → IA → application */}
             <div className="relative max-w-4xl mx-auto animate-fade-up ad-3">
@@ -363,11 +351,13 @@ export default function MasterclassVibeCodingClient() {
             </div>
 
             <div className="mt-10 text-center reveal">
-              <a href={PAYMENT_URL} onClick={handleCtaClick} className="gradient-btn inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-black text-base">
-                <Rocket className="w-5 h-5" />
-                JE VEUX CRÉER MON APPLICATION
-              </a>
-              <p className="text-xs text-gray-500 mt-3">Accédez à la masterclass pour seulement {PRICE}</p>
+              <button onClick={handleBuy} className="gradient-btn inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-black text-base">
+                {info.closed ? <Clock className="w-5 h-5" /> : <Rocket className="w-5 h-5" />}
+                {info.closed ? "REJOINDRE LA LISTE D'ATTENTE" : "JE VEUX CRÉER MON APPLICATION"}
+              </button>
+              <p className="text-xs text-gray-500 mt-3">
+                {info.closed ? "Vous serez averti(e) dès l'ouverture de la prochaine session" : `Accédez à la masterclass pour seulement ${info.price}`}
+              </p>
             </div>
           </div>
         </section>
@@ -659,29 +649,40 @@ export default function MasterclassVibeCodingClient() {
               </SectionTitle>
             </div>
             <div className="glass-panel rounded-3xl p-8 sm:p-10 border-emerald-500/20 shadow-2xl reveal text-center">
-              <p className="text-gray-400 text-sm mb-3">Accès complet à la masterclass</p>
-              <div className="flex items-end justify-center gap-3 mb-2">
-                <span className="text-5xl sm:text-6xl font-black text-white">{PRICE}</span>
-              </div>
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <span className="text-gray-500 line-through text-sm">{ORIGINAL_PRICE}</span>
-                <span className="text-xs font-black text-orange-400 px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 uppercase tracking-wide">
-                  Économisez 17 500 FCFA
-                </span>
-              </div>
+              {info.closed ? (
+                <p className="text-orange-300 bg-orange-500/10 border border-orange-500/20 rounded-xl px-4 py-3 mb-6 text-sm">
+                  Les inscriptions pour cette session sont fermées. Rejoignez la liste d'attente pour être averti(e) de la prochaine session.
+                </p>
+              ) : (
+                <>
+                  <p className="text-gray-400 text-sm mb-3">Accès complet à la masterclass</p>
+                  <div className="flex items-end justify-center gap-3 mb-2">
+                    <span className="text-5xl sm:text-6xl font-black text-white">{info.price}</span>
+                  </div>
+                  {info.originalPrice && (
+                    <div className="flex items-center justify-center gap-2 mb-6">
+                      <span className="text-gray-500 line-through text-sm">{info.originalPrice}</span>
+                      <span className="text-xs font-black text-orange-400 px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 uppercase tracking-wide">
+                        Économisez 17 500 FCFA
+                      </span>
+                    </div>
+                  )}
+                </>
+              )}
               <p className="text-white font-bold mb-6 max-w-md mx-auto">
                 Transformez votre idée en véritable application web grâce à l'IA, même si vous ne savez pas coder.
               </p>
-              <a
+              <button
                 id="pricing-cta"
-                href={PAYMENT_URL}
-                onClick={handleCtaClick}
+                onClick={handleBuy}
                 className="gradient-btn w-full py-4 rounded-xl text-white font-black text-base tracking-wide flex items-center justify-center gap-2 shadow-xl"
               >
-                <ArrowRight className="w-5 h-5" />
-                JE VEUX ACCÉDER À LA MASTERCLASS
-              </a>
-              <p className="text-center text-xs text-gray-500 mt-4">Accédez à la masterclass pour seulement {PRICE} · Accès immédiat</p>
+                {info.closed ? <Clock className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
+                {info.closed ? "REJOINDRE LA LISTE D'ATTENTE" : "JE VEUX ACCÉDER À LA MASTERCLASS"}
+              </button>
+              <p className="text-center text-xs text-gray-500 mt-4">
+                {info.closed ? "Vous serez averti(e) dès l'ouverture de la prochaine session" : `Accédez à la masterclass pour seulement ${info.price} · Accès immédiat`}
+              </p>
             </div>
           </div>
         </section>
@@ -736,22 +737,29 @@ export default function MasterclassVibeCodingClient() {
 
             <div className="glass-panel rounded-3xl p-8 sm:p-12 border-emerald-500/20 mb-10 max-w-2xl mx-auto">
               <div className="flex items-center justify-center gap-2 mb-6">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-emerald-400 text-sm font-bold">Accès immédiat après paiement</span>
+                <div className={`w-2 h-2 rounded-full animate-pulse ${info.closed ? "bg-orange-400" : "bg-emerald-400"}`} />
+                <span className={`text-sm font-bold ${info.closed ? "text-orange-400" : "text-emerald-400"}`}>
+                  {info.closed ? "Inscriptions fermées — liste d'attente ouverte" : "Accès immédiat après paiement"}
+                </span>
               </div>
-              <div className="flex items-end justify-center gap-3 mb-2">
-                <span className="text-5xl font-black text-white">{PRICE}</span>
-              </div>
-              <p className="text-gray-500 line-through text-sm mb-8">au lieu de {ORIGINAL_PRICE}</p>
-              <a
+              {!info.closed && (
+                <>
+                  <div className="flex items-end justify-center gap-3 mb-2">
+                    <span className="text-5xl font-black text-white">{info.price}</span>
+                  </div>
+                  {info.originalPrice && (
+                    <p className="text-gray-500 line-through text-sm mb-8">au lieu de {info.originalPrice}</p>
+                  )}
+                </>
+              )}
+              <button
                 id="final-cta"
-                href={PAYMENT_URL}
-                onClick={handleCtaClick}
+                onClick={handleBuy}
                 className="gradient-btn w-full py-5 rounded-xl text-white font-black text-lg tracking-wide flex items-center justify-center gap-3 shadow-2xl mb-4"
               >
-                <Rocket className="w-6 h-6" />
-                JE COMMENCE MAINTENANT — {PRICE}
-              </a>
+                {info.closed ? <Clock className="w-6 h-6" /> : <Rocket className="w-6 h-6" />}
+                {info.closed ? "REJOINDRE LA LISTE D'ATTENTE" : `JE COMMENCE MAINTENANT — ${info.price}`}
+              </button>
               <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
                 {["Accès immédiat", "Paiement sécurisé", "Mobile & PC"].map((badge) => (
                   <span key={badge} className="flex items-center gap-1.5 text-xs text-gray-400">
