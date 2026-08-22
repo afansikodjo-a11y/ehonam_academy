@@ -16,8 +16,8 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Landing page dédiée : aucune navigation (funnel de vente).
-  const hideNav = pathname === "/vibe-coding-mastery";
+  // Landing pages dédiées : aucune navigation (funnel de vente).
+  const hideNav = pathname === "/vibe-coding-mastery" || pathname === "/masterclass-vibe-coding";
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
