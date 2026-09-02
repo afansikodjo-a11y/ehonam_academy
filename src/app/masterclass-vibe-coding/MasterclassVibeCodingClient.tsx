@@ -11,10 +11,14 @@ import {
   TrendingUp, PenTool, Code2, Rows3, Clock,
 } from "lucide-react";
 import Eyebrow from "@/components/Eyebrow";
+import BrowserFrame from "@/components/BrowserFrame";
+import { SAAS_PORTFOLIO } from "@/lib/portfolio";
 import { MASTERCLASS_COURSE_ID } from "@/lib/courses";
 import CheckoutModal from "@/components/CheckoutModal";
 import WaitlistModal from "@/components/WaitlistModal";
 import { useSalesPageCheckout } from "@/lib/useSalesPageCheckout";
+
+const FOUNDER_PHOTO = "/ehonam.jpg";
 import { useScrollReveal } from "@/lib/useScrollReveal";
 
 const TRUST_PILLS = [
@@ -438,6 +442,69 @@ export default function MasterclassVibeCodingClient() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════ VOTRE FORMATEUR ══════════ */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center reveal">
+              <div className="lg:col-span-2">
+                <div className="glass-panel rounded-3xl border-white/10 overflow-hidden aspect-[4/5] relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={FOUNDER_PHOTO} alt="Ehonam, formateur & SaaS Builder" className="w-full h-full object-cover" />
+                  <div className="absolute bottom-4 left-4 right-4 glass-panel rounded-xl border-white/10 px-4 py-3">
+                    <p className="text-white font-bold">Ehonam</p>
+                    <p className="text-xs text-emerald-400">Formateur · SaaS Builder</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-3">
+                <Eyebrow color="orange">Votre formateur</Eyebrow>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3 mb-5 leading-tight">
+                  Il ne vous enseigne pas la théorie. <br className="hidden sm:inline" />Il vous montre son vrai métier.
+                </h2>
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  Ehonam est <span className="text-white font-semibold">SaaS Builder</span> : il conçoit et lance de vraies applications, utilisées par de vrais clients. Il ne partage pas des idées — il partage <span className="text-white font-semibold">son processus de travail exact</span>, celui-là même que vous allez apprendre dans cette masterclass.
+                </p>
+                <p className="text-gray-400 leading-relaxed mb-8">
+                  En plus de ses propres produits, il accompagne des entrepreneurs dans la création de leur SaaS. Toute la méthode repose sur cette expérience de terrain.
+                </p>
+                <div className="flex flex-wrap gap-x-10 gap-y-4">
+                  <div>
+                    <p className="text-2xl sm:text-3xl font-black gradient-text">3 SaaS</p>
+                    <p className="text-xs text-gray-500">lancés en production</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl sm:text-3xl font-black text-white">De vrais clients</p>
+                    <p className="text-xs text-gray-500">écoles, entreprises, freelances</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl sm:text-3xl font-black text-white">Des entrepreneurs</p>
+                    <p className="text-xs text-gray-500">accompagnés sur leurs projets</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Galerie des réalisations */}
+            <div className="mt-16 sm:mt-20 reveal">
+              <div className="text-center max-w-2xl mx-auto mb-10">
+                <Eyebrow>Ses réalisations</Eyebrow>
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-white mt-3">
+                  Des SaaS déjà en production, utilisés chaque jour
+                </h3>
+                <p className="text-gray-400 mt-2 text-sm">
+                  Ce ne sont pas des démos. Ce sont de vrais produits, en ligne, avec de vrais utilisateurs — construits avec la méthode que vous allez apprendre.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {SAAS_PORTFOLIO.map((p) => (
+                  <BrowserFrame key={p.name} {...p} />
+                ))}
               </div>
             </div>
           </div>
