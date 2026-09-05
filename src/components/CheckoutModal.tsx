@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Shield, Loader2, AlertCircle, CreditCard, Mail, Lock, MessageCircle } from "lucide-react";
+import { Shield, Loader2, AlertCircle, CreditCard, Mail, Lock, MessageCircle, Smartphone, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { type ItemType } from "@/lib/purchases-db";
 import GoogleIcon from "@/components/GoogleIcon";
 import { setPendingCheckout } from "@/lib/pending-checkout";
 import { trackFbEvent, parsePriceFCFA } from "@/lib/fb-pixel";
 import { buildWhatsappUrl } from "@/lib/whatsapp";
+import { type MyappPayMethods, countryLabel, methodLabel } from "@/lib/payment-methods";
 
 interface CheckoutModalProps {
   open: boolean;
@@ -16,18 +17,19 @@ interface CheckoutModalProps {
   price: string;
   itemType: ItemType;
   itemId: string;
-  /** Unused now (success is handled on return from Moneroo) — kept for compatibility. */
+  /** Unused now (success is handled on return from the payment processor) — kept for compatibility. */
   successMessage?: string;
 }
 
 const inputClass =
   "w-full rounded-xl bg-white/5 border border-white/10 focus:border-emerald-500/60 px-4 py-3 text-sm text-white placeholder-gray-500 outline-none transition-colors";
 
-type Phase = "checking" | "auth" | "confirm-email" | "processing" | "error";
+type Phase = "checking" | "auth" | "confirm-email" | "select-method" | "processing" | "error";
+type PaymentMode = "mobile" | "card";
 
 /**
  * Achat en un seul tunnel : si l'utilisateur n'est pas connecté, la modale crée son
- * compte (ou le connecte) sur place, puis initie immédiatement le paiement Moneroo —
+ * compte (ou le connecte) sur place, puis initie immédiatement le paiement —
  * sans jamais renvoyer vers une page de connexion séparée.
  */
 export default function CheckoutModal({ open, onClose, itemTitle, price, itemType, itemId }: CheckoutModalProps) {
@@ -39,7 +41,17 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
   const [authLoading, setAuthLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const initiateCheckout = async (accessToken: string) => {
+  // Sélection du moyen de paiement (pays + méthode Mobile Money, ou carte) —
+  // myapp-pay exige un choix fait par le marchand/client AVANT la création du
+  // paiement (sa page hébergée ne propose pas de sélection).
+  const [pendingToken, setPendingToken] = useState<string | null>(null);
+  const [methodsData, setMethodsData] = useState<MyappPayMethods | null>(null);
+  const [methodsLoaded, setMethodsLoaded] = useState(false);
+  const [paymentMode, setPaymentMode] = useState<PaymentMode>("mobile");
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedMethod, setSelectedMethod] = useState("");
+
+  const initiateCheckout = async (accessToken: string, method?: string, country?: string) => {
     setPhase("processing");
     setError("");
     try {
@@ -49,7 +61,7 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ itemType, itemId }),
+        body: JSON.stringify({ itemType, itemId, method, country }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.checkoutUrl) {
@@ -69,7 +81,7 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
         content_type: "product",
         content_name: itemTitle,
       });
-      window.location.href = data.checkoutUrl; // → page de paiement Moneroo
+      window.location.href = data.checkoutUrl; // → page de paiement du processeur
     } catch (e: any) {
       setError(e.message || "Le paiement n'a pas pu être initié.");
       setPhase("error");
@@ -83,6 +95,8 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
     setPassword("");
     setAuthMode("signup");
     setPhase("checking");
+    setMethodsData(null);
+    setMethodsLoaded(false);
     let active = true;
 
     trackFbEvent("InitiateCheckout", {
@@ -93,10 +107,23 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
       content_name: itemTitle,
     });
 
+    fetch("/api/payment-methods")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: MyappPayMethods | null) => {
+        if (active) setMethodsData(data);
+      })
+      .catch(() => {
+        if (active) setMethodsData(null);
+      })
+      .finally(() => {
+        if (active) setMethodsLoaded(true);
+      });
+
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
       if (data.session) {
-        initiateCheckout(data.session.access_token);
+        setPendingToken(data.session.access_token);
+        setPhase("select-method");
       } else {
         setPhase("auth");
       }
@@ -107,6 +134,21 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  // Dès que les moyens actifs sont connus, présélectionne un pays/méthode
+  // cohérents (le client peut ensuite changer librement).
+  useEffect(() => {
+    if (!methodsData) return;
+    const countries = Object.keys(methodsData.countries || {});
+    if (countries.length > 0) {
+      const firstCountry = countries.sort((a, b) => countryLabel(a).localeCompare(countryLabel(b)))[0];
+      setSelectedCountry(firstCountry);
+      setSelectedMethod(methodsData.countries[firstCountry][0] || "");
+      setPaymentMode("mobile");
+    } else if (methodsData.card) {
+      setPaymentMode("card");
+    }
+  }, [methodsData]);
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +165,8 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
       if (data.session) {
         setAuthLoading(false);
         trackFbEvent("CompleteRegistration", { content_name: "Achat — création de compte" });
-        await initiateCheckout(data.session.access_token);
+        setPendingToken(data.session.access_token);
+        setPhase("select-method");
         return;
       }
       // Pas de session ni d'erreur : soit un nouveau compte en attente de
@@ -133,7 +176,8 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
       const { data: signInData } = await supabase.auth.signInWithPassword({ email, password });
       setAuthLoading(false);
       if (signInData.session) {
-        await initiateCheckout(signInData.session.access_token);
+        setPendingToken(signInData.session.access_token);
+        setPhase("select-method");
         return;
       }
       setPhase("confirm-email");
@@ -146,7 +190,8 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
       setError("Email ou mot de passe incorrect.");
       return;
     }
-    await initiateCheckout(data.session.access_token);
+    setPendingToken(data.session.access_token);
+    setPhase("select-method");
   };
 
   const handleGoogle = async () => {
@@ -203,6 +248,124 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
           </div>
         )}
 
+        {phase === "select-method" && (
+          <div className="p-6 space-y-5">
+            {!methodsLoaded ? (
+              <div className="py-10 text-center">
+                <Loader2 className="w-7 h-7 text-emerald-400 animate-spin mx-auto" />
+              </div>
+            ) : !methodsData ? (
+              <div className="space-y-4 text-center">
+                <p className="text-sm text-gray-300">Un seul moyen de paiement est disponible pour l'instant.</p>
+                <button
+                  onClick={() => pendingToken && initiateCheckout(pendingToken)}
+                  className="w-full py-3.5 rounded-xl font-bold text-white gradient-btn flex items-center justify-center gap-2 shadow-lg"
+                >
+                  <CreditCard className="w-5 h-5" />
+                  Continuer vers le paiement
+                </button>
+              </div>
+            ) : (
+              <>
+                <p className="text-xs text-gray-400 text-center">Choisissez votre moyen de paiement</p>
+
+                {methodsData.card && Object.keys(methodsData.countries || {}).length > 0 && (
+                  <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-white/5 border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMode("mobile")}
+                      className={`py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                        paymentMode === "mobile" ? "bg-emerald-500/20 text-emerald-300" : "text-gray-400"
+                      }`}
+                    >
+                      <Smartphone className="w-3.5 h-3.5" />
+                      Mobile Money
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMode("card")}
+                      className={`py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                        paymentMode === "card" ? "bg-emerald-500/20 text-emerald-300" : "text-gray-400"
+                      }`}
+                    >
+                      <CreditCard className="w-3.5 h-3.5" />
+                      Carte bancaire
+                    </button>
+                  </div>
+                )}
+
+                {paymentMode === "mobile" && Object.keys(methodsData.countries || {}).length > 0 && (
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Pays</label>
+                      <select
+                        value={selectedCountry}
+                        onChange={(e) => {
+                          const c = e.target.value;
+                          setSelectedCountry(c);
+                          setSelectedMethod(methodsData.countries[c]?.[0] || "");
+                        }}
+                        className={inputClass}
+                      >
+                        {Object.keys(methodsData.countries)
+                          .sort((a, b) => countryLabel(a).localeCompare(countryLabel(b)))
+                          .map((code) => (
+                            <option key={code} value={code} className="bg-gray-900">
+                              {countryLabel(code)}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Opérateur</label>
+                      <select
+                        value={selectedMethod}
+                        onChange={(e) => setSelectedMethod(e.target.value)}
+                        className={inputClass}
+                      >
+                        {(methodsData.countries[selectedCountry] || []).map((code) => (
+                          <option key={code} value={code} className="bg-gray-900">
+                            {methodLabel(code)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {paymentMode === "card" && (
+                  <p className="text-xs text-gray-400 text-center py-2">
+                    Vous paierez par carte bancaire (Visa, Mastercard…) sur la page de paiement suivante.
+                  </p>
+                )}
+
+                {error && (
+                  <div className="flex items-center gap-2 text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  onClick={() =>
+                    pendingToken &&
+                    initiateCheckout(
+                      pendingToken,
+                      paymentMode === "card" ? "card" : selectedMethod,
+                      paymentMode === "card" ? selectedCountry || "CI" : selectedCountry
+                    )
+                  }
+                  disabled={paymentMode === "mobile" && !selectedMethod}
+                  className="w-full py-3.5 rounded-xl font-bold text-white gradient-btn flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
+                >
+                  Payer {price}
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
         {phase === "processing" && (
           <div className="p-10 text-center space-y-4">
             <Loader2 className="w-10 h-10 text-emerald-400 animate-spin mx-auto" />
@@ -212,7 +375,7 @@ export default function CheckoutModal({ open, onClose, itemTitle, price, itemTyp
                 Redirection vers le paiement…
               </h4>
               <p className="text-xs text-gray-400">
-                Vous allez être redirigé vers la page sécurisée Moneroo (Carte / Mobile Money).
+                Vous allez être redirigé vers notre page de paiement sécurisée.
               </p>
             </div>
             <p className="text-xs text-gray-500 pt-2 border-t border-white/5">

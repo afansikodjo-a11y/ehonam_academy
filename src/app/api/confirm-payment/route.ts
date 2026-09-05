@@ -2,20 +2,20 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { notifyNewPurchase } from "@/lib/notify";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { supabaseAdmin, isServiceConfigured } from "@/lib/supabase-admin";
+import { MYAPP_PAY_SECRET, MYAPP_PAY_SUCCESS_STATUS, fetchMyappPayPayment } from "@/lib/myapppay";
 
-const MONEROO_SECRET = process.env.MONEROO_SECRET_KEY || "";
 const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-// Statuts Moneroo considérés comme "payé"
-const SUCCESS_STATUSES = ["success", "successful", "completed", "paid"];
-
 // Confirmation synchrone au retour de paiement : on revérifie la transaction
-// auprès de Moneroo (avec la clé secrète) puis on enregistre l'achat au nom de
-// l'utilisateur connecté. C'est un filet de sécurité indépendant du webhook.
+// auprès de myapp-pay (avec la clé secrète) puis on enregistre l'achat au nom
+// de l'utilisateur connecté. C'est un filet de sécurité indépendant du
+// webhook — le statut renvoyé dans l'URL de retour n'est jamais fiable
+// (modifiable côté navigateur, précisé par la doc myapp-pay elle-même).
 export async function POST(request: Request) {
   try {
-    if (!MONEROO_SECRET) {
+    if (!MYAPP_PAY_SECRET || !isServiceConfigured) {
       return NextResponse.json({ error: "Paiement non configuré." }, { status: 500 });
     }
 
@@ -26,11 +26,7 @@ export async function POST(request: Request) {
     const paymentId = String(body.paymentId || "").trim();
     if (!paymentId) return NextResponse.json({ error: "Paiement manquant." }, { status: 400 });
 
-    // Client agissant AU NOM de l'utilisateur → respecte la RLS
-    // (policy "Users insert own purchases" : auth.uid() = user_id).
-    const supa = createClient(SUPA_URL, ANON, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-    });
+    const supa = createClient(SUPA_URL, ANON);
     const { data: userData, error: userErr } = await supa.auth.getUser(token);
     if (userErr || !userData.user) {
       return NextResponse.json({ error: "Session invalide." }, { status: 401 });
@@ -41,40 +37,45 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Trop de requêtes. Réessayez dans un instant." }, { status: 429 });
     }
 
-    // Revérifie la transaction auprès de Moneroo
-    const verifyRes = await fetch(`https://api.moneroo.io/v1/payments/${encodeURIComponent(paymentId)}/verify`, {
-      headers: { Authorization: `Bearer ${MONEROO_SECRET}`, Accept: "application/json" },
-    });
-    const verifyData = await verifyRes.json().catch(() => ({}));
-    const tx = verifyData?.data;
-    const status = String(tx?.status || "").toLowerCase();
-
-    if (!verifyRes.ok || !tx) {
-      console.error("[confirm-payment] vérification échouée:", verifyData);
+    // Revérifie la transaction auprès de myapp-pay
+    const tx = await fetchMyappPayPayment(paymentId);
+    if (!tx) {
+      console.error("[confirm-payment] vérification échouée pour", paymentId);
       return NextResponse.json({ granted: false, reason: "verify_failed" }, { status: 200 });
     }
-    if (!SUCCESS_STATUSES.includes(status)) {
-      return NextResponse.json({ granted: false, status }, { status: 200 });
+    if (tx.status !== MYAPP_PAY_SUCCESS_STATUS) {
+      return NextResponse.json({ granted: false, status: tx.status }, { status: 200 });
     }
 
-    const md = tx.metadata || {};
+    // myapp-pay ne renvoie pas de métadonnées : la correspondance utilisateur/
+    // article vient de payment_intents (créée lors de /api/checkout).
+    const { data: intent, error: intentErr } = await supabaseAdmin
+      .from("payment_intents")
+      .select("user_id, item_type, item_id, title, price, email, amount_numeric")
+      .eq("provider", "myapp-pay")
+      .eq("provider_payment_id", paymentId)
+      .maybeSingle();
+
+    if (intentErr || !intent) {
+      console.error("[confirm-payment] payment_intent introuvable:", intentErr, { paymentId });
+      return NextResponse.json({ granted: false, reason: "no_item" }, { status: 200 });
+    }
+
     // Sécurité : un paiement ne peut être réclamé que par son propriétaire
-    if (md.user_id && md.user_id !== user.id) {
+    if (intent.user_id !== user.id) {
       return NextResponse.json({ granted: false, reason: "owner_mismatch" }, { status: 403 });
     }
 
-    const itemType = md.item_type === "coaching" ? "coaching" : "course";
-    const itemId = String(md.item_id || "");
-    if (!itemId) return NextResponse.json({ granted: false, reason: "no_item" }, { status: 200 });
+    const paidAmount = Number(tx.amount ?? tx.amountGross ?? 0);
+    if (paidAmount !== Number(intent.amount_numeric)) {
+      console.error("[confirm-payment] montant incohérent:", { paidAmount, expected: intent.amount_numeric, paymentId });
+      return NextResponse.json({ granted: false, reason: "amount_mismatch" }, { status: 200 });
+    }
 
-    const title = md.title || "";
-    const price = md.price || (tx.amount ? `${tx.amount} ${tx.currency || "XOF"}` : "");
-    const email = md.user_email || user.email || "";
-
-    const { data: inserted, error: insErr } = await supa
+    const { data: inserted, error: insErr } = await supabaseAdmin
       .from("purchases")
       .upsert(
-        { user_id: user.id, item_type: itemType, item_id: itemId, title, price, email },
+        { user_id: user.id, item_type: intent.item_type, item_id: intent.item_id, title: intent.title, price: intent.price, email: intent.email || user.email || "" },
         { onConflict: "user_id,item_type,item_id", ignoreDuplicates: true }
       )
       .select();
@@ -85,10 +86,10 @@ export async function POST(request: Request) {
 
     // Notifie l'admin uniquement si une nouvelle ligne a été créée (pas de doublon).
     if (inserted && inserted.length > 0) {
-      await notifyNewPurchase({ title, price, email, itemType });
+      await notifyNewPurchase({ title: intent.title, price: intent.price, email: intent.email || user.email || "", itemType: intent.item_type });
     }
 
-    return NextResponse.json({ granted: true, itemType, itemId });
+    return NextResponse.json({ granted: true, itemType: intent.item_type, itemId: intent.item_id });
   } catch (err: any) {
     console.error("[confirm-payment] exception:", err);
     return NextResponse.json({ error: "Erreur interne." }, { status: 500 });

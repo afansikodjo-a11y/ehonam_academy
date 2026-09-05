@@ -653,6 +653,37 @@ grant select on public.waitlist_signups to authenticated;
 grant select, insert, update, delete on public.waitlist_signups to service_role;
 
 -- ════════════════════════════════════════════════════════════════
+-- PAIEMENT myapp-pay — table de correspondance paiement ↔ utilisateur/article.
+-- myapp-pay ne renvoie aucune métadonnée personnalisée avec un paiement
+-- (contrairement à Moneroo) : cette table est donc l'unique source de vérité
+-- qui permet, une fois un paiement confirmé, de savoir à qui et à quoi il
+-- correspond. Écrite/lue uniquement côté serveur (jamais par un visiteur).
+-- ════════════════════════════════════════════════════════════════
+create table if not exists public.payment_intents (
+  id                  uuid primary key default gen_random_uuid(),
+  provider            text not null default 'myapp-pay',
+  provider_payment_id text not null,
+  user_id             uuid not null references auth.users(id) on delete cascade,
+  item_type           text not null check (item_type in ('course','coaching')),
+  item_id             text not null,
+  title               text not null default '',
+  price               text not null default '',
+  amount_numeric      numeric not null default 0,
+  email               text,
+  created_at          timestamptz not null default now(),
+  unique (provider, provider_payment_id)
+);
+
+alter table public.payment_intents enable row level security;
+-- Aucune policy anon/authenticated : cette table n'est jamais lue/écrite que
+-- côté serveur (checkout, confirm-payment, webhook), toujours via
+-- supabaseAdmin (service_role) — pas de GRANT à anon/authenticated par design.
+
+-- service_role — explicite pour que cette section fonctionne même exécutée
+-- seule, sans dépendre du correctif en bas de fichier.
+grant select, insert, update, delete on public.payment_intents to service_role;
+
+-- ════════════════════════════════════════════════════════════════
 -- CORRECTIF : privilèges manquants pour service_role.
 -- service_role CONTOURNE la RLS mais reste soumis aux GRANTs Postgres
 -- normaux. Sans ceci, le webhook Moneroo (qui utilise supabaseAdmin /

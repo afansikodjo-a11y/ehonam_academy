@@ -22,12 +22,13 @@ function formatDate(iso: string): string {
   }
 }
 
-// Au retour de Moneroo : revérifie la transaction et enregistre l'achat
-// (filet de sécurité, indépendant du webhook).
+// Au retour du paiement (myapp-pay) : revérifie la transaction et enregistre
+// l'achat (filet de sécurité, indépendant du webhook).
 async function confirmReturnPayment(accessToken: string) {
   try {
     const params = new URLSearchParams(window.location.search);
     const pid =
+      params.get("transactionId") ||
       params.get("paymentId") ||
       params.get("payment_id") ||
       params.get("paymentID") ||

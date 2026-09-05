@@ -280,7 +280,7 @@ const HERO_BADGES = [
   { Icon: Flame, text: "Le Défi 30 jours pour lancer votre SaaS" },
   { Icon: Sparkles, text: "Propulsé par l'IA générative" },
 ];
-const TRUST = ["Sans écrire de code", "100 % guidé, étape par étape", "Accès à vie", "Paiement sécurisé Moneroo"];
+const TRUST = ["Sans écrire de code", "100 % guidé, étape par étape", "Accès à vie", "Paiement sécurisé"];
 
 const NEW_REALITY = [
   { Icon: Zap, title: "Ce qui prenait 1 an prend 30 jours", text: "Hier, créer un logiciel demandait des années d'études et une équipe de développeurs. Aujourd'hui, vous pilotez l'IA et elle construit à votre place." },
@@ -837,7 +837,7 @@ export default function VibeCodingMasteryPage() {
 
           <p className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-5">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            {info.closed ? "Vous serez averti(e) dès l'ouverture de la prochaine session" : "Paiement sécurisé Moneroo (Carte / Mobile Money) · accès immédiat dans « Mon espace »"}
+            {info.closed ? "Vous serez averti(e) dès l'ouverture de la prochaine session" : "Paiement sécurisé · accès immédiat dans « Mon espace »"}
           </p>
 
           {!info.closed && <Countdown />}
@@ -899,7 +899,7 @@ export default function VibeCodingMasteryPage() {
             Vous avez l'idée. Vous avez enfin la méthode. Il ne manque plus qu'une décision.
           </p>
           <PrimaryCTA label="Je lance mon SaaS maintenant" className="text-lg px-10 py-5" />
-          <p className="text-xs text-gray-500 mt-5">Accès immédiat · Garantie 14 jours · Paiement sécurisé Moneroo</p>
+          <p className="text-xs text-gray-500 mt-5">Accès immédiat · Garantie 14 jours · Paiement sécurisé</p>
         </div>
       </section>
 

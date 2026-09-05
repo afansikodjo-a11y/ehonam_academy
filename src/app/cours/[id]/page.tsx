@@ -204,7 +204,7 @@ export default function CourseDetailPage() {
               <p className="text-center text-xs text-gray-500 leading-relaxed">
                 {course.closed
                   ? "Vous serez averti(e) dès l'ouverture de la prochaine session."
-                  : <>Paiement sécurisé via <span className="text-white font-semibold">Moneroo</span>. Vous devez être connecté ; l'accès apparaît dans <span className="text-white font-semibold">Mon espace</span>.</>}
+                  : <>Paiement sécurisé. Vous devez être connecté ; l'accès apparaît dans <span className="text-white font-semibold">Mon espace</span>.</>}
               </p>
             </div>
 

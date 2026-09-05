@@ -18,9 +18,9 @@ const limiters = redis
   ? {
       // Formulaire de contact : non authentifié → on serre la vis.
       contact: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, "10 m"), prefix: "rl:contact", analytics: false }),
-      // Initialisation de paiement (appelle Moneroo).
+      // Initialisation de paiement (appelle le processeur de paiement).
       checkout: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, "10 m"), prefix: "rl:checkout", analytics: false }),
-      // Confirmation au retour (appelle Moneroo verify).
+      // Confirmation au retour (revérifie la transaction auprès du processeur).
       confirm: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(20, "10 m"), prefix: "rl:confirm", analytics: false }),
       // Journal interne des évènements pixel : très fréquent, non authentifié.
       pixelEvent: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(30, "1 m"), prefix: "rl:pixel", analytics: false }),
