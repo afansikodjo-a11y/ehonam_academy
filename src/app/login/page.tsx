@@ -56,8 +56,16 @@ export default function LoginPage() {
       if (session) completeLogin();
       else setCheckingSession(false);
     });
+    // Filet de sécurité : sur une connexion lente, cet appel peut traîner
+    // plusieurs secondes. On affiche le formulaire après un délai plutôt que
+    // de laisser un spinner tourner indéfiniment (si une session existe bien,
+    // la redirection ci-dessus se fera dès que la réponse arrive quand même).
+    const timeout = setTimeout(() => {
+      if (active) setCheckingSession(false);
+    }, 4000);
     return () => {
       active = false;
+      clearTimeout(timeout);
       sub.subscription.unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
