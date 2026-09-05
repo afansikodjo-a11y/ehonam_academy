@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { User, Menu, X, Compass, Sparkles, Mail, Newspaper, LogOut, LayoutDashboard, UserCog, Code2 } from "lucide-react";
+import { User, Menu, X, Compass, Mail, Newspaper, LogOut, LayoutDashboard, UserCog } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import { supabase } from "@/lib/supabase";
 import { isSupabaseConfigured } from "@/lib/courses-db";
@@ -69,17 +69,9 @@ export default function Navbar() {
 
         {/* Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link href="/#accompagnement" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4" />
-            Accompagnement
-          </Link>
           <Link href="/#courses" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-1.5">
             <Compass className="w-4 h-4" />
             Formations
-          </Link>
-          <Link href="/saas-builder" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-1.5">
-            <Code2 className="w-4 h-4" />
-            SaaS Builder
           </Link>
           <Link href="/blog" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-1.5">
             <Newspaper className="w-4 h-4" />
@@ -141,28 +133,12 @@ export default function Navbar() {
         <div className="md:hidden glass-panel border-t border-white/5 absolute top-20 left-0 w-full p-6 space-y-4 shadow-2xl backdrop-blur-lg">
           <nav className="flex flex-col gap-4">
             <Link
-              href="/#accompagnement"
-              onClick={() => setIsOpen(false)}
-              className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-2 py-2"
-            >
-              <Sparkles className="w-4.5 h-4.5" />
-              Accompagnement
-            </Link>
-            <Link
               href="/#courses"
               onClick={() => setIsOpen(false)}
               className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-2 py-2"
             >
               <Compass className="w-4.5 h-4.5" />
               Formations
-            </Link>
-            <Link
-              href="/saas-builder"
-              onClick={() => setIsOpen(false)}
-              className="text-sm font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-2 py-2"
-            >
-              <Code2 className="w-4.5 h-4.5" />
-              SaaS Builder
             </Link>
             <Link
               href="/blog"

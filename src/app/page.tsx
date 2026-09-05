@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { Play, Sparkles, BookOpen, Clock, Users, ArrowRight, Star, Smartphone, ShieldCheck, Zap, CreditCard, Video, Check, Newspaper, Calendar } from "lucide-react";
+import { Play, Sparkles, BookOpen, Clock, Users, ArrowRight, Star, Smartphone, ShieldCheck, Zap, CreditCard, Video, Check, Newspaper, Calendar, Code2 } from "lucide-react";
 import { courses as staticCourses, courseImageSrc, VIBE_COURSE_ID, AFFICHE_COURSE_ID, PORTRAIT_COURSE_ID, MASTERCLASS_COURSE_ID, type Course } from "@/lib/courses";
 import { fetchPublishedCourses } from "@/lib/courses-db";
 import { coachingOffers as staticOffers, type CoachingOffer } from "@/lib/coaching";
@@ -284,6 +284,58 @@ export default function HomePage() {
               </div>
             </div>
           ))}
+
+          {/* Accompagnement privé — plus dans le menu, découvrable ici */}
+          <a href="#accompagnement" className="group glass-panel rounded-2xl border-white/5 overflow-hidden flex flex-col justify-between glass-panel-hover cursor-pointer">
+            <div className="h-48 w-full relative flex items-center justify-center border-b border-white/5 overflow-hidden bg-gradient-to-br from-orange-600 to-amber-500">
+              <div className="absolute top-4 left-4 z-10 bg-white/10 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-xs font-bold text-white">
+                Accompagnement
+              </div>
+              <Sparkles className="w-16 h-16 text-white/40 group-hover:scale-110 transition-transform duration-300" />
+            </div>
+            <div className="p-6 flex-grow flex flex-col justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-orange-300 transition-colors">
+                  Accompagnement privé 1-on-1
+                </h3>
+                <p className="text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed">
+                  Un suivi personnalisé en visio, pensé pour votre projet et votre rythme — au-delà des formations.
+                </p>
+              </div>
+              <div className="flex items-center justify-end mt-auto">
+                <span className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md">
+                  Découvrir les offres
+                  <Play className="w-3 h-3 fill-current" />
+                </span>
+              </div>
+            </div>
+          </a>
+
+          {/* SaaS Builder — plus dans le menu, découvrable ici */}
+          <Link href="/saas-builder" className="group glass-panel rounded-2xl border-white/5 overflow-hidden flex flex-col justify-between glass-panel-hover cursor-pointer">
+            <div className="h-48 w-full relative flex items-center justify-center border-b border-white/5 overflow-hidden bg-gradient-to-br from-teal-600 to-emerald-500">
+              <div className="absolute top-4 left-4 z-10 bg-white/10 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-xs font-bold text-white">
+                SaaS Builder
+              </div>
+              <Code2 className="w-16 h-16 text-white/40 group-hover:scale-110 transition-transform duration-300" />
+            </div>
+            <div className="p-6 flex-grow flex flex-col justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-orange-300 transition-colors">
+                  Votre application sur mesure
+                </h3>
+                <p className="text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed">
+                  Une équipe pour concevoir et développer votre SaaS ou application métier, de l'idée au lancement.
+                </p>
+              </div>
+              <div className="flex items-center justify-end mt-auto">
+                <span className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white gradient-btn flex items-center gap-1.5 shadow-md">
+                  Découvrir l'offre
+                  <Play className="w-3 h-3 fill-current" />
+                </span>
+              </div>
+            </div>
+          </Link>
         </div>
       </section>
 
